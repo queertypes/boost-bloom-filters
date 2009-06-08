@@ -6,7 +6,8 @@
 #include <bitset>
 #include <cassert>
 #include <iostream>
-#include "bloom_filter.hpp"
+#include <boost/bloom_filter.hpp>
+#include <boost/detail/lightweight_test.hpp>
 
 #define FILTER_SIZE 256
 
