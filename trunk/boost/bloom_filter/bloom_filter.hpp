@@ -18,14 +18,16 @@ namespace boost {
 
     template <class Input, size_t M, size_t K>
     struct bloom_filter {
+        public:
+            typedef std::bitset<M> bitset_type;
+
         private:
-            std::bitset<M> bit_set;
+            bitset_type bit_set;
             array<function<size_t(Input)>, K> hash_array;
 
             typedef typename add_reference<typename add_const<Input>::type>::type const_ref;
 
         public:
-            typedef std::bitset<M> bitset_type;
             static size_t const size = M;
             static size_t const functions = K;
             typedef Input element_type;
@@ -78,6 +80,16 @@ namespace boost {
 
             bitset_type const & state() const { 
                 return bit_set; 
+            }
+
+            bool operator== (bloom_filter const & other) const {
+                // FIXME For some reason, we cannot compare boost::function instances...
+                // return (hash_array == other.hash_array) && (bit_set == other.bit_set);
+                return bit_set == other.bit_set;
+            }
+
+            bool operator!= (bloom_filter const & other) const {
+                return !(*this == other);
             }
     };
 
