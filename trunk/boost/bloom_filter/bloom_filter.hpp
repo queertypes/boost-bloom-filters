@@ -12,6 +12,7 @@
 
 #include <boost/type_traits/add_const.hpp>
 #include <boost/type_traits/add_reference.hpp>
+#include <boost/bloom_filter/detail/default_hash.hpp>
 
 namespace boost {
 
@@ -21,17 +22,23 @@ namespace boost {
             std::bitset<M> bit_set;
             array<function<size_t(Input)>, K> hash_array;
 
-            typedef typename add_const<typename add_reference<Input>::type>::type const_ref;
+            typedef typename add_reference<typename add_const<Input>::type>::type const_ref;
 
         public:
             typedef std::bitset<M> bitset_type;
             static size_t const size = M;
             static size_t const functions = K;
+            typedef Input element_type;
 
             explicit bloom_filter(
                     array<function<size_t(Input)>, K> const & hash_functions
                     ) :
                 hash_array(hash_functions) {}
+
+            bloom_filter() {
+                for(size_t k = 0; k < K; ++k)
+                    hash_array[k] = detail::default_hash<Input,M>(k);
+            }
 
             bloom_filter(bloom_filter const & other) :
                 bit_set(other.bit_set), hash_array(other.hash_array) {}

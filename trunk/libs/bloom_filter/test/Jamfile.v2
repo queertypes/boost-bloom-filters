@@ -3,7 +3,9 @@ import testing ;
 
 {
     test-suite "bloom_filter"
-    : [ run bloom_filter_test.cpp ]
+    : 
+    [ run bloom_filter_test.cpp ]
+    [ run default_constructed_filter_test.cpp ]
     ;
 }
 

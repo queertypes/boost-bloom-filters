@@ -3,9 +3,6 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <bitset>
-#include <cassert>
-#include <iostream>
 #include <boost/bloom_filter.hpp>
 #include <boost/detail/lightweight_test.hpp>
 
@@ -41,8 +38,6 @@ int main(int argc, char * argv[]) {
     for(uint32_t i = 0; i < 10; ++i) filter.insert(i);
     for(uint32_t i = 0; i < 10; ++i) assert(filter.contains(i));
     filter_type::bitset_type bit_set = filter.state();
-    for(uint32_t i = 0; i < filter_type::size ; ++i)
-        cout << (bit_set[i] ? '1' : '0');
     cout << endl;
     // assignment test
     filter_copy = filter;
