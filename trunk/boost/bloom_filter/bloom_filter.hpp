@@ -37,7 +37,9 @@ namespace boost {
                     ) :
                 hash_array(hash_functions) {}
 
-            bloom_filter() {
+            bloom_filter(bitset_type const & initial_state = bitset_type()) 
+                : bit_set(initial_state)
+            {
                 for(size_t k = 0; k < K; ++k)
                     hash_array[k] = detail::default_hash<Input,M>(k);
             }
