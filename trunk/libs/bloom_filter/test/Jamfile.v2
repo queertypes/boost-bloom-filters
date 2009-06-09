@@ -6,6 +6,7 @@ import testing ;
     : 
     [ run bloom_filter_test.cpp ]
     [ run default_constructed_filter_test.cpp ]
+    [ run bloom_filter_swap_adl_test.cpp ]
     ;
 }
 

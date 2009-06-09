@@ -80,6 +80,13 @@ namespace boost {
                 return bit_set; 
             }
     };
+
+    template <class Input, size_t M, size_t K>
+        inline void swap(
+                bloom_filter<Input, M, K> & left, 
+                bloom_filter<Input, M, K> & right) {
+            left.swap(right);
+        }
 }
 
 #endif
