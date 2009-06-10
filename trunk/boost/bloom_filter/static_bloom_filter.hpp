@@ -1,5 +1,5 @@
-#ifndef BLOOM_FILTER_20090608_0
-#define BLOOM_FILTER_20090608_0
+#ifndef STATIC_BLOOM_FILTER_20090608_0
+#define STATIC_BLOOM_FILTER_20090608_0
 
 // Copyright 2009 (c) Dean Michael Berris <mikhailberis@gmail.com>
 // Distributed under the Boost Software License, Version 1.0.
