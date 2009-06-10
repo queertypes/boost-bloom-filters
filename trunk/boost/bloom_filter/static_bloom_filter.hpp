@@ -41,7 +41,7 @@ namespace boost {
                 : bit_set(initial_state)
             {
                 for(size_t k = 0; k < K; ++k)
-                    hash_array[k] = detail::default_hash<Input,M>(k);
+                    hash_array[k] = detail::default_hash<Input>(k);
             }
 
             static_bloom_filter(static_bloom_filter const & other) :
@@ -61,13 +61,13 @@ namespace boost {
 
             void insert(const_ref input) {
                 for(size_t k = 0; k < K; ++k)
-                    bit_set[hash_array[k](input)] = 1;
+                    bit_set[hash_array[k](input) % M] = 1;
             }
 
             bool contains(const_ref input) const {
                 bool result = true;
                 for(size_t k = 0; k < K && result; ++k)
-                    result = result && bit_set[hash_array[k](input)];
+                    result = result && bit_set[hash_array[k](input) % M];
                 return result;
             }
 
