@@ -10,6 +10,8 @@ import testing ;
     [ run static_bloom_filter_equality_test.cpp ]
     [ run static_bloom_filter_construct_from_bitset_test.cpp ]
     [ run bloom_filter_construct_runtime_size_test.cpp ]
+    [ run bloom_filter_equality_test.cpp ]
+    [ run bloom_filter_swap_adl_test.cpp ]
     ;
 }
 

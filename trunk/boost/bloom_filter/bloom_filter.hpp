@@ -44,7 +44,22 @@ namespace boost {
                         size_t size, 
                         Sequence const & functions = Sequence())
                     : bit_set(size, 0), hash_functions(functions)
-                { }
+                {}
+
+                bloom_filter(bloom_filter const & other)
+                    : bit_set(other.bit_set), hash_functions(other.hash_functions)
+                {}
+
+                bloom_filter & operator= (bloom_filter rhs) {
+                    return rhs.swap(*this);
+                }
+
+                bloom_filter & swap(bloom_filter & other) {
+                    using std::swap;
+                    swap(bit_set, other.bit_set);
+                    swap(hash_functions, other.hash_functions);
+                    return *this;
+                }
 
                 void insert(const_ref input) {
                     using fusion::for_each;
@@ -65,7 +80,23 @@ namespace boost {
                             );
                     return found;
                 }
+
+                bool operator==(bloom_filter const & other) const {
+                    return bit_set == other.bit_set;
+                }
+
+                bool operator!=(bloom_filter const & other) const {
+                    return !(*this == other);
+                }
         };
+
+    template <class Input, class Sequence, class Block, class Allocator>
+        inline void swap(
+                bloom_filter<Input, Sequence, Block, Allocator> & left,
+                bloom_filter<Input, Sequence, Block, Allocator> & right
+                ) {
+            left.swap(right);
+        }
 
 } // namespace boost
 
