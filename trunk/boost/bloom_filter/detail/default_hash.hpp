@@ -10,15 +10,11 @@ namespace boost {
 
     namespace detail {
 
-        template <class Input>
+        template <size_t Seed = 0>
             struct default_hash {
-                typedef typename add_reference<typename add_const<Input>::type>::type const_ref;
-                size_t seed_;
-                default_hash(size_t seed) 
-                    : seed_(seed) {}
-
-                size_t operator()(const_ref input) const {
-                    size_t seed = seed_;
+                template <class T>
+                size_t operator() (T const & input) const {
+                    size_t seed = Seed;
                     hash_combine(seed, input);
                     return seed;
                 }

@@ -9,9 +9,9 @@
 using boost::static_bloom_filter;
 
 int main(int argc, char * argv[]) {
-    static_bloom_filter<int, 32, 3> filter1;
+    static_bloom_filter<int, 32> filter1;
     filter1.insert(1);
-    static_bloom_filter<int, 32, 3> filter2(filter1.state()); // construct from bitset
+    static_bloom_filter<int, 32> filter2(filter1.state()); // construct from bitset
     assert(filter2.contains(1));
     return EXIT_SUCCESS;
 }

@@ -9,7 +9,7 @@
 using boost::static_bloom_filter;
 
 int main(int argc, char * arg[]) {
-    static_bloom_filter<int, 32, 3> filter1, filter2;
+    static_bloom_filter<int, 32> filter1, filter2;
     assert(filter1 == filter2);
     filter1.insert(1);
     assert(filter1 != filter2);

@@ -12,11 +12,23 @@
 
 #include <boost/fusion/algorithm/iteration/for_each.hpp>
 #include <boost/fusion/include/for_each.hpp>
+#include <boost/fusion/container/vector.hpp>
+#include <boost/fusion/include/vector.hpp>
+#include <boost/bloom_filter/detail/internals.hpp>
 
 namespace boost {
 
-    template <class Input, class Sequence, class Block = unsigned char, class Allocator = std::allocator<unsigned char> >
-        struct bloom_filter {
+    template <
+        class Input, 
+        class Sequence = fusion::vector<
+            detail::default_hash<0>,
+            detail::default_hash<1>,
+            detail::default_hash<2>
+                >,
+        class Block = unsigned char, 
+        class Allocator = std::allocator<unsigned char> 
+             >
+        struct bloom_filter : protected detail::bloom_filter_internals<Input, dynamic_bitset<Block,Allocator> > {
             public:
                 typedef dynamic_bitset<Block, Allocator> bitset_type;
 
@@ -25,31 +37,7 @@ namespace boost {
                 Sequence hash_functions;
 
                 typedef typename add_reference<typename add_const<Input>::type>::type const_ref;
-
-                struct insert_impl {
-                    bitset_type & bit_set_;
-                    const_ref input_;
-                    insert_impl(bitset_type & bit_set, const_ref input)
-                        : bit_set_(bit_set), input_(input)
-                    {}
-                    template <class F>
-                        void operator()(F const & f) const {
-                            bit_set_[f(input_) % bit_set_.size()] = true;
-                        }
-                };
-
-                struct contains_impl {
-                    bitset_type const & bit_set_;
-                    const_ref input_;
-                    bool & result_;
-                    contains_impl(bitset_type const & bit_set, const_ref input, bool & result)
-                        : bit_set_(bit_set), input_(input), result_(result)
-                    {}
-                    template <class F>
-                        void operator()(F const & f) const {
-                            result_ = result_ && bit_set_[f(input_) % bit_set_.size()];
-                        }
-                };
+                typedef detail::bloom_filter_internals<Input, dynamic_bitset<Block,Allocator> > base;
 
             public:
                 bloom_filter(
@@ -60,17 +48,21 @@ namespace boost {
 
                 void insert(const_ref input) {
                     using fusion::for_each;
+                    typedef typename base::insert_impl inserter;
                     for_each(
                             hash_functions, 
-                            insert_impl(bit_set, input));
+                            inserter(bit_set, input)
+                            );
                 }
 
                 bool contains(const_ref input) const {
                     using fusion::for_each;
+                    typedef typename base::contains_impl contains_checker;
                     bool found = true;
                     for_each(
                             hash_functions, 
-                            contains_impl(bit_set, input, found));
+                            contains_checker(bit_set, input, found)
+                            );
                     return found;
                 }
         };

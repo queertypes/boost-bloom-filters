@@ -12,40 +12,57 @@
 
 #include <boost/type_traits/add_const.hpp>
 #include <boost/type_traits/add_reference.hpp>
+#include <boost/fusion/container/vector.hpp>
+#include <boost/fusion/include/vector.hpp>
+#include <boost/fusion/algorithm/iteration/for_each.hpp>
+#include <boost/fusion/include/for_each.hpp>
 #include <boost/bloom_filter/detail/default_hash.hpp>
+#include <boost/bloom_filter/detail/internals.hpp>
 
 namespace boost {
 
-    template <class Input, size_t M, size_t K>
-    struct static_bloom_filter {
+    template <
+        class Input, 
+        size_t M, 
+        class Sequence = fusion::vector<
+            detail::default_hash<0>,
+            detail::default_hash<1>,
+            detail::default_hash<2>
+            >
+        >
+    struct static_bloom_filter : protected detail::bloom_filter_internals<Input, std::bitset<M> > {
         public:
             typedef std::bitset<M> bitset_type;
 
         private:
             bitset_type bit_set;
-            array<function<size_t(Input)>, K> hash_array;
+            Sequence hash_functions;
 
             typedef typename add_reference<typename add_const<Input>::type>::type const_ref;
+            typedef detail::bloom_filter_internals<Input, std::bitset<M> > base;
+
+            struct insert_impl {
+                bitset_type & bit_set_;
+            };
 
         public:
             static size_t const size = M;
-            static size_t const functions = K;
             typedef Input element_type;
 
-            explicit static_bloom_filter(
-                    array<function<size_t(Input)>, K> const & hash_functions
-                    ) :
-                hash_array(hash_functions) {}
+            static_bloom_filter(
+                    bitset_type const & initial_state = bitset_type(),
+                    Sequence const & hash_functions = Sequence()) 
+                : bit_set(initial_state), hash_functions(hash_functions)
+            {}
 
-            static_bloom_filter(bitset_type const & initial_state = bitset_type()) 
-                : bit_set(initial_state)
-            {
-                for(size_t k = 0; k < K; ++k)
-                    hash_array[k] = detail::default_hash<Input>(k);
-            }
+            explicit static_bloom_filter(
+                    Sequence const & hash_functions
+                    )
+                : bit_set(), hash_functions(hash_functions)
+            {}
 
             static_bloom_filter(static_bloom_filter const & other) :
-                bit_set(other.bit_set), hash_array(other.hash_array) {}
+                bit_set(other.bit_set), hash_functions(other.hash_functions) {}
 
             static_bloom_filter & operator=(static_bloom_filter rhs) {
                 rhs.swap(*this);
@@ -55,20 +72,28 @@ namespace boost {
             static_bloom_filter & swap(static_bloom_filter & other) {
                 using std::swap;
                 swap(bit_set, other.bit_set);
-                swap(hash_array, other.hash_array);
+                swap(hash_functions, other.hash_functions);
                 return *this;
             }
 
             void insert(const_ref input) {
-                for(size_t k = 0; k < K; ++k)
-                    bit_set[hash_array[k](input) % M] = 1;
+                using fusion::for_each;
+                typedef typename base::insert_impl inserter;
+                for_each(
+                        hash_functions,
+                        inserter(bit_set, input)
+                        );
             }
 
             bool contains(const_ref input) const {
-                bool result = true;
-                for(size_t k = 0; k < K && result; ++k)
-                    result = result && bit_set[hash_array[k](input) % M];
-                return result;
+                using fusion::for_each;
+                typedef typename base::contains_impl contains_checker;
+                bool found = true;
+                for_each(
+                        hash_functions,
+                        contains_checker(bit_set, input, found)
+                        );
+                return found;
             }
 
             bool operator[](const_ref input) const {
@@ -85,8 +110,6 @@ namespace boost {
             }
 
             bool operator== (static_bloom_filter const & other) const {
-                // FIXME For some reason, we cannot compare boost::function instances...
-                // return (hash_array == other.hash_array) && (bit_set == other.bit_set);
                 return bit_set == other.bit_set;
             }
 
@@ -95,10 +118,10 @@ namespace boost {
             }
     };
 
-    template <class Input, size_t M, size_t K>
+    template <class Input, size_t M, class Sequence>
         inline void swap(
-                static_bloom_filter<Input, M, K> & left, 
-                static_bloom_filter<Input, M, K> & right) {
+                static_bloom_filter<Input, M, Sequence> & left, 
+                static_bloom_filter<Input, M, Sequence> & right) {
             left.swap(right);
         }
 }

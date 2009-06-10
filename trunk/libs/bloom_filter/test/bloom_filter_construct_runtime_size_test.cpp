@@ -12,20 +12,11 @@ using boost::bloom_filter;
 using boost::fusion::tuple;
 using boost::hash_combine;
 
-template <size_t Offset>
-struct hash {
-    template <class T>
-    size_t operator() (T const & element) const {
-        size_t seed = Offset;
-        hash_combine(seed, element);
-        return seed;
-    }
-};
-
 int main(int argc, char * argv[]) {
-    bloom_filter<int, tuple<hash<1>, hash<2>, hash<3> > > bf(2048);
+    bloom_filter<int> bf(2048);
     bf.insert(1);
     assert(bf.contains(1));
+    assert(!bf.contains(2));
     return EXIT_SUCCESS;
 }
 

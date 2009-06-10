@@ -6,12 +6,10 @@
 #include <boost/bloom_filter/static_bloom_filter.hpp>
 #include <boost/detail/lightweight_test.hpp>
 
-#define FILTER_SIZE 256
-
 using boost::static_bloom_filter;
 
 int main(int argc, char * argv[]) {
-    typedef static_bloom_filter<uint32_t, FILTER_SIZE, 3> filter_type;
+    typedef static_bloom_filter<uint32_t, 256> filter_type;
     filter_type filter; // default constructed
     filter.insert(1u);
     assert(filter.contains(1u));
