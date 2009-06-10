@@ -6,13 +6,15 @@
 #include <boost/bloom_filter.hpp>
 #include <boost/detail/lightweight_test.hpp>
 
-using boost::bloom_filter;
+using boost::static_bloom_filter;
 
-int main(int argc, char * argv[]) {
-    bloom_filter<int, 32, 3> filter1;
+int main(int argc, char * arg[]) {
+    static_bloom_filter<int, 32, 3> filter1, filter2;
+    assert(filter1 == filter2);
     filter1.insert(1);
-    bloom_filter<int, 32, 3> filter2(filter1.state()); // construct from bitset
-    assert(filter2.contains(1));
+    assert(filter1 != filter2);
+    filter2.insert(1);
+    assert(filter1 == filter2);
     return EXIT_SUCCESS;
 }
 

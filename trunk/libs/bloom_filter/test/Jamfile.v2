@@ -4,11 +4,11 @@ import testing ;
 {
     test-suite "bloom_filter"
     : 
-    [ run bloom_filter_test.cpp ]
-    [ run default_constructed_filter_test.cpp ]
-    [ run bloom_filter_swap_adl_test.cpp ]
-    [ run bloom_filter_equality_test.cpp ]
-    [ run construct_from_bitset_test.cpp ]
+    [ run static_bloom_filter_test.cpp ]
+    [ run static_bloom_filter_default_construct_test.cpp ]
+    [ run static_bloom_filter_swap_adl_test.cpp ]
+    [ run static_bloom_filter_equality_test.cpp ]
+    [ run static_bloom_filter_construct_from_bitset_test.cpp ]
     ;
 }
 

@@ -17,7 +17,7 @@
 namespace boost {
 
     template <class Input, size_t M, size_t K>
-    struct bloom_filter {
+    struct static_bloom_filter {
         public:
             typedef std::bitset<M> bitset_type;
 
@@ -32,27 +32,27 @@ namespace boost {
             static size_t const functions = K;
             typedef Input element_type;
 
-            explicit bloom_filter(
+            explicit static_bloom_filter(
                     array<function<size_t(Input)>, K> const & hash_functions
                     ) :
                 hash_array(hash_functions) {}
 
-            bloom_filter(bitset_type const & initial_state = bitset_type()) 
+            static_bloom_filter(bitset_type const & initial_state = bitset_type()) 
                 : bit_set(initial_state)
             {
                 for(size_t k = 0; k < K; ++k)
                     hash_array[k] = detail::default_hash<Input,M>(k);
             }
 
-            bloom_filter(bloom_filter const & other) :
+            static_bloom_filter(static_bloom_filter const & other) :
                 bit_set(other.bit_set), hash_array(other.hash_array) {}
 
-            bloom_filter & operator=(bloom_filter rhs) {
+            static_bloom_filter & operator=(static_bloom_filter rhs) {
                 rhs.swap(*this);
                 return *this;
             }
 
-            bloom_filter & swap(bloom_filter & other) {
+            static_bloom_filter & swap(static_bloom_filter & other) {
                 using std::swap;
                 swap(bit_set, other.bit_set);
                 swap(hash_array, other.hash_array);
@@ -75,7 +75,7 @@ namespace boost {
                 return contains(input);
             }
 
-            bloom_filter & clear() {
+            static_bloom_filter & clear() {
                 bit_set.reset();
                 return *this;
             }
@@ -84,21 +84,21 @@ namespace boost {
                 return bit_set; 
             }
 
-            bool operator== (bloom_filter const & other) const {
+            bool operator== (static_bloom_filter const & other) const {
                 // FIXME For some reason, we cannot compare boost::function instances...
                 // return (hash_array == other.hash_array) && (bit_set == other.bit_set);
                 return bit_set == other.bit_set;
             }
 
-            bool operator!= (bloom_filter const & other) const {
+            bool operator!= (static_bloom_filter const & other) const {
                 return !(*this == other);
             }
     };
 
     template <class Input, size_t M, size_t K>
         inline void swap(
-                bloom_filter<Input, M, K> & left, 
-                bloom_filter<Input, M, K> & right) {
+                static_bloom_filter<Input, M, K> & left, 
+                static_bloom_filter<Input, M, K> & right) {
             left.swap(right);
         }
 }

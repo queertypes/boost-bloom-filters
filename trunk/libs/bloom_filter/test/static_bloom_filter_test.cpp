@@ -25,14 +25,14 @@ using std::cout;
 using std::endl;
 using boost::array;
 using boost::function;
-using boost::bloom_filter;
+using boost::static_bloom_filter;
 
 int main(int argc, char * argv[]) {
     array<function<size_t(uint32_t)>, 3> functions;
     functions[0] = hash1;
     functions[1] = hash2;
     functions[2] = hash3;
-    typedef bloom_filter<uint32_t, FILTER_SIZE, 3> filter_type;
+    typedef static_bloom_filter<uint32_t, FILTER_SIZE, 3> filter_type;
     filter_type filter(functions);
     filter_type filter_copy = filter;
     for(uint32_t i = 0; i < 10; ++i) filter.insert(i);

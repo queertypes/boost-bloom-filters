@@ -6,10 +6,10 @@
 #include <boost/bloom_filter.hpp>
 #include <boost/detail/lightweight_test.hpp>
 
-using boost::bloom_filter;
+using boost::static_bloom_filter;
 
 int main(int argc, char * argv[]) {
-    typedef bloom_filter<uint32_t, 32, 3> filter_type;
+    typedef static_bloom_filter<uint32_t, 32, 3> filter_type;
     filter_type filter1, filter2;
     filter1.insert(1u);
     filter2.insert(2u);
