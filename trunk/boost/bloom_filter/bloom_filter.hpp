@@ -20,7 +20,7 @@ namespace boost {
 
     template <
         class Input, 
-        class Sequence = fusion::vector<
+        class HashFunctions = fusion::vector<
             detail::default_hash<0>,
             detail::default_hash<1>,
             detail::default_hash<2>
@@ -34,7 +34,7 @@ namespace boost {
 
             private:
                 bitset_type bit_set;
-                Sequence hash_functions;
+                HashFunctions hash_functions;
 
                 typedef typename add_reference<typename add_const<Input>::type>::type const_ref;
                 typedef detail::bloom_filter_internals<Input, dynamic_bitset<Block,Allocator> > base;
@@ -42,7 +42,7 @@ namespace boost {
             public:
                 bloom_filter(
                         size_t size, 
-                        Sequence const & functions = Sequence())
+                        HashFunctions const & functions = HashFunctions())
                     : bit_set(size, 0), hash_functions(functions)
                 {}
 
@@ -90,10 +90,10 @@ namespace boost {
                 }
         };
 
-    template <class Input, class Sequence, class Block, class Allocator>
+    template <class Input, class HashFunctions, class Block, class Allocator>
         inline void swap(
-                bloom_filter<Input, Sequence, Block, Allocator> & left,
-                bloom_filter<Input, Sequence, Block, Allocator> & right
+                bloom_filter<Input, HashFunctions, Block, Allocator> & left,
+                bloom_filter<Input, HashFunctions, Block, Allocator> & right
                 ) {
             left.swap(right);
         }
