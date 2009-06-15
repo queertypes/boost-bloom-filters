@@ -18,85 +18,91 @@
 
 namespace boost {
 
-    template <
-        class Input, 
-        class HashFunctions = fusion::vector<
-            detail::default_hash<0>,
-            detail::default_hash<1>,
-            detail::default_hash<2>
-                >,
-        class Block = unsigned char, 
-        class Allocator = std::allocator<unsigned char> 
-             >
-        struct bloom_filter : protected detail::bloom_filter_internals<Input, dynamic_bitset<Block,Allocator> > {
-            public:
-                typedef dynamic_bitset<Block, Allocator> bitset_type;
+    namespace bloom_filters {
 
-            private:
-                bitset_type bit_set;
-                HashFunctions hash_functions;
+        template <
+            class Input, 
+            class HashFunctions = fusion::vector<
+                detail::default_hash<0>,
+                detail::default_hash<1>,
+                detail::default_hash<2>
+                    >,
+            class Block = unsigned char, 
+            class Allocator = std::allocator<unsigned char> 
+                 >
+            struct bloom_filter : protected detail::internals<Input, dynamic_bitset<Block,Allocator> > {
+                public:
+                    typedef dynamic_bitset<Block, Allocator> bitset_type;
 
-                typedef typename add_reference<typename add_const<Input>::type>::type const_ref;
-                typedef detail::bloom_filter_internals<Input, dynamic_bitset<Block,Allocator> > base;
+                private:
+                    bitset_type bit_set;
+                    HashFunctions hash_functions;
 
-            public:
-                bloom_filter(
-                        size_t size, 
-                        HashFunctions const & functions = HashFunctions())
-                    : bit_set(size, 0), hash_functions(functions)
-                {}
+                    typedef typename add_reference<typename add_const<Input>::type>::type const_ref;
+                    typedef detail::internals<Input, dynamic_bitset<Block,Allocator> > base;
 
-                bloom_filter(bloom_filter const & other)
-                    : bit_set(other.bit_set), hash_functions(other.hash_functions)
-                {}
+                public:
+                    bloom_filter(
+                            size_t size, 
+                            HashFunctions const & functions = HashFunctions())
+                        : bit_set(size, 0), hash_functions(functions)
+                    {}
 
-                bloom_filter & operator= (bloom_filter rhs) {
-                    return rhs.swap(*this);
-                }
+                    bloom_filter(bloom_filter const & other)
+                        : bit_set(other.bit_set), hash_functions(other.hash_functions)
+                    {}
 
-                bloom_filter & swap(bloom_filter & other) {
-                    using std::swap;
-                    swap(bit_set, other.bit_set);
-                    swap(hash_functions, other.hash_functions);
-                    return *this;
-                }
+                    bloom_filter & operator= (bloom_filter rhs) {
+                        return rhs.swap(*this);
+                    }
 
-                void insert(const_ref input) {
-                    using fusion::for_each;
-                    typedef typename base::insert_impl inserter;
-                    for_each(
-                            hash_functions, 
-                            inserter(bit_set, input)
-                            );
-                }
+                    bloom_filter & swap(bloom_filter & other) {
+                        using std::swap;
+                        swap(bit_set, other.bit_set);
+                        swap(hash_functions, other.hash_functions);
+                        return *this;
+                    }
 
-                bool contains(const_ref input) const {
-                    using fusion::for_each;
-                    typedef typename base::contains_impl contains_checker;
-                    bool found = true;
-                    for_each(
-                            hash_functions, 
-                            contains_checker(bit_set, input, found)
-                            );
-                    return found;
-                }
+                    void insert(const_ref input) {
+                        using fusion::for_each;
+                        typedef typename base::insert_impl inserter;
+                        for_each(
+                                hash_functions, 
+                                inserter(bit_set, input)
+                                );
+                    }
 
-                bool operator==(bloom_filter const & other) const {
-                    return bit_set == other.bit_set;
-                }
+                    bool contains(const_ref input) const {
+                        using fusion::for_each;
+                        typedef typename base::contains_impl contains_checker;
+                        bool found = true;
+                        for_each(
+                                hash_functions, 
+                                contains_checker(bit_set, input, found)
+                                );
+                        return found;
+                    }
 
-                bool operator!=(bloom_filter const & other) const {
-                    return !(*this == other);
-                }
-        };
+                    bool operator==(bloom_filter const & other) const {
+                        return bit_set == other.bit_set;
+                    }
 
-    template <class Input, class HashFunctions, class Block, class Allocator>
-        inline void swap(
-                bloom_filter<Input, HashFunctions, Block, Allocator> & left,
-                bloom_filter<Input, HashFunctions, Block, Allocator> & right
-                ) {
-            left.swap(right);
-        }
+                    bool operator!=(bloom_filter const & other) const {
+                        return !(*this == other);
+                    }
+            };
+
+        template <class Input, class HashFunctions, class Block, class Allocator>
+            inline void swap(
+                    bloom_filter<Input, HashFunctions, Block, Allocator> & left,
+                    bloom_filter<Input, HashFunctions, Block, Allocator> & right
+                    ) {
+                left.swap(right);
+            }
+
+    } // namespace bloom_filters
+
+    using bloom_filters::bloom_filter;
 
 } // namespace boost
 

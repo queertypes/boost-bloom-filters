@@ -6,44 +6,51 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
+#include <boost/type_traits/add_reference.hpp>
+#include <boost/type_traits/add_const.hpp>
+
 namespace boost {
 
-    namespace detail {
+    namespace bloom_filters {
 
-        template <class Input, class BitSet>
-            class bloom_filter_internals {
-                protected:
-                    typedef BitSet bitset_type;
-                    typedef typename add_reference<typename add_const<Input>::type>::type const_ref;
+        namespace detail {
 
-                    struct insert_impl {
-                        bitset_type & bit_set_;
-                        const_ref input_;
-                        insert_impl(bitset_type & bit_set, const_ref input)
-                            : bit_set_(bit_set), input_(input)
-                        {}
-                        template <class F>
-                            void operator()(F const & f) const {
-                                bit_set_[f(input_) % bit_set_.size()] = true;
-                            }
-                    };
+            template <class Input, class BitSet>
+                class internals {
+                    protected:
+                        typedef BitSet bitset_type;
+                        typedef typename add_reference<typename add_const<Input>::type>::type const_ref;
 
-                    struct contains_impl {
-                        bitset_type const & bit_set_;
-                        const_ref input_;
-                        bool & result_;
-                        contains_impl(bitset_type const & bit_set, const_ref input, bool & result)
-                            : bit_set_(bit_set), input_(input), result_(result)
-                        {}
-                        template <class F>
-                            void operator()(F const & f) const {
-                                result_ = result_ && bit_set_[f(input_) % bit_set_.size()];
-                            }
-                    };
+                        struct insert_impl {
+                            bitset_type & bit_set_;
+                            const_ref input_;
+                            insert_impl(bitset_type & bit_set, const_ref input)
+                                : bit_set_(bit_set), input_(input)
+                            {}
+                            template <class F>
+                                void operator()(F const & f) const {
+                                    bit_set_[f(input_) % bit_set_.size()] = true;
+                                }
+                        };
 
-            };
+                        struct contains_impl {
+                            bitset_type const & bit_set_;
+                            const_ref input_;
+                            bool & result_;
+                            contains_impl(bitset_type const & bit_set, const_ref input, bool & result)
+                                : bit_set_(bit_set), input_(input), result_(result)
+                            {}
+                            template <class F>
+                                void operator()(F const & f) const {
+                                    result_ = result_ && bit_set_[f(input_) % bit_set_.size()];
+                                }
+                        };
 
-    } // namespace detail
+                };
+
+        } // namespace detail
+
+    } // namespace bloom_filters
 
 } // namespace boost
 

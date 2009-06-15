@@ -8,19 +8,23 @@
 
 namespace boost {
 
-    namespace detail {
+    namespace bloom_filters {
 
-        template <size_t Seed = 0>
-            struct default_hash {
-                template <class T>
-                size_t operator() (T const & input) const {
-                    size_t seed = Seed;
-                    hash_combine(seed, input);
-                    return seed;
-                }
-            };
+        namespace detail {
 
-    } // namespace detail
+            template <size_t Seed = 0>
+                struct default_hash {
+                    template <class T>
+                    size_t operator() (T const & input) const {
+                        size_t seed = Seed;
+                        hash_combine(seed, input);
+                        return seed;
+                    }
+                };
+
+        } // namespace detail
+
+    } // namespace bloom_filters
 
 } // namespace boost
 
