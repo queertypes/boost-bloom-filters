@@ -39,6 +39,7 @@ struct apply_hash<0, T, Size, HashFunctions>
     return (_bits[Hash::hash(t) % Size]);
   }
 };
+
 template <typename T, 
 	  size_t Size,
 	  class HashFunctions = std::tuple<MurmurHash3<T, 3>, 
@@ -68,6 +69,10 @@ public:
 
   bool operator[](const T& t) const {
     return this->contains(t);
+  }
+
+  void clear() {
+    bits.reset();
   }
 
 private:

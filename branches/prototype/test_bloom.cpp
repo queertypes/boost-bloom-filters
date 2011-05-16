@@ -42,6 +42,7 @@ int main()
   }
 
   std::cout << collisions << " collisions" << std::endl;
+  bloom.clear();
   
   return 0;
 }
