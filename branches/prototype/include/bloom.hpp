@@ -1,6 +1,11 @@
 #ifndef _BLOOM_HPP
 #define _BLOOM_HPP 1
-
+/**
+ * \author Alejandro Cabrera
+ * \brief A generic Bloom filter providing compile-time unrolling
+ *        of hash function application.
+ */
+#include <boost/config.hpp>
 #include <bitset>
 #include <tuple>
 #include "hash.hpp"
@@ -24,6 +29,9 @@ struct apply_hash
   }
 };
 
+/**
+ * \todo: clean up tuples here, as well
+ */
 template <typename T,
 	  size_t Size,
 	  class HashFunctions>
@@ -40,6 +48,9 @@ struct apply_hash<0, T, Size, HashFunctions>
   }
 };
 
+/**
+ * \todo: clean-up use of tuple here. Not all compilers support std::tuple
+ */
 template <typename T, 
 	  size_t Size,
 	  class HashFunctions = std::tuple<MurmurHash3<T, 3>, 
@@ -49,12 +60,10 @@ class bloom_filter {
   typedef std::bitset<Size> Bitset;
 
 public:
-  bloom_filter() 
-  {
-  }
+  bloom_filter() {}
 
   // \todo: need to add compiler check for constexpr
-  constexpr size_t size() const {
+  BOOST_CONSTEXPR size_t size() const {
     return Size;
   }
 
@@ -73,28 +82,38 @@ public:
   }
 
   void clear() {
-    bits.reset();
+    this->bits.reset();
   }
-
-  bloom_filter(const bloom_filter&);
-  bloom_filter& operator=(const bloom_filter& other);
 
   // \todo: need to add compiler check for rvalue references
   bloom_filter(const bloom_filter&&);
   bloom_filter& operator=(const bloom_filter&& other);
 
-  bloom_filter& operator&=(const bloom_filter& rhs);
-  bloom_filter& operator|=(const bloom_filter& rhs);
+  bloom_filter& operator|=(const bloom_filter& rhs) {
+    this->bits |= rhs.bits;
+  }
+
+  bloom_filter& operator&=(const bloom_filter& rhs) {
+    this->bits &= rhs.bits;
+  }
 
   template<class _T, size_t _Size, class _HashFunctions> 
   friend bloom_filter<_T, _Size, _HashFunctions>& 
   operator|(const bloom_filter<_T, _Size, _HashFunctions>& lhs,
-	    const bloom_filter<_T, _Size, _HashFunctions>& rhs);
+	    const bloom_filter<_T, _Size, _HashFunctions>& rhs)
+  {
+    bloom_filter<_T, _Size, _HashFunctions> ret = lhs;
+    return (ret |= rhs);
+  }
 
   template<class _T, size_t _Size, class _HashFunctions> 
   friend bloom_filter<_T, _Size, _HashFunctions>& 
   operator&(const bloom_filter<_T, _Size, _HashFunctions>& lhs,
-	    const bloom_filter<_T, _Size, _HashFunctions>& rhs);
+	    const bloom_filter<_T, _Size, _HashFunctions>& rhs)
+  {
+    bloom_filter<_T, _Size, _HashFunctions> ret = lhs;
+    return (ret &= rhs);
+  }
 
 private:
   std::bitset<Size> bits;

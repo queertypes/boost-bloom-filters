@@ -1,6 +1,6 @@
 #include <iostream>
-#include "lib/murmurhash3/MurmurHash3.h"
-#include "bloom.hpp"
+#include "../lib/murmurhash3/MurmurHash3.h"
+#include "../include/bloom.hpp"
 
 typedef int BloomType;
 

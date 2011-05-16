@@ -1,6 +1,12 @@
 #ifndef _HASH_HPP_
 #define _HASH_HPP_ 1
-
+/**
+ * \author Alejandro Cabrera
+ * \brief An alternative implentation of murmurhash3 for users
+ *        not wishing to rely on the public domain Murmurhash3.
+ * \todo Hash many more collisions than public domain version of murmurhash3.
+ * \todo Provide 64-bit implementation of murmurhash3.
+ */
 #include <cstdint>
 
 template <typename UnsignedIntT>
