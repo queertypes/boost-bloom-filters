@@ -53,6 +53,7 @@ public:
   {
   }
 
+  // \todo: need to add compiler check for constexpr
   constexpr size_t size() const {
     return Size;
   }
@@ -74,6 +75,26 @@ public:
   void clear() {
     bits.reset();
   }
+
+  bloom_filter(const bloom_filter&);
+  bloom_filter& operator=(const bloom_filter& other);
+
+  // \todo: need to add compiler check for rvalue references
+  bloom_filter(const bloom_filter&&);
+  bloom_filter& operator=(const bloom_filter&& other);
+
+  bloom_filter& operator&=(const bloom_filter& rhs);
+  bloom_filter& operator|=(const bloom_filter& rhs);
+
+  template<class _T, size_t _Size, class _HashFunctions> 
+  friend bloom_filter<_T, _Size, _HashFunctions>& 
+  operator|(const bloom_filter<_T, _Size, _HashFunctions>& lhs,
+	    const bloom_filter<_T, _Size, _HashFunctions>& rhs);
+
+  template<class _T, size_t _Size, class _HashFunctions> 
+  friend bloom_filter<_T, _Size, _HashFunctions>& 
+  operator&(const bloom_filter<_T, _Size, _HashFunctions>& lhs,
+	    const bloom_filter<_T, _Size, _HashFunctions>& rhs);
 
 private:
   std::bitset<Size> bits;
