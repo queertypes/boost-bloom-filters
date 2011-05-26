@@ -8,7 +8,7 @@
  * \todo Provide 64-bit implementation of murmurhash3.
  */
 #include <cstdint>
-#include <murmurhash3/MurmurHash3.h>
+#include <murmurhash3/murmurhash3.h>
 
 template <typename UnsignedIntT>
 inline UnsignedIntT rotl(const UnsignedIntT x, uint8_t r)
