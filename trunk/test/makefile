@@ -1,14 +1,15 @@
 CXXFLAGS := -Wall -Wextra -pedantic -std=c++0x -O3 -g
-ST_LIBS := ../lib/murmurhash3/MurmurHash3.o
+LD_FLAGS := -lpthread -lboost_unit_test_framework
 INCLUDE_DIR := ../include
-INCLUDES := $(INCLUDE_DIR)/bloom.hpp $(INCLUDE_DIR)/hash.hpp
-all : test_bloom
+INCLUDES := -I$(INCLUDE_DIR) -I$(INCLUDE_DIR)/murmurhash3
+EXES := boost_test
+all : $(EXES)
 
-%.o : %.cpp $(INCLUDES)
-	$(CXX) $(CXXFLAGS) -c $<
+%.o : %.cpp $(INCLUDE_DIR)/bloom.hpp
+	$(CXX) $(CXXFLAGS) -c $< $(INCLUDES)
 
-test_bloom : test_bloom.o $(INCLUDES)
-	$(CXX) $(CXXFLAGS) -o $@ $< $(ST_LIBS)
+boost_test : boost_test.o murmurhash3.o
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(INCLUDES) $(LD_FLAGS)
 
 clean:
-	rm -f *.o test_bloom
+	rm -f *.o $(EXES)

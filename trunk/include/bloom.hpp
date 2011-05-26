@@ -8,7 +8,8 @@
 #include <boost/config.hpp>
 #include <bitset>
 #include <tuple>
-#include "hash.hpp"
+
+#include <hash.hpp>
 
 template <size_t N,
 	  typename T,
@@ -85,37 +86,37 @@ public:
     this->bits.reset();
   }
 
-  // \todo: need to add compiler check for rvalue references
-  bloom_filter(const bloom_filter&&);
-  bloom_filter& operator=(const bloom_filter&& other);
-
   bloom_filter& operator|=(const bloom_filter& rhs) {
     this->bits |= rhs.bits;
+    return *this;
   }
-
+  
   bloom_filter& operator&=(const bloom_filter& rhs) {
     this->bits &= rhs.bits;
+    return *this;
   }
-
-  template<class _T, size_t _Size, class _HashFunctions> 
-  friend bloom_filter<_T, _Size, _HashFunctions>& 
-  operator|(const bloom_filter<_T, _Size, _HashFunctions>& lhs,
-	    const bloom_filter<_T, _Size, _HashFunctions>& rhs)
-  {
-    bloom_filter<_T, _Size, _HashFunctions> ret = lhs;
-    return (ret |= rhs);
-  }
-
-  template<class _T, size_t _Size, class _HashFunctions> 
-  friend bloom_filter<_T, _Size, _HashFunctions>& 
-  operator&(const bloom_filter<_T, _Size, _HashFunctions>& lhs,
-	    const bloom_filter<_T, _Size, _HashFunctions>& rhs)
-  {
-    bloom_filter<_T, _Size, _HashFunctions> ret = lhs;
-    return (ret &= rhs);
-  }
-
+  
 private:
   std::bitset<Size> bits;
 };
+
+template<class _T, size_t _Size, class _HashFunctions> 
+bloom_filter<_T, _Size, _HashFunctions> 
+operator|(const bloom_filter<_T, _Size, _HashFunctions>& lhs,
+	  const bloom_filter<_T, _Size, _HashFunctions>& rhs)
+{
+  bloom_filter<_T, _Size, _HashFunctions> ret = lhs;
+  ret |= rhs;
+  return ret;
+}
+
+template<class _T, size_t _Size, class _HashFunctions> 
+bloom_filter<_T, _Size, _HashFunctions>
+operator&(const bloom_filter<_T, _Size, _HashFunctions>& lhs,
+	  const bloom_filter<_T, _Size, _HashFunctions>& rhs)
+{
+  bloom_filter<_T, _Size, _HashFunctions> ret = lhs;
+  ret &= rhs;
+  return ret;
+}
 #endif
