@@ -1,6 +1,6 @@
 CXXFLAGS := -Wall -Wextra -pedantic -std=c++0x -O3 -g
 LD_FLAGS := -lpthread -lboost_unit_test_framework
-INCLUDE_DIR := ../include
+INCLUDE_DIR := ../../../boost/bloom_filter
 INCLUDES := -I$(INCLUDE_DIR)
 EXES := boost_test
 all : $(EXES)
