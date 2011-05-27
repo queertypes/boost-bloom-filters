@@ -5,6 +5,8 @@
 #include <bloom.hpp>
 #include <boost/test/unit_test.hpp>
 
+using boost::bloom_filter;
+
 BOOST_AUTO_TEST_CASE(defaultConstructor) {
   typedef boost::mpl::vector<
     OHash <int, 2>,
@@ -166,7 +168,7 @@ BOOST_AUTO_TEST_CASE(collisionBenchmark) {
   std::cout << "bloom size " << bloom.size() << std::endl;
   bloom.insert(INSERT_VAL);
   for (size_t i = 0; i < SEARCH_SPACE; ++i) {
-    if (bloom[i] && i != INSERT_VAL) ++collisions;
+    if (bloom.contains(i) && i != INSERT_VAL) ++collisions;
   }
 
   std::cout << collisions << " collisions" << std::endl;
