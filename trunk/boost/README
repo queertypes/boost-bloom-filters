@@ -1,15 +1,6 @@
 This prototype uses the public domain library MurmurHash3 to get its 
 work done. 
 
-To build:
-$> make
-
-To clean:
-$> make clean
-
-To run:
-$> ./test_bloom
-
 ===== Compression =====
 
 (Lossless) Compression policies to investigate:
