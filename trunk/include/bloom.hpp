@@ -7,7 +7,10 @@
  */
 #include <boost/config.hpp>
 #include <bitset>
-#include <tuple>
+
+#include <boost/mpl/vector.hpp>
+#include <boost/mpl/size.hpp>
+#include <boost/mpl/at.hpp>
 
 #include <hash.hpp>
 
@@ -18,64 +21,57 @@ template <size_t N,
 struct apply_hash
 {
   static void insert(const T& t, std::bitset<Size>& _bits) {
-    typedef typename std::tuple_element<N, HashFunctions>::type Hash;
+    typedef typename boost::mpl::at_c<HashFunctions, N>::type Hash;
     _bits[Hash::hash(t) % Size] = true;
     apply_hash<N-1, T, Size, HashFunctions>::insert(t, _bits);
   }
 
   static bool contains(const T& t, const std::bitset<Size>& _bits) {
-    typedef typename std::tuple_element<N, HashFunctions>::type Hash;
+    typedef typename boost::mpl::at_c<HashFunctions, N>::type Hash;
     return (_bits[Hash::hash(t) % Size] && 
 	    apply_hash<N-1, T, Size, HashFunctions>::contains(t, _bits));
   }
 };
 
-/**
- * \todo: clean up tuples here, as well
- */
 template <typename T,
 	  size_t Size,
 	  class HashFunctions>
 struct apply_hash<0, T, Size, HashFunctions>
 {    
   static void insert(const T& t, std::bitset<Size>& _bits) {
-    typedef typename std::tuple_element<0, HashFunctions>::type Hash;
+    typedef typename boost::mpl::at_c<HashFunctions, 0>::type Hash;
     _bits[Hash::hash(t) % Size] = true;
   }
 
   static bool contains(const T& t, const std::bitset<Size>& _bits) {
-    typedef typename std::tuple_element<0, HashFunctions>::type Hash;
+    typedef typename boost::mpl::at_c<HashFunctions, 0>::type Hash;
     return (_bits[Hash::hash(t) % Size]);
   }
 };
 
-/**
- * \todo: clean-up use of tuple here. Not all compilers support std::tuple
- */
 template <typename T, 
 	  size_t Size,
-	  class HashFunctions = std::tuple<MurmurHash3<T, 3>, 
-					   MurmurHash3<T, 5>,
-					   MurmurHash3<T, 7> > >
+	  class HashFunctions = boost::mpl::vector<MurmurHash3<T, 3>, 
+						   MurmurHash3<T, 5>,
+						   MurmurHash3<T, 7> > >
 class bloom_filter {
   typedef std::bitset<Size> Bitset;
 
 public:
   bloom_filter() {}
 
-  // \todo: need to add compiler check for constexpr
   BOOST_CONSTEXPR size_t size() const {
     return Size;
   }
 
   void insert(const T& t) {
-    static const unsigned size = std::tuple_size<HashFunctions>::value - 1;
-    apply_hash<size, T, Size, HashFunctions>::insert(t, bits);
+    static const unsigned N = boost::mpl::size<HashFunctions>::value - 1;
+    apply_hash<N, T, Size, HashFunctions>::insert(t, bits);
   }
 
   bool contains(const T& t) const {
-    static const unsigned size = std::tuple_size<HashFunctions>::value - 1;
-    return apply_hash<size, T, Size, HashFunctions>::contains(t, bits);
+    static const unsigned N = boost::mpl::size<HashFunctions>::value - 1;
+    return apply_hash<N, T, Size, HashFunctions>::contains(t, bits);
   }
 
   bool operator[](const T& t) const {

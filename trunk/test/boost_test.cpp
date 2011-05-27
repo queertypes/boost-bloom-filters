@@ -6,7 +6,7 @@
 #include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_CASE(defaultConstructor) {
-  typedef std::tuple<
+  typedef boost::mpl::vector<
     OHash <int, 2>,
     OHash<int, 3>,
     OHash<int, 5>,
@@ -147,7 +147,7 @@ BOOST_AUTO_TEST_CASE(testIntersectAssign) {
 }
 
 BOOST_AUTO_TEST_CASE(collisionBenchmark) {
-  typedef std::tuple<
+  typedef boost::mpl::vector<
     OHash <size_t, 2>,
     OHash<size_t, 3>,
     OHash<size_t, 5>,

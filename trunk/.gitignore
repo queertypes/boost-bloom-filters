@@ -1,0 +1,3 @@
+*.o
+*.a
+boost_test
