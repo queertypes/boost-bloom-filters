@@ -1,5 +1,16 @@
-#ifndef _HASH_HPP_
-#define _HASH_HPP_ 1
+//////////////////////////////////////////////////////////////////////////////
+//
+// (C) Copyright Alejandro Cabrera 2011.
+// Distributed under the Boost
+// Software License, Version 1.0.
+// (See accompanying file LICENSE_1_0.txt or
+// copy at http://www.boost.org/LICENSE_1_0.txt)
+//
+// See http://www.boost.org/libs/bloom_filter for documentation.
+//
+//////////////////////////////////////////////////////////////////////////////
+#ifndef BOOST_BLOOM_FILTER_HASH_HPP_
+#define BOOST_BLOOM_FILTER_HASH_HPP_ 1
 /**
  * \author Alejandro Cabrera
  * \brief An alternative implentation of murmurhash3 for users
