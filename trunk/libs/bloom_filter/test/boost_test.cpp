@@ -13,7 +13,7 @@
 #define BOOST_TEST_MODULE "Boost Bloom Filter" 1
 #include <iostream>
 
-#include <bloom.hpp>
+#include <boost/bloom_filter/bloom.hpp>
 #include <boost/test/unit_test.hpp>
 
 using boost::bloom_filter;

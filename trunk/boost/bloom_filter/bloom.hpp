@@ -22,8 +22,8 @@
 #include <boost/mpl/vector.hpp>
 #include <boost/mpl/size.hpp>
 
-#include <detail/apply_hash.hpp>
-#include <hash.hpp>
+#include <boost/bloom_filter/detail/apply_hash.hpp>
+#include <boost/bloom_filter/hash.hpp>
 
 namespace boost {
   template <typename T, 
