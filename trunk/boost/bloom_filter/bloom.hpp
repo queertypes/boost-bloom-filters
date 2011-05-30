@@ -32,8 +32,6 @@ namespace boost {
 					      MurmurHash3<T, 5>,
 					      MurmurHash3<T, 7> > >
   class bloom_filter {
-    typedef std::bitset<Size> Bitset;
-
   public:
     bloom_filter() {}
 
