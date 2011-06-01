@@ -16,6 +16,7 @@
  * \brief A generic Bloom filter providing compile-time unrolling
  *        of hash function application.
  */
+#include <cmath>
 #include <bitset>
 
 #include <boost/config.hpp>
@@ -38,6 +39,23 @@ namespace boost {
     BOOST_CONSTEXPR size_t size() const {
       return Size;
     }
+
+    BOOST_CONSTEXPR size_t num_hash_functions() const {
+      return mpl::size<HashFunctions>::value;
+    };
+
+    double false_positive_rate() const {
+      const double n = static_cast<double>(this->bits.count());
+      static const double k = static_cast<double>(num_hash_functions());
+      static const double m = static_cast<double>(Size);
+      static const double e = 
+	2.718281828459045235360287471352662497757247093699959574966;
+      return std::pow(1 - std::pow(e, -k * n / m), k);
+    };
+
+    size_t count() const {
+      return this->bits.count();
+    };
     
     void insert(const T& t) {
       static const unsigned N = mpl::size<HashFunctions>::value - 1;

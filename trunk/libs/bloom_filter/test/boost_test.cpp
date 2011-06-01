@@ -15,6 +15,7 @@
 
 #include <boost/bloom_filter/bloom.hpp>
 #include <boost/test/unit_test.hpp>
+#include <boost/test/floating_point_comparison.hpp>
 
 using boost::bloom_filter;
 using boost::BoostHash;
@@ -71,18 +72,60 @@ BOOST_AUTO_TEST_CASE(size) {
   BOOST_CHECK_EQUAL(bloom_2048.size(), 2048ul);
 }
 
+BOOST_AUTO_TEST_CASE(numHashFunctions) {
+  bloom_filter<size_t, 8> bloom_3;
+  bloom_filter<size_t, 8, boost::mpl::vector<
+    BoostHash<size_t, 1>,
+    BoostHash<size_t, 2>>> bloom_2;
+  bloom_filter<size_t, 8, boost::mpl::vector<
+    BoostHash<size_t, 1>,
+    BoostHash<size_t, 2>,
+    BoostHash<size_t, 3>,
+    BoostHash<size_t, 4>,
+    BoostHash<size_t, 5>,
+    BoostHash<size_t, 6>,
+    BoostHash<size_t, 7>>> bloom_7;
+  
+  BOOST_CHECK_EQUAL(bloom_3.num_hash_functions(), 3);
+  BOOST_CHECK_EQUAL(bloom_2.num_hash_functions(), 2);
+  BOOST_CHECK_EQUAL(bloom_7.num_hash_functions(), 7);
+}
+
+BOOST_AUTO_TEST_CASE(falsePositiveRate) {
+  bloom_filter<size_t, 64> bloom;
+
+  BOOST_CHECK_EQUAL(bloom.false_positive_rate(), 0.0);
+  
+  bloom.insert(1);
+  BOOST_CHECK_CLOSE(bloom.false_positive_rate(), 0.002257625907, 0.0001);
+  
+  bloom.insert(2);
+  BOOST_CHECK_LT(bloom.false_positive_rate(), 0.014736);
+
+  bloom.insert(3);
+  BOOST_CHECK_LT(bloom.false_positive_rate(), 0.040773);
+
+  bloom.insert(4);
+  BOOST_CHECK_LT(bloom.false_positive_rate(), 0.0796276);
+
+  bloom.insert(5);
+  BOOST_CHECK_LT(bloom.false_positive_rate(), 0.12877);
+
+  bloom.insert(6);
+  BOOST_CHECK_LT(bloom.false_positive_rate(), 0.185102);
+
+  for (size_t i = 7; i < 5000; ++i)
+    bloom.insert(i);
+  BOOST_CHECK_LE(bloom.false_positive_rate(), 1.0);  
+}
+
 BOOST_AUTO_TEST_CASE(contains) {
   bloom_filter<size_t, 8> bloom;  
 
   bloom.insert(1);
   BOOST_CHECK_EQUAL(bloom.contains(1), true);
-}
-
-BOOST_AUTO_TEST_CASE(containsOperator) {
-  bloom_filter<size_t, 8> bloom;  
-
-  bloom.insert(1);
-  BOOST_CHECK_EQUAL(bloom.contains(1), true);
+  BOOST_CHECK_LE(bloom.count(), 3);
+  BOOST_CHECK_GE(bloom.count(), 1);
 }
 
 BOOST_AUTO_TEST_CASE(doesNotContain) {
@@ -108,6 +151,7 @@ BOOST_AUTO_TEST_CASE(clear) {
 
   bloom.clear();
   BOOST_CHECK_EQUAL(bloom.contains(1), false);
+  BOOST_CHECK_EQUAL(bloom.count(), 0);
 }
 
 BOOST_AUTO_TEST_CASE(testUnion) {
@@ -125,27 +169,31 @@ BOOST_AUTO_TEST_CASE(testUnion) {
 
   for (size_t i = 0; i < 200; ++i)
     BOOST_CHECK_EQUAL(bloom_union.contains(i), true);
+  BOOST_CHECK_GE(bloom_union.count(), bloom_1.count());
+  BOOST_CHECK_GE(bloom_union.count(), bloom_2.count());
 }
 
 BOOST_AUTO_TEST_CASE(testUnionAssign) {
   bloom_filter<size_t, 32> bloom_1;
-  bloom_filter<size_t, 32> bloom_2;
+  bloom_filter<size_t, 32> bloom_union;
 
   for (size_t i = 0; i < 100; ++i) 
     bloom_1.insert(i);
   
-  bloom_2 |= bloom_1;
+  bloom_union |= bloom_1;
 
   for (size_t i = 0; i < 100; ++i)
-    BOOST_CHECK_EQUAL(bloom_2.contains(i), true);
+    BOOST_CHECK_EQUAL(bloom_union.contains(i), true);
+  BOOST_CHECK_EQUAL(bloom_union.count(), bloom_1.count());
 }
 
 BOOST_AUTO_TEST_CASE(testIntersect) {
-  bloom_filter<size_t, 20000> bloom_1;
-  bloom_filter<size_t, 20000> bloom_2;
-  bloom_filter<size_t, 20000> bloom_intersect;
+  bloom_filter<size_t, 32> bloom_1;
+  bloom_filter<size_t, 32> bloom_2;
+  bloom_filter<size_t, 32> bloom_intersect;
 
-  for (size_t i = 0; i < 100; ++i) 
+  // overlap at 100
+  for (size_t i = 0; i < 101; ++i) 
     bloom_1.insert(i);
   
   for (size_t i = 100; i < 200; ++i) 
@@ -153,23 +201,25 @@ BOOST_AUTO_TEST_CASE(testIntersect) {
 
   bloom_intersect = bloom_1 & bloom_2;
 
-  for (size_t i = 0; i < 200; ++i)
-    BOOST_CHECK_EQUAL(bloom_intersect.contains(i), false);
+  BOOST_CHECK_LE(bloom_intersect.count(), bloom_1.count());
+  BOOST_CHECK_LE(bloom_intersect.count(), bloom_2.count());
+  BOOST_CHECK_EQUAL(bloom_intersect.contains(100), true);
 }
 
 BOOST_AUTO_TEST_CASE(testIntersectAssign) {
   bloom_filter<size_t, 32> bloom_1;
-  bloom_filter<size_t, 32> bloom_2;
+  bloom_filter<size_t, 32> bloom_intersect;
 
   for (size_t i = 0; i < 100; ++i) 
     bloom_1.insert(i);
   
-  bloom_2 &= bloom_1;
+  bloom_intersect &= bloom_1;
 
   for (size_t i = 0; i < 100; ++i)
-    BOOST_CHECK_EQUAL(bloom_2.contains(i), false);
+    BOOST_CHECK_EQUAL(bloom_intersect.contains(i), false);
 }
 
+/*
 BOOST_AUTO_TEST_CASE(collisionBenchmark) {
   typedef boost::mpl::vector<
     OHash <size_t, 2>,
@@ -196,3 +246,4 @@ BOOST_AUTO_TEST_CASE(collisionBenchmark) {
   std::cout << collisions << " collisions" << std::endl;
   bloom.clear();
 }
+*/
