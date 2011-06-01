@@ -17,6 +17,7 @@
 #include <boost/test/unit_test.hpp>
 
 using boost::bloom_filter;
+using boost::BoostHash;
 
 BOOST_AUTO_TEST_CASE(defaultConstructor) {
   typedef boost::mpl::vector<
@@ -31,6 +32,16 @@ BOOST_AUTO_TEST_CASE(defaultConstructor) {
   
   bloom_filter<int, 8> bloom1;
   bloom_filter<int, 8, EightHashFunctions_O> bloom2;
+}
+
+BOOST_AUTO_TEST_CASE(defaultConstructor_boost) {
+  typedef boost::mpl::vector<
+    BoostHash<int, 13>,
+    BoostHash<int, 17>,
+    BoostHash<int, 19>> BoostHashFunctions;
+  
+  bloom_filter<int, 8> bloom1;
+  bloom_filter<int, 8, BoostHashFunctions> bloom2;
 }
 
 BOOST_AUTO_TEST_CASE(assignment)
@@ -130,9 +141,9 @@ BOOST_AUTO_TEST_CASE(testUnionAssign) {
 }
 
 BOOST_AUTO_TEST_CASE(testIntersect) {
-  bloom_filter<size_t, 8> bloom_1;
-  bloom_filter<size_t, 8> bloom_2;
-  bloom_filter<size_t, 8> bloom_intersect;
+  bloom_filter<size_t, 20000> bloom_1;
+  bloom_filter<size_t, 20000> bloom_2;
+  bloom_filter<size_t, 20000> bloom_intersect;
 
   for (size_t i = 0; i < 100; ++i) 
     bloom_1.insert(i);
@@ -147,8 +158,8 @@ BOOST_AUTO_TEST_CASE(testIntersect) {
 }
 
 BOOST_AUTO_TEST_CASE(testIntersectAssign) {
-  bloom_filter<size_t, 8> bloom_1;
-  bloom_filter<size_t, 8> bloom_2;
+  bloom_filter<size_t, 32> bloom_1;
+  bloom_filter<size_t, 32> bloom_2;
 
   for (size_t i = 0; i < 100; ++i) 
     bloom_1.insert(i);

@@ -28,9 +28,9 @@
 namespace boost {
   template <typename T, 
 	    size_t Size,
-	    class HashFunctions = mpl::vector<MurmurHash3<T, 3>, 
-					      MurmurHash3<T, 5>,
-					      MurmurHash3<T, 7> > >
+	    class HashFunctions = mpl::vector<boost::BoostHash<T, 3>, 
+					      boost::BoostHash<T, 5>,
+					      boost::BoostHash<T, 7> > >
   class bloom_filter {
   public:
     bloom_filter() {}
@@ -62,7 +62,7 @@ namespace boost {
       this->bits &= rhs.bits;
       return *this;
     }
-  
+
   private:
     std::bitset<Size> bits;
   };
@@ -72,7 +72,7 @@ namespace boost {
   operator|(const bloom_filter<_T, _Size, _HashFunctions>& lhs,
 	    const bloom_filter<_T, _Size, _HashFunctions>& rhs)
   {
-    bloom_filter<_T, _Size, _HashFunctions> ret = lhs;
+    bloom_filter<_T, _Size, _HashFunctions> ret(lhs);
     ret |= rhs;
     return ret;
   }
@@ -82,7 +82,7 @@ namespace boost {
   operator&(const bloom_filter<_T, _Size, _HashFunctions>& lhs,
 	    const bloom_filter<_T, _Size, _HashFunctions>& rhs)
   {
-    bloom_filter<_T, _Size, _HashFunctions> ret = lhs;
+    bloom_filter<_T, _Size, _HashFunctions> ret(lhs);
     ret &= rhs;
     return ret;
   }

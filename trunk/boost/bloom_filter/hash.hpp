@@ -19,7 +19,12 @@
  * \todo Provide 64-bit implementation of murmurhash3.
  */
 #include <cstdint>
+
+#include <boost/functional/hash.hpp>
+
 #include <boost/bloom_filter/murmurhash3/murmurhash3.h>
+
+#include <iostream>
 
 template <typename UnsignedIntT>
 inline UnsignedIntT rotl(const UnsignedIntT x, uint8_t r)
@@ -104,7 +109,7 @@ void murmurhash3(const void *const key, const int len,
 
 template <typename T, size_t Seed>
 struct MurmurHash3 {
-  static size_t hash(const T& t) {
+  size_t operator()(const T& t) {
     size_t out = 0;
     murmurhash3(static_cast<const void *const>(&t), 
 		sizeof(t),
@@ -117,7 +122,7 @@ struct MurmurHash3 {
 // uses public domain implementation of murmurhash3
 template <typename T, size_t Seed>
 struct OHash {
-  static size_t hash(const T& t) {
+  size_t operator()(const T& t) {
     size_t out = 0;
     MurmurHash3_x86_32(static_cast<const void *const>(&t), 
 		       sizeof(t),
@@ -126,4 +131,15 @@ struct OHash {
     return out;
   }
 };
+
+namespace boost {
+  template <typename T, size_t Seed>
+  struct BoostHash {
+    size_t operator()(const T& t) {
+      size_t seed = Seed;
+      boost::hash_combine(seed, t);
+      return seed;
+    }
+  };
+}
 #endif
