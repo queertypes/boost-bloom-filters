@@ -22,7 +22,7 @@
 
 #include <boost/functional/hash.hpp>
 
-#include <boost/bloom_filter/murmurhash3/murmurhash3.h>
+#include <boost/bloom_filter/hash/murmurhash3.hpp>
 
 #include <iostream>
 

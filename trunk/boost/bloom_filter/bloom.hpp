@@ -23,7 +23,7 @@
 #include <boost/mpl/size.hpp>
 
 #include <boost/bloom_filter/detail/apply_hash.hpp>
-#include <boost/bloom_filter/hash.hpp>
+#include <boost/bloom_filter/hash/hash.hpp>
 
 namespace boost {
   template <typename T, 

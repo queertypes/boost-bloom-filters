@@ -7,7 +7,7 @@
 // compile and run any of them on any platform, but your performance with the
 // non-native version will be less than optimal.
 
-#include <boost/bloom_filter/murmurhash3/murmurhash3.h>
+#include <boost/bloom_filter/hash/murmurhash3.hpp>
 
 //-----------------------------------------------------------------------------
 // Platform-specific functions and macros
