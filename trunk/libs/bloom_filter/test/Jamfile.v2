@@ -1,0 +1,40 @@
+# Boost.BloomFilter library JamFile
+
+# Copyright Alejandro Cabrera 2011
+
+# Distributed under the Boost Software License, Version 1.0.
+# See accompanying file LICENSE_1_0.txt or http://www.boost.org/LICENSE_1_0.txt
+
+# See library home page at http://www.boost.org/libs/ratio
+
+# uncomment one of the above lines if you build outside the Boost release
+local BOOST_ROOT = /home/alejandro/Downloads/boost_1_46_1 ;
+#local BOOST_ROOT = c:/cygwin/boost_1_41_0 ;
+
+if ! $(BOOST_ROOT)
+{
+    BOOST_ROOT = [ modules.peek : BOOST_ROOT ] ;
+}
+
+project
+    : requirements
+        <os>LINUX:<threading>multi
+        # uncomment the line below if you build outside the Boost release
+        <include>$(BOOST_ROOT) 
+        # uncomment the line below if you build outside the Boost release
+        <include>../../..
+        <toolset>msvc:<asynch-exceptions>on
+        <define>BOOST_ENABLE_WARNINGS
+        <warnings>all
+        <toolset>gcc:<cxxflags>-Wextra
+        <toolset>gcc:<cxxflags>-Wall
+        <toolset>gcc:<cxxflags>-ansi
+        <toolset>gcc:<cxxflags>-pedantic
+    ;
+
+    test-suite "basic"
+        :
+        [ compile boost_test.cpp ]
+	[ run boost_test.cpp ]
+        ;
+
