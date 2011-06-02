@@ -9,6 +9,7 @@
 // See http://www.boost.org/libs/bloom_filter for documentation.
 //
 //////////////////////////////////////////////////////////////////////////////
+
 #define BOOST_TEST_MODULE "Boost Bloom Filter" 1
 #include <iostream>
 
@@ -23,7 +24,7 @@ BOOST_AUTO_TEST_CASE(defaultConstructor) {
   typedef boost::mpl::vector<
     boost_hash<int, 13>,
     boost_hash<int, 17>,
-    boost_hash<int, 19>> BoostHashFunctions;
+    boost_hash<int, 19> > BoostHashFunctions;
   
   bloom_filter<int, 8> bloom1;
   bloom_filter<int, 8, BoostHashFunctions> bloom2;
@@ -60,7 +61,7 @@ BOOST_AUTO_TEST_CASE(numHashFunctions) {
   bloom_filter<size_t, 8> bloom_3;
   bloom_filter<size_t, 8, boost::mpl::vector<
     boost_hash<size_t, 1>,
-    boost_hash<size_t, 2>>> bloom_2;
+    boost_hash<size_t, 2> > > bloom_2;
   bloom_filter<size_t, 8, boost::mpl::vector<
     boost_hash<size_t, 1>,
     boost_hash<size_t, 2>,
@@ -68,7 +69,7 @@ BOOST_AUTO_TEST_CASE(numHashFunctions) {
     boost_hash<size_t, 4>,
     boost_hash<size_t, 5>,
     boost_hash<size_t, 6>,
-    boost_hash<size_t, 7>>> bloom_7;
+    boost_hash<size_t, 7> > > bloom_7;
 
   BOOST_CHECK_EQUAL(bloom_3.num_hash_functions(), 3ul);
   BOOST_CHECK_EQUAL(bloom_2.num_hash_functions(), 2ul);

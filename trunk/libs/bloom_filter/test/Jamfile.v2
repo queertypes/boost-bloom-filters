@@ -13,13 +13,14 @@ if ! $(BOOST_ROOT)
 
 project
     : requirements
-	<library>../../test/build//boost_unit_test_framework/<link>shared
+	<library>../test/build//boost_unit_test_framework/<link>static
+	#<library>../../../../libs/test/build//boost_unit_test_framework/<link>static
         <define>BOOST_ENABLE_WARNINGS
         <warnings>all
     ;
 
     test-suite "basic"
         :
-	[ run boost_test.cpp ]
+	[ run regression.cpp ]
         ;
 
