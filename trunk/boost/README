@@ -1,6 +1,3 @@
-This prototype uses the public domain library MurmurHash3 to get its 
-work done. 
-
 ===== Compression =====
 
 (Lossless) Compression policies to investigate:
