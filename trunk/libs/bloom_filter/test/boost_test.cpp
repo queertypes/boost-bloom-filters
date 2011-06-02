@@ -9,7 +9,6 @@
 // See http://www.boost.org/libs/bloom_filter for documentation.
 //
 //////////////////////////////////////////////////////////////////////////////
-#define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MODULE "Boost Bloom Filter" 1
 #include <iostream>
 
@@ -86,9 +85,9 @@ BOOST_AUTO_TEST_CASE(numHashFunctions) {
     BoostHash<size_t, 6>,
     BoostHash<size_t, 7>>> bloom_7;
   
-  BOOST_CHECK_EQUAL(bloom_3.num_hash_functions(), 3);
-  BOOST_CHECK_EQUAL(bloom_2.num_hash_functions(), 2);
-  BOOST_CHECK_EQUAL(bloom_7.num_hash_functions(), 7);
+  BOOST_CHECK_EQUAL(bloom_3.num_hash_functions(), 3ul);
+  BOOST_CHECK_EQUAL(bloom_2.num_hash_functions(), 2ul);
+  BOOST_CHECK_EQUAL(bloom_7.num_hash_functions(), 7ul);
 }
 
 BOOST_AUTO_TEST_CASE(falsePositiveRate) {
@@ -124,8 +123,8 @@ BOOST_AUTO_TEST_CASE(contains) {
 
   bloom.insert(1);
   BOOST_CHECK_EQUAL(bloom.contains(1), true);
-  BOOST_CHECK_LE(bloom.count(), 3);
-  BOOST_CHECK_GE(bloom.count(), 1);
+  BOOST_CHECK_LE(bloom.count(), 3ul);
+  BOOST_CHECK_GE(bloom.count(), 1ul);
 }
 
 BOOST_AUTO_TEST_CASE(doesNotContain) {
@@ -151,7 +150,7 @@ BOOST_AUTO_TEST_CASE(clear) {
 
   bloom.clear();
   BOOST_CHECK_EQUAL(bloom.contains(1), false);
-  BOOST_CHECK_EQUAL(bloom.count(), 0);
+  BOOST_CHECK_EQUAL(bloom.count(), 0ul);
 }
 
 BOOST_AUTO_TEST_CASE(testUnion) {
