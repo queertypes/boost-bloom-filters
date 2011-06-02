@@ -16,29 +16,14 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
 
-using boost::bloom_filter;
-using boost::BoostHash;
+using boost::bloom_filter::bloom_filter;
+using boost::bloom_filter::boost_hash;
 
 BOOST_AUTO_TEST_CASE(defaultConstructor) {
   typedef boost::mpl::vector<
-    OHash <int, 2>,
-    OHash<int, 3>,
-    OHash<int, 5>,
-    OHash<int, 7>,
-    OHash<int, 11>,
-    OHash<int, 13>,
-    OHash<int, 17>,
-    OHash<int, 19>> EightHashFunctions_O;
-  
-  bloom_filter<int, 8> bloom1;
-  bloom_filter<int, 8, EightHashFunctions_O> bloom2;
-}
-
-BOOST_AUTO_TEST_CASE(defaultConstructor_boost) {
-  typedef boost::mpl::vector<
-    BoostHash<int, 13>,
-    BoostHash<int, 17>,
-    BoostHash<int, 19>> BoostHashFunctions;
+    boost_hash<int, 13>,
+    boost_hash<int, 17>,
+    boost_hash<int, 19>> BoostHashFunctions;
   
   bloom_filter<int, 8> bloom1;
   bloom_filter<int, 8, BoostHashFunctions> bloom2;
@@ -74,17 +59,17 @@ BOOST_AUTO_TEST_CASE(size) {
 BOOST_AUTO_TEST_CASE(numHashFunctions) {
   bloom_filter<size_t, 8> bloom_3;
   bloom_filter<size_t, 8, boost::mpl::vector<
-    BoostHash<size_t, 1>,
-    BoostHash<size_t, 2>>> bloom_2;
+    boost_hash<size_t, 1>,
+    boost_hash<size_t, 2>>> bloom_2;
   bloom_filter<size_t, 8, boost::mpl::vector<
-    BoostHash<size_t, 1>,
-    BoostHash<size_t, 2>,
-    BoostHash<size_t, 3>,
-    BoostHash<size_t, 4>,
-    BoostHash<size_t, 5>,
-    BoostHash<size_t, 6>,
-    BoostHash<size_t, 7>>> bloom_7;
-  
+    boost_hash<size_t, 1>,
+    boost_hash<size_t, 2>,
+    boost_hash<size_t, 3>,
+    boost_hash<size_t, 4>,
+    boost_hash<size_t, 5>,
+    boost_hash<size_t, 6>,
+    boost_hash<size_t, 7>>> bloom_7;
+
   BOOST_CHECK_EQUAL(bloom_3.num_hash_functions(), 3ul);
   BOOST_CHECK_EQUAL(bloom_2.num_hash_functions(), 2ul);
   BOOST_CHECK_EQUAL(bloom_7.num_hash_functions(), 7ul);
@@ -94,10 +79,10 @@ BOOST_AUTO_TEST_CASE(falsePositiveRate) {
   bloom_filter<size_t, 64> bloom;
 
   BOOST_CHECK_EQUAL(bloom.false_positive_rate(), 0.0);
-  
+
   bloom.insert(1);
   BOOST_CHECK_CLOSE(bloom.false_positive_rate(), 0.002257625907, 0.0001);
-  
+
   bloom.insert(2);
   BOOST_CHECK_LT(bloom.false_positive_rate(), 0.014736);
 
@@ -115,11 +100,11 @@ BOOST_AUTO_TEST_CASE(falsePositiveRate) {
 
   for (size_t i = 7; i < 5000; ++i)
     bloom.insert(i);
-  BOOST_CHECK_LE(bloom.false_positive_rate(), 1.0);  
+  BOOST_CHECK_LE(bloom.false_positive_rate(), 1.0);
 }
 
 BOOST_AUTO_TEST_CASE(contains) {
-  bloom_filter<size_t, 8> bloom;  
+  bloom_filter<size_t, 8> bloom;
 
   bloom.insert(1);
   BOOST_CHECK_EQUAL(bloom.contains(1), true);
@@ -128,7 +113,7 @@ BOOST_AUTO_TEST_CASE(contains) {
 }
 
 BOOST_AUTO_TEST_CASE(doesNotContain) {
-  bloom_filter<size_t, 8> bloom;  
+  bloom_filter<size_t, 8> bloom;
 
   BOOST_CHECK_EQUAL(bloom.contains(1), false);
 }
@@ -143,7 +128,7 @@ BOOST_AUTO_TEST_CASE(insertNoFalseNegatives) {
 }
 
 BOOST_AUTO_TEST_CASE(clear) {
-  bloom_filter<size_t, 8> bloom;  
+  bloom_filter<size_t, 8> bloom;
 
   for (size_t i = 0; i < 1000; ++i)
     bloom.insert(i);
@@ -158,10 +143,10 @@ BOOST_AUTO_TEST_CASE(testUnion) {
   bloom_filter<size_t, 32> bloom_2;
   bloom_filter<size_t, 32> bloom_union;
 
-  for (size_t i = 0; i < 100; ++i) 
+  for (size_t i = 0; i < 100; ++i)
     bloom_1.insert(i);
-  
-  for (size_t i = 100; i < 200; ++i) 
+
+  for (size_t i = 100; i < 200; ++i)
     bloom_2.insert(i);
 
   bloom_union = bloom_1 | bloom_2;
@@ -178,7 +163,7 @@ BOOST_AUTO_TEST_CASE(testUnionAssign) {
 
   for (size_t i = 0; i < 100; ++i) 
     bloom_1.insert(i);
-  
+
   bloom_union |= bloom_1;
 
   for (size_t i = 0; i < 100; ++i)
