@@ -1,0 +1,27 @@
+.toc ul, .toc li {padding: 0em; list-style:none;}
+.toc ul {margin: 0em 0em 0em 0em;}
+.toc p {font-weight: bold;}
+.copyright {font-style: italic;}
+
+header {
+    height: 94px;
+    position: relative;
+    font-family: sans;
+}
+
+header img {
+    float: left;
+    position: absolute; top: 4px; left: 4px;
+}
+
+header p {
+    float: right;
+    text-align: right;
+    width: 75em;
+    padding-top: 1.5em; 
+}
+
+header p a {
+    font-size: 1.1em;
+    padding-right: 7%;
+}
