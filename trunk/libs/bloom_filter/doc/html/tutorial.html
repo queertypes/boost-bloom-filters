@@ -25,7 +25,88 @@
     <hr/>
 
     <h2 class="title">Tutorial</h2>
-    
+
+    <p>
+      To use this Bloom filter to its fullest potential, there are two template parameters to be aware of and two functions to utilize:
+    </p>
+
+    <ul>
+      <li>Template parameters:
+      <ul>
+	<li>Type: the type of elements this Bloom filter will store</li>
+	<li>Size: the number of bits used to store the Bloom filter state</li>
+      </ul>
+      </li>
+      <li>Basic functions:
+      <ul>
+	<li><code>void insert(const T&amp;);</code></li>
+	<li><code>bool contains(const T&amp;);</code></li>
+      </ul>
+      </li>
+    </ul>
+
+    <p>
+      With that out of the way, let's jump into a minimal example.
+    </p>
+
+    <div class="listing">
+      <code class="c_comment">// introductory Boost.BloomFilter program</code>
+      <code class="c_keyword">#include</code> <code class="c_include">&lt;boost/bloom_filter/bloom.hpp&gt;</code>
+      <code class="c_keyword">#include</code> <code class="c_include">&lt;iostream&gt;</code>
+      <code class="c_keyword">using namespace</code> <code class="c_namespace">boost::bloom_filter</code>;
+      <code class="c_keyword">using namespace</code> <code class="c_namespace">std</code>;
+	
+      <code class="c_type">int</code> <code class="c_func">main</code>() {
+        <code class="c_type">  bloom_filter</code>&lt;int, 512&gt; <code class="c_id">bloom</code>;
+
+	<code class="c_keyword">  for</code> (<code class="c_type">int</code><code class="c_id"> i</code> = 0; i &lt; 5000; ++i) {
+	    bloom.insert(i);
+	  }
+
+	<code class="c_keyword">  for</code> (<code class="c_type">int</code><code class="c_id"> i</code> = 5000; i &lt; 10000; ++i) {
+	    <code class="c_keyword">if</code> (bloom.contains(i)) cout &lt;&lt; "collision" &lt;&lt; endl;
+	  }
+
+	<code class="c_keyword">return</code> 0;
+      }
+    </div>
+
+    <p>
+      Above, we see a simple example that instantiates the default Bloom filter, inserts integers
+      0 - 4999, and then queries the existence of those integers. That's all it takes to use
+      this Bloom filter!
+    </p>
+    <p>
+      In practice, where false positive rates matter a great deal, care must be taken to choose not
+      only the right bitset Size, but also the right number (and implementation) of hash functions.
+      This is where the last template parameter comes in, as well as the remaining member functions.
+    </p>
+    <ul>
+      <li>Advanced template parameters:
+      <ul>
+	<li><code>HashFunctions</code>:
+	an mpl::vector or std::tuple (a compile-time sequence) of Hasher objects.</li>
+      </ul>
+      </li>
+      <li>Advanced state monitoring functions:
+      <ul>
+	<li><code>size_t size() const</code>: returns the value of the template parameter Size</li>
+	<li><code>size_t num_hash_functions() const</code>: returns the number of hash functions used to define this Bloom filter.</li>
+	<li><code>double false_positive_rate() const </code>: returns the current false positive rate</li>
+      </ul>
+      </li>
+    </ul>
+
+    <p>
+      A Hasher is a function object that overloads operator() such that the following interface is satisfied:
+      <div class="listing">
+	<code class="c_keyword">template</code> &lt;<code class="c_keyword">typename</code> <code class="c_id">T</code>&gt;
+	<code class="c_keyword">struct</code> <code class="c_id">ExampleHasher</code> {
+	  <code class="c_type">size_t</code> <code class="c_func">operator</code>()(<code class="c_keyword">const</code> <code class="c_type">T</code>&) <code class="c_keyword">const</code>;
+	};
+      </div>
+    </p>
+
     <hr/>
 
     <footer>

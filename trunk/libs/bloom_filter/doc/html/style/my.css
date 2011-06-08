@@ -25,3 +25,40 @@ header p a {
     font-size: 1.1em;
     padding-right: 7%;
 }
+
+.listing {
+    white-space: pre;
+    background: #d0d0d0;
+    font-family: monospace;
+    display: block;
+    margin-left: 5%;
+    margin-right: 5%;
+}
+
+.c_comment {
+    color: maroon;
+}
+
+.c_include {
+    color: purple;
+}
+
+.c_keyword {
+    color: fuchsia;
+}
+
+.c_namespace {
+    color: teal;
+}
+
+.c_type {
+    color: green;
+}
+
+.c_id {
+    color: red;
+}
+
+.c_func {
+    color: blue;
+}
