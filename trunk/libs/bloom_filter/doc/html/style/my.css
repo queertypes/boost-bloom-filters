@@ -50,6 +50,11 @@ header p a {
     color: maroon;
 }
 
+code.c_comment a {
+    color: maroon;
+    text-decoration: underline;
+};
+
 .c_include {
     color: purple;
 }
