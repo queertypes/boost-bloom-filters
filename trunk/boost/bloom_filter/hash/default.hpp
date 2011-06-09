@@ -14,8 +14,7 @@
 #define BOOST_BLOOM_FILTER_HASH_HPP_ 1
 /**
  * \author Alejandro Cabrera
- * \brief An alternative implentation of murmurhash3 for users
- *        not wishing to rely on the public domain Murmurhash3.
+ * \brief A default Hasher to be used with the Bloom filter.
  */
 #include <boost/functional/hash.hpp>
 
