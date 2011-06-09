@@ -37,17 +37,20 @@
       <ul>
 	<li><a href="#introduction">Introduction</a></li>
 	<li><a href="tutorial.html">Tutorial</a></li>
-	<li><a href="design.html">Design</a></li>
 	<li><a href="misc.html">Miscellaneous</a></li>
 	<li><a href="reference.html">Reference</a></li>
+	<li><a href="testing.html">Testing</a></li>
 	<li><a href="bibliography.html">Bibliography</a></li>
+	<li><a href="history.html">Version History</a></li>
+	<li><a href="design.html">Design</a></li>
+	<li><a href="acknowledgements.html">Acknowledgements</a></li>
       </ul>
     </div>
 
     <a name="introduction"></a>
     <h2>Introduction</h2>
     <p>
-      A Bloom filter is a probabilistic data structures that allows the compact representation of a set of elements. Bloom filters are used where an application can gain a performance advantage by avoiding an expensive lookup. For example, one might use a Bloom filter to ask whether a file may be stored on the network. If the Bloom filter returns false, the network lookup can be skipped. A few known applications of Bloom filters:
+      A Bloom filter is a probabilistic data structure that allows the compact representation of a set of elements. Bloom filters are used where an application can gain a performance advantage by avoiding an expensive lookup. For example, one might use a Bloom filter to ask whether a file may be stored on the network. If the Bloom filter returns false, the network lookup can be skipped. A few known applications of Bloom filters:
     </p>
     <ul>
       <li>Google BigTable: check whether particular rows/columns exist - improves query performance</li>
