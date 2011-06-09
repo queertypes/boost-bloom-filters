@@ -82,3 +82,23 @@ code.c_comment a {
 .c_str {
     color: purple;
 }
+
+/**
+ * Duplicate of Spirit Navigation
+ **/
+
+.spirit-nav
+{
+    text-align: right;
+}
+
+.spirit-nav a
+{
+    color: white;
+    padding-left: 0.5em;
+}
+
+.spirit-nav img
+{
+    border-width: 0px;
+}
