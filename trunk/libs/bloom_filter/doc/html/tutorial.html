@@ -57,15 +57,24 @@
       <code class="c_keyword">using namespace</code> <code class="c_namespace">std</code>;
 	
       <code class="c_type">int</code> <code class="c_func">main</code>() {
-        <code class="c_type">  bloom_filter</code>&lt;int, 512&gt; <code class="c_id">bloom</code>;
+        <code class="c_keyword">static const</code> <code class="c_type">size_t</code> <code class="c_id">INSERT_MAX</code> = 5000;
+        <code class="c_keyword">static const</code> <code class="c_type">size_t</code> <code class="c_id">CONTAINS_MAX</code> = 10000;
+        <code class="c_keyword">static const</code> <code class="c_type">size_t</code> <code class="c_id">NUM_BITS</code> = 512;
 
-	<code class="c_keyword">  for</code> (<code class="c_type">int</code><code class="c_id"> i</code> = 0; i &lt; 5000; ++i) {
-	    bloom.insert(i);
-	  }
+        <code class="c_type">bloom_filter</code>&lt;int, NUM_BITS&gt; <code class="c_id">bloom</code>;
+	<code class="c_type">size_t</code><code class="c_id"> collisions</code> = 0;
 
-	<code class="c_keyword">  for</code> (<code class="c_type">int</code><code class="c_id"> i</code> = 5000; i &lt; 10000; ++i) {
-	    <code class="c_keyword">if</code> (bloom.contains(i)) cout &lt;&lt; "collision" &lt;&lt; endl;
-	  }
+	<code class="c_keyword">for</code> (<code class="c_type">int</code><code class="c_id"> i</code> = 0; i &lt; INSERT_MAX; ++i) {
+	  bloom.insert(i);
+	}
+
+	<code class="c_keyword">for</code> (<code class="c_type">int</code><code class="c_id"> i</code> = INSERT_MAX; i &lt; CONTAINS_MAX; ++i) {
+	  <code class="c_keyword">if</code> (bloom.contains(i)) cout &lt;&lt; "collision" &lt;&lt; endl;
+	}
+
+	cout &lt;&lt; <code class="c_str">"collisions: "</code> 
+	     &lt;&lt; collisions  
+	     &lt;&lt; endl;
 
 	<code class="c_keyword">return</code> 0;
       }
@@ -109,8 +118,10 @@
     </div>
     <p>
       Note that the template parameter Seed isn't strictly required, as 
-      long as some form of seeding is present in the Hasher object. Now 
-      we can use a richer Bloom filter:
+      long as some form of seeding is present in the Hasher object. By 
+      default, boost_hash is defined for users in 
+      boost/bloom_filter/hash/default.hpp. This can be used to define 
+      Bloom filters with additonal hashing functions easily, as demonstrated below:
     </p>
 
     <div class="listing">
@@ -121,26 +132,36 @@
       <code class="c_keyword">using namespace</code> <code class="c_namespace">std</code>;
 	
       <code class="c_type">int</code> <code class="c_func">main</code>() {
-        <code class="c_keyword">typedef</code> <code class="c_namespace">boost::mpl::vector</code>&lt;<code class="c_type">Hasher</code>&lt;<code class="c_id">int, 1</code>&gt;, 
-	                           <code class="c_type">Hasher</code>&lt;<code class="c_id">int, 2</code>&gt;, 
-				   <code class="c_type">Hasher</code>&lt;<code class="c_id">int, 3</code>&gt; &gt; <code class="c_type">HashFns</code>;
-      <code class="c_type">  bloom_filter</code>&lt;int, 1024, HashFns&gt; <code class="c_id">bloom</code>;
+        <code class="c_keyword">typedef</code> <code class="c_namespace">boost::mpl::vector</code>&lt;<code class="c_type">boost_hash</code>&lt;<code class="c_id">int, 1</code>&gt;, 
+	                           <code class="c_type">boost_hash</code>&lt;<code class="c_id">int, 2</code>&gt;, 
+				   <code class="c_type">boost_hash</code>&lt;<code class="c_id">int, 3</code>&gt; &gt; <code class="c_type">HashFns</code>;
 
-	cout << "false positive rate: " 
-	     << bloom.false_positive_rate()
-	     << endl;
+        <code class="c_keyword">static const</code> <code class="c_type">size_t</code> <code class="c_id">INSERT_MAX</code> = 5000;
+        <code class="c_keyword">static const</code> <code class="c_type">size_t</code> <code class="c_id">CONTAINS_MAX</code> = 10000;
+        <code class="c_keyword">static const</code> <code class="c_type">size_t</code> <code class="c_id">NUM_BITS</code> = 1024;
 
-	<code class="c_keyword">for</code> (<code class="c_type">int</code><code class="c_id"> i</code> = 0; i &lt; 5000; ++i) {
+        <code class="c_type">bloom_filter</code>&lt;int, NUM_BITS, HashFns&gt; <code class="c_id">bloom</code>;
+        <code class="c_type">size_t</code><code class="c_id"> collisions</code> = 0;
+
+	cout &lt;&lt; <code class="c_str">"false positive rate: "</code> 
+	     &lt;&lt; bloom.false_positive_rate()
+	     &lt;&lt; endl;
+
+	<code class="c_keyword">for</code> (<code class="c_type">int</code><code class="c_id"> i</code> = 0; i &lt; INSERT_MAX; ++i) {
 	  bloom.insert(i);
 	}
 
-	<code class="c_keyword">for</code> (<code class="c_type">int</code><code class="c_id"> i</code> = 5000; i &lt; 10000; ++i) {
-	    <code class="c_keyword">if</code> (bloom.contains(i)) cout &lt;&lt; "collision" &lt;&lt; endl;
+	<code class="c_keyword">for</code> (<code class="c_type">int</code><code class="c_id"> i</code> = INSERT_MAX; i &lt; CONTAINS_MAX; ++i) {
+	    <code class="c_keyword">if</code> (bloom.contains(i)) ++collisions;
 	}
 
-	cout << "false positive rate: " 
-	     << bloom.false_positive_rate()
-	     << endl;
+	cout &lt;&lt; <code class="c_str">"false positive rate: "</code> 
+	     &lt;&lt; bloom.false_positive_rate()
+	     &lt;&lt; endl;
+
+	cout &lt;&lt; <code class="c_str">"collisions: "</code>
+	     &lt;&lt; collisions
+	     &lt;&lt; endl;
 
 	<code class="c_keyword">return</code> 0;
       }

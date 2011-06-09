@@ -73,3 +73,7 @@ header p a {
 .c_func {
     color: blue;
 }
+
+.c_str {
+    color: purple;
+}
