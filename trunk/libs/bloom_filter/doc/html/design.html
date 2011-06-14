@@ -98,20 +98,39 @@
       There are a few planned features that have not yet made it to the Bloom filter package:
     </p>
     <ul>
-      <li>[De]Compression policy support via template policy class</li>
-      <li>Bloom filter variations implemented as separate classes:
+      <li>[De]Compression policy support via template policy class:
       <ul>
-	<li>Counting Bloom filter (deletion support)</li>
-	<li>Scaling Bloom filter (constant false positive rate)</li>
-	<li>Two-hash Bloom filter (uses two-hash functions to generate k hash values)</li>
-	<li>Bloomier filters (?)</li>
+	<li><a href="http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.119.6895&amp;rep=rep1&amp;type=pdf">
+	  Compressed Bloom Filters.</a> M. Mitzenmacher. IEEE/ACM TON. 2002.
+	</li>
+	<li><a href="http://bcl.comli.eu/index.php?media=manual">
+	Basic Compression Library Manual. </a> Chp. 4, pp. 12-15.
+	</li>
       </ul>
       </li>
-      <li>Union/intersection of Bloom filters of the same size and same number/type of hash functions differing only by type (types must be convertible).</li>
+      <li>Bloom filter variations implemented as separate classes:
+      <ul>
+	<li>Counting Bloom filter (deletion support): <a href="http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.96.6789&amp;rep=rep1&amp;type=pdf">
+	Summary Cache. Fan et al. ACM SIGCOMM. 1998.
+      </a>
+	</li>
+	<li>Scaling Bloom filter (constant false positive rate): <a href="http://www.google.com/url?sa=t&amp;source=web&amp;cd=1&amp;ved=0CBsQFjAA&amp;url=http%3A%2F%2Fgsd.di.uminho.pt%2Fmembers%2Fcbm%2Fps%2Fdbloom.pdf&amp;ei=ZH_2TbboIeeu0AH5o4XtDA&amp;usg=AFQjCNFGN0RS1-bUCxZJwUmD0C8cTnllQg&amp;sig2=__OvO8j0bdnj5gDH0xt4mw">
+	Scalable Bloom Filter. </a>Almeida et al. Elsevier. 2007.
+	</li>
+	<li>Two hash function Bloom filter (uses two hash functions to generate k hash values):
+	<a href="http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.72.2442&amp;rep=rep1&amp;type=pdf">
+	  Less Hashing, Same Performance: Building a Better Bloom Filter. Kirsch et al. Springer. 2006.
+	</a>
+	</li>
+	<li>Bloomier filters: <a href="http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.86.4154&amp;rep=rep1&amp;type=pdf">
+	The Bloomier Filter. </a>Chazelle et al. ACM SODA. 2004.
+	</li>
+      </ul>
+      </li>
       <li>Parallel execution of hashing, especially useful for large (>1MB, >32 hash functions) Bloom filters. Such a feature should have a smart, defaulting mechanism that enables parallelism once Size/HashFunction parameters exceed a certain threshold, if parallelism is available on the given platform.</li>
     </ul>
     <p>
-      The design space for Bloom filter-like data structures is immense. Given feedback in the future, this section is likely to grow. Please send suggestions to <a href="mailto:cpp.cabrera@gmail.com">Alejandro Cabrera</a>
+      The design space for Bloom filter-like data structures is immense. Given feedback in the future, this section is likely to grow. Please send suggestions to <a href="mailto:cpp.cabrera@gmail.com">Alejandro Cabrera</a>.
     </p>
     <hr/>
     <div class="spirit-nav">
@@ -128,7 +147,7 @@
 
     <footer>
       <p>
-	Last revised: <time datetime="2011-06-06">June 6, 2011</time>.
+	Last revised: <time datetime="2011-06-13">June 13, 2011</time>.
       </p>
 
       <p class="copyright">
