@@ -46,6 +46,16 @@ header p a {
     margin-right: 5%;
 }
 
+.example_output {
+    white-space: pre;
+    background: #000000;
+    font-family: monospace;
+    display: block;
+    margin-left: 5%;
+    margin-right: 5%;
+    color: silver;
+};
+
 .c_comment {
     color: maroon;
 }
