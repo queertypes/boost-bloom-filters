@@ -17,31 +17,29 @@ using namespace boost::bloom_filter;
 using namespace std;
 
 int main () {
-  typedef boost::mpl::vector<boost_hash<int, 1>,
-                             boost_hash<int, 2>,
-			     boost_hash<int, 3> > HashFns;
+  typedef boost::mpl::vector<boost_hash<int, 0> > HashFns;
 
   static const size_t INSERT_MAX = 5000;
   static const size_t CONTAINS_MAX = 10000;
-  static const size_t NUM_BITS = 1024;
+  static const size_t NUM_BITS = 8192;
 
   bloom_filter<int, NUM_BITS, HashFns> bloom;
   size_t collisions = 0;
 
   cout << "false positive rate: "
-       << bloom.false_positive_rate()
+       << bloom.false_positive_rate() * 100.0 << "%"
        << endl;
 
-  for (int i = 0; i < INSERT_MAX; ++i) {
+  for (size_t i = 0; i < INSERT_MAX; ++i) {
     bloom.insert(i);
   }
 
-  for (int i = INSERT_MAX; i < CONTAINS_MAX_MAX; ++i) {
+  for (size_t i = INSERT_MAX; i < CONTAINS_MAX; ++i) {
     if (bloom.contains(i)) ++collisions;
   }
 
   cout << "false positive rate: "
-       << bloom.false_positive_rate()
+       << bloom.false_positive_rate() * 100.0 << "%"
        << endl;
 
   cout << "collisions: " << collisions << endl;
