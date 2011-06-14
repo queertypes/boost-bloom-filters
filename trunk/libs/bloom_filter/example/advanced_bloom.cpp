@@ -26,7 +26,11 @@ int main () {
   bloom_filter<int, NUM_BITS, HashFns> bloom;
   size_t collisions = 0;
 
-  cout << "false positive rate: "
+  cout << "bloom filter storage size: "
+       << sizeof(bloom) << " bytes"
+       << endl;
+
+  cout << "false positive rate before inserts: "
        << bloom.false_positive_rate() * 100.0 << "%"
        << endl;
 
@@ -38,11 +42,11 @@ int main () {
     if (bloom.contains(i)) ++collisions;
   }
 
-  cout << "false positive rate: "
+  cout << "false positive rate after inserts: "
        << bloom.false_positive_rate() * 100.0 << "%"
        << endl;
 
-  cout << "collisions: " << collisions << endl;
+  cout << "collisions (false positives): " << collisions << endl;
 
   return 0;
 }
