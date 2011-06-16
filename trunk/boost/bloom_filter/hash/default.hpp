@@ -23,9 +23,7 @@ namespace boost {
   template <typename T, size_t Seed>
     struct boost_hash {
       size_t operator()(const T& t) {
-        size_t seed = Seed;
-        boost::hash_combine(seed, t);
-        return seed;
+        return boost::hash_value(t) + Seed;
       }
     };
   }

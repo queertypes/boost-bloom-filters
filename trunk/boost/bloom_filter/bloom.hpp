@@ -32,17 +32,20 @@ namespace boost {
     template <typename T,
 	      size_t Size,
 	      class HashFunctions = mpl::vector<boost_hash<T, 3>,
-					        boost_hash<T, 5>,
-					        boost_hash<T, 7> > >
+						boost_hash<T, 37> > >
     class bloom_filter {
+    public:
+      typedef T value_type;
+      typedef T key_type;
+
     public:
       bloom_filter() {}
 
-      BOOST_CONSTEXPR size_t size() const {
+      static BOOST_CONSTEXPR size_t size() const {
         return Size;
       }
 
-      BOOST_CONSTEXPR size_t num_hash_functions() const {
+      static BOOST_CONSTEXPR size_t num_hash_functions() const {
         return mpl::size<HashFunctions>::value;
       };
 
