@@ -4,7 +4,7 @@
     <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
     <link rel="stylesheet" type="text/css" 
 	  href="../../../../../doc/src/boostbook.css"/>
-    <link rel="stylesheet" type="text/css" href="style/my.css"/>
+    <link rel="stylesheet" type="text/css" href="../style/my.css"/>
 
     <title>Boost.BloomFilter</title>  
   </head>
@@ -38,7 +38,69 @@
       </a>
     </div>
 
-    <h1 class="title">To be completed...</h1>
+    <h1>Basic Bloom Filter</h1>
+    <div class="listing">
+      <code class="c_keyword">template</code> &lt;<code class="c_keyword">typename</code> <code class="c_id">T</code>,
+                <code class="c_type">size_t</code> <code class="c_id">Size</code>,
+                <code class="c_keyword">class</code> <code class="c_id">HashFunctions</code> = <code class="c_namespace">mpl::vector</code>&lt;<code class="c_type">boost_hash</code>&lt;<code class="c_id">T, 3</code>&gt;,
+					          <code class="c_type">boost_hash</code>&lt;<code class="c_id">T, 37</code>&gt; &gt; &gt;
+      <code class="c_keyword">class</code> <code class="c_id">bloom_filter</code> {
+        <code class="c_comment">// exported typedefs</code>
+        <code class="c_keyword">typedef</code> <code class="c_id">T value_type</code>;
+        <code class="c_keyword">typedef</code> <code class="c_id">T key_type</code>;
+
+        <code class="c_comment">// constructors</code>
+        <code class="c_func">bloom_filter</code>();
+
+        <code class="c_comment">// data structure metadata query functions</code>
+        <code class="c_keyword">static constexpr</code> <code class="c_type">size_t</code> <code class="c_func">size</code>() <code class="c_keyword">const</code>;
+        <code class="c_keyword">static constexpr</code> <code class="c_type">size_t</code> <code class="c_func">num_hash_functions</code>() <code class="c_keyword">const</code>;
+        <code class="c_type">double</code> <code class="c_func">false_positive_rate</code>() <code class="c_keyword">const</code>;
+        <code class="c_type">size_t</code> <code class="c_func">count</code>() <code class="c_keyword">const</code>;
+
+        <code class="c_comment">// data structures core ops</code>
+        <code class="c_type">void</code> <code class="c_func">insert</code>(<code class="c_keyword">const</code> <code class="c_type">T</code>&amp;);
+        <code class="c_type">bool</code> <code class="c_func">contains</code>(<code class="c_keyword">const</code> <code class="c_type">T</code>&amp;) <code class="c_keyword">const</code>;
+        
+        <code class="c_comment">// union assign/intersect assign</code>
+        <code class="c_type">bloom_filter</code>&amp; <code class="c_func">operator|=</code>(<code class="c_keyword">const</code> <code class="c_type">bloom_filter</code>&amp;);
+        <code class="c_type">bloom_filter</code>&amp; <code class="c_func">operator&amp;=</code>(<code class="c_keyword">const</code> <code class="c_type">bloom_filter</code>&amp;);       
+      };
+
+      <code class="c_comment">// union</code>
+      <code class="c_keyword">template</code> &lt;<code class="c_keyword">typename</code> <code class="c_id">T</code>, <code class="c_type">size_t</code> <code class="c_id">Size</code>,
+		<code class="c_keyword">class</code> <code class="c_id">HashFunctions</code>&gt;
+      <code class="c_type">bloom_filter</code>&lt;<code class="c_id">T, Size, HashFunctions</code>&gt;
+      <code class="c_func">operator|</code>(<code class="c_keyword">const</code> <code class="c_type">bloom_filter</code>&lt;<code class="c_id">T, Size, HashFunctions</code>&gt;&amp; <code class="c_id">lhs</code>,
+	        <code class="c_keyword">const</code> <code class="c_type">bloom_filter</code>&lt;<code class="c_id">T, Size, HashFunctions</code>&gt;&amp; <code class="c_id">rhs</code>);
+
+      <code class="c_comment">// intersect</code>
+      <code class="c_keyword">template</code> &lt;<code class="c_keyword">typename</code> <code class="c_id">T</code>, <code class="c_type">size_t</code> <code class="c_id">Size</code>,
+		<code class="c_keyword">class</code> <code class="c_id">HashFunctions</code>&gt;
+      <code class="c_type">bloom_filter</code>&lt;<code class="c_id">T, Size, HashFunctions</code>&gt;
+      <code class="c_func">operator&amp;</code>(<code class="c_keyword">const</code> <code class="c_type">bloom_filter</code>&lt;<code class="c_id">T, Size, HashFunctions</code>&gt;&amp; <code class="c_id">lhs</code>,
+	        <code class="c_keyword">const</code> <code class="c_type">bloom_filter</code>&lt;<code class="c_id">T, Size, HashFunctions</code>&gt;&amp; <code class="c_id">rhs</code>);
+    </div>
+    <p>
+      The basic Bloom filter data structure. Supports insertion and query. 
+    </p>
+
+    <h2> Template Parameters Reference</h2>
+    <dl>
+      <dt>T</dt>
+      <dd>The type used for all Bloom filter operations.</dd>
+      <dt>Size</dt>
+      <dd>The size in bits of the underlying bitset used by the Bloom filter.</dd>
+      <dt>HashFunctions</dt>
+      <dd>The set of hash functions used by the Bloom filter. Currently required to be an mpl::vector of <a href="../tutorial.html">Hashers</a>.</dd>
+    </dl>
+
+    <h2>Function Reference</h2>
+    <h5>Function name</h5>
+    <p>Description text</p>
+    <h6>Pre-condition</h6>
+    <h6>Post-condition</h6>
+    <h6>Returns</h6>
 
     <hr/>
     <div class="spirit-nav">
@@ -58,7 +120,7 @@
 
     <footer>
       <p>
-	Last revised: <time datetime="2011-06-14">June 14, 2011</time>.
+	Last revised: <time datetime="2011-06-16">June 16, 2011</time>.
       </p>
 
       <p class="copyright">

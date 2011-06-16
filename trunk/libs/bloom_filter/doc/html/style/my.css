@@ -54,7 +54,7 @@ header p a {
     margin-left: 5%;
     margin-right: 5%;
     color: silver;
-};
+}
 
 .c_comment {
     color: maroon;
@@ -63,7 +63,7 @@ header p a {
 code.c_comment a {
     color: maroon;
     text-decoration: underline;
-};
+}
 
 .c_include {
     color: purple;
@@ -110,5 +110,5 @@ code.c_comment a {
 
 .spirit-nav img
 {
-    border-width: 0px;
+    border-width: 0;
 }
