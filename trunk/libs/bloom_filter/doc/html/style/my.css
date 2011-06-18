@@ -14,10 +14,6 @@
 .toc p {font-weight: bold;}
 .copyright {font-style: italic;}
 
-dt {
-    font-weight: bold;
-};
-
 header {
     height: 94px;
     position: relative;
@@ -58,6 +54,10 @@ header p a {
     margin-right: 1%;
     border: solid 1px;
 }
+
+.func_ref dt {
+    font-weight: bold;
+};
 
 .example_output {
     white-space: pre;
