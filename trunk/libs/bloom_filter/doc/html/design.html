@@ -46,8 +46,8 @@
       </ul>
     </div>
 
-    <h4>Overview</h4>
     <a name="overview"></a>
+    <h4>Overview</h4>
     <p>
       This Bloom filter implementation is designed to allow compile-time determination of storage space(in bits), insertion/query type, and hash functions. The design goals were:
     </p>
@@ -71,8 +71,8 @@
       Currently, the Bloom filter executes the hash functions one at a time. It is not hard to imagine an implementation that dispatches lightweight threads to perform each of the k hash functions. 
     </p>
 
-    <h4>Default Hash Functions</h4>
     <a name="default_hash"></a>
+    <h4>Default Hash Functions</h4>
     <p>
       To make the Bloom filter easy to use, the HashFunctions template partameter has a default value. This way, if the user wishes to use a Bloom filter for a quick, non-critical task, the user has the ability to just declare and use.
     </p>
@@ -83,8 +83,8 @@
       <strong>Be warned</strong> - the Boost default hash function when hashing integral types returns the unsigned version of the integer itself. This makes it such that using the default Bloom filter works against you. In this case, it's best to use a single boost_hash function object with seed set to 0.
     </div>
 
-    <h4>C++0x Considerations</h4>
     <a name="c++0x"></a>
+    <h4>C++0x Considerations</h4>
     <p>
       Currently, this implementation uses boost::mpl::vector, boost::mpl::size, and boost::mpl::at_c for managing the hash function set. When C++0x is widely implemented, it may be beneficial to implement hash function set management in terms of std::tuple, std::tuple_size, and std::tuple_element. This will have to be investigated.
     </p>
@@ -95,8 +95,8 @@
       C++0x also introduces lambdas. It may be possible to define hash function objects in terms of lambdas for small, localized uses of the Bloom filter class. Testing needs to be done to verify that lambdas can be safely used.
     </p>
 
-    <h4>Future Directions</h4>
     <a name="future"></a>
+    <h4>Future Directions</h4>
     <p>
       There are a few planned features that have not yet made it to the Bloom filter package:
     </p>
@@ -149,10 +149,6 @@
     </div>
 
     <footer>
-      <p>
-	Last revised: <time datetime="2011-06-14">June 14, 2011</time>.
-      </p>
-
       <p class="copyright">
 	Copyright &#169; 2011 
 	<a href="mailto:cpp.cabrera@gmail.com">Alejandro Cabrera</a>

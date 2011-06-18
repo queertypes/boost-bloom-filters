@@ -42,12 +42,11 @@ header p a {
     background: #d0d0d0;
     font-family: monospace;
     display: block;
-    margin-left: 5%;
-    margin-right: 5%;
+    margin: 0 5%;
 }
 
 .func_ref {
-    background: #f0f0f0;
+    background-color: #f0f0f0;
     display: block;
     margin-bottom: 1%;
     margin-left: 1%;
@@ -57,15 +56,14 @@ header p a {
 
 .func_ref dt {
     font-weight: bold;
-};
+}
 
 .example_output {
     white-space: pre;
-    background: #000000;
     font-family: monospace;
     display: block;
-    margin-left: 5%;
-    margin-right: 5%;
+    margin: 0 5%;
+    background-color: black;
     color: silver;
 }
 

@@ -4,7 +4,7 @@
     <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
     <link rel="stylesheet" type="text/css" 
 	  href="../../../../../../doc/src/boostbook.css"/>
-    <link rel="stylesheet" type="text/css" href="style/my.css"/>
+    <link rel="stylesheet" type="text/css" href="../../style/my.css"/>
 
     <title>Boost.BloomFilter</title>  
   </head>
@@ -38,7 +38,16 @@
       </a>
     </div>
 
-    <h1 class="title">To be completed...</h1>
+    <h1 class="title">Default Hash Function</h1>
+    <div class="listing">
+      <code class="c_keyword">template</code> &lt;<code class="c_keyword">typename</code> <code class="c_id">T</code>, <code class="c_type">size_t</code> <code class="c_id">Size</code>&gt;
+      <code class="c_keyword">struct</code> <code class="c_id">boost_hash</code> {
+        <code class="c_type">size_t</code> <code class="c_func">operator</code>()(<code class="c_keyword">const</code> <code class="c_type">T&amp;</code>) const;
+      };
+    </div>
+    <p>
+      A generic Hasher provided by using <a href="http://www.boost.org/doc/libs/1_46_1/doc/html/hash/reference.html#header.boost.functional.hash_hpp">boost::functional::hash_value</a>. Used by the Bloom filter as a default template parameter for HashFunctions.
+    </p>
 
     <hr/>
     <div class="spirit-nav">
@@ -57,10 +66,6 @@
     </div>
 
     <footer>
-      <p>
-	Last revised: <time datetime="2011-06-14">June 14, 2011</time>.
-      </p>
-
       <p class="copyright">
 	Copyright &#169; 2011 
 	<a href="mailto:cpp.cabrera@gmail.com">Alejandro Cabrera</a>
