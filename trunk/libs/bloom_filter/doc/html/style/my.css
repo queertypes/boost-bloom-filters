@@ -9,8 +9,8 @@
  * See http://www.boost.org/libs/bloom_filter for documentation.
  *
  ******************************************************************************/
-.toc ul, .toc li {padding: 0em; list-style:none;}
-.toc ul {margin: 0em 0em 0em 0em;}
+.toc ul, .toc li {padding: 0; list-style:none;}
+.toc ul {margin: 0 0 0 0;}
 .toc p {font-weight: bold;}
 .copyright {font-style: italic;}
 
@@ -29,12 +29,12 @@ header p {
     float: right;
     text-align: right;
     width: 75em;
-    padding-top: 1.5em; 
 }
+
 
 header p a {
     font-size: 1.1em;
-    padding-right: 7%;
+    margin-right: 7%;
 }
 
 .listing {
@@ -71,7 +71,7 @@ header p a {
     color: maroon;
 }
 
-code.c_comment a {
+.c_comment a {
     color: maroon;
     text-decoration: underline;
 }
