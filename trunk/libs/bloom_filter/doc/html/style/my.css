@@ -14,25 +14,25 @@
 .toc p {font-weight: bold;}
 .copyright {font-style: italic;}
 
-header {
+.header {
     height: 94px;
     position: relative;
     font-family: sans;
 }
 
-header img {
+.header img {
     float: left;
     position: absolute; top: 4px; left: 4px;
 }
 
-header p {
+.header p {
     float: right;
     text-align: right;
     width: 75em;
 }
 
 
-header p a {
+.header p a {
     font-size: 1.1em;
     margin-right: 7%;
 }
