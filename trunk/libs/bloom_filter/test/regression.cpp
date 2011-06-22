@@ -37,24 +37,34 @@ BOOST_AUTO_TEST_CASE(assignment)
 
   for (size_t i = 0; i < 200; ++i) {
     bloom1.insert(i);
-    BOOST_CHECK_EQUAL(bloom1.contains(i), true);
+    BOOST_CHECK_EQUAL(bloom1.probably_contains(i), true);
   }
 
   bloom2 = bloom1;
 
   for (size_t i = 0; i < 200; ++i) {
-    BOOST_CHECK_EQUAL(bloom2.contains(i), true);
+    BOOST_CHECK_EQUAL(bloom2.probably_contains(i), true);
   }
 }
 
-BOOST_AUTO_TEST_CASE(size) {
+BOOST_AUTO_TEST_CASE(bit_capacity) {
   bloom_filter<size_t, 8> bloom_8;
   bloom_filter<size_t, 256> bloom_256;
   bloom_filter<size_t, 2048> bloom_2048;
   
-  BOOST_CHECK_EQUAL(bloom_8.size(), 8ul);
-  BOOST_CHECK_EQUAL(bloom_256.size(), 256ul);
-  BOOST_CHECK_EQUAL(bloom_2048.size(), 2048ul);
+  BOOST_CHECK_EQUAL(bloom_8.bit_capacity(), 8ul);
+  BOOST_CHECK_EQUAL(bloom_256.bit_capacity(), 256ul);
+  BOOST_CHECK_EQUAL(bloom_2048.bit_capacity(), 2048ul);
+}
+
+BOOST_AUTO_TEST_CASE(empty) {
+  bloom_filter<size_t, 8> bloom;
+  
+  BOOST_CHECK_EQUAL(bloom.empty(), true);
+  bloom.insert(1);
+  BOOST_CHECK_EQUAL(bloom.empty(), false);
+  bloom.clear();
+  BOOST_CHECK_EQUAL(bloom.empty(), true);
 }
 
 BOOST_AUTO_TEST_CASE(numHashFunctions) {
@@ -71,7 +81,7 @@ BOOST_AUTO_TEST_CASE(numHashFunctions) {
     boost_hash<size_t, 6>,
     boost_hash<size_t, 7> > > bloom_7;
 
-  BOOST_CHECK_EQUAL(bloom_3.num_hash_functions(), 3ul);
+  BOOST_CHECK_EQUAL(bloom_3.num_hash_functions(), 1ul);
   BOOST_CHECK_EQUAL(bloom_2.num_hash_functions(), 2ul);
   BOOST_CHECK_EQUAL(bloom_7.num_hash_functions(), 7ul);
 }
@@ -82,33 +92,35 @@ BOOST_AUTO_TEST_CASE(falsePositiveRate) {
   BOOST_CHECK_EQUAL(bloom.false_positive_rate(), 0.0);
 
   bloom.insert(1);
-  BOOST_CHECK_CLOSE(bloom.false_positive_rate(), 0.002257625907, 0.0001);
+  BOOST_CHECK_CLOSE(bloom.false_positive_rate(), 0.015504, .01);
 
   bloom.insert(2);
-  BOOST_CHECK_LT(bloom.false_positive_rate(), 0.014736);
+  BOOST_CHECK_CLOSE(bloom.false_positive_rate(), 0.030768, .01);
 
   bloom.insert(3);
-  BOOST_CHECK_LT(bloom.false_positive_rate(), 0.040773);
+  BOOST_CHECK_CLOSE(bloom.false_positive_rate(), 0.045794, .01);
 
   bloom.insert(4);
-  BOOST_CHECK_LT(bloom.false_positive_rate(), 0.0796276);
+  BOOST_CHECK_CLOSE(bloom.false_positive_rate(), 0.060588, .01);
 
   bloom.insert(5);
-  BOOST_CHECK_LT(bloom.false_positive_rate(), 0.12877);
+  BOOST_CHECK_CLOSE(bloom.false_positive_rate(), 0.075151, .01);
 
   bloom.insert(6);
-  BOOST_CHECK_LT(bloom.false_positive_rate(), 0.185102);
+  BOOST_CHECK_CLOSE(bloom.false_positive_rate(), 0.089491, .01);
 
   for (size_t i = 7; i < 5000; ++i)
     bloom.insert(i);
+  
+  BOOST_CHECK_GE(bloom.false_positive_rate(), 0.6);
   BOOST_CHECK_LE(bloom.false_positive_rate(), 1.0);
 }
 
-BOOST_AUTO_TEST_CASE(contains) {
+BOOST_AUTO_TEST_CASE(probably_contains) {
   bloom_filter<size_t, 8> bloom;
 
   bloom.insert(1);
-  BOOST_CHECK_EQUAL(bloom.contains(1), true);
+  BOOST_CHECK_EQUAL(bloom.probably_contains(1), true);
   BOOST_CHECK_LE(bloom.count(), 3ul);
   BOOST_CHECK_GE(bloom.count(), 1ul);
 }
@@ -116,7 +128,7 @@ BOOST_AUTO_TEST_CASE(contains) {
 BOOST_AUTO_TEST_CASE(doesNotContain) {
   bloom_filter<size_t, 8> bloom;
 
-  BOOST_CHECK_EQUAL(bloom.contains(1), false);
+  BOOST_CHECK_EQUAL(bloom.probably_contains(1), false);
 }
 
 BOOST_AUTO_TEST_CASE(insertNoFalseNegatives) {
@@ -124,7 +136,7 @@ BOOST_AUTO_TEST_CASE(insertNoFalseNegatives) {
 
   for (size_t i = 0; i < 100; ++i) {
     bloom.insert(i);
-    BOOST_CHECK_EQUAL(bloom.contains(i), true);
+    BOOST_CHECK_EQUAL(bloom.probably_contains(i), true);
   }
 }
 
@@ -135,7 +147,7 @@ BOOST_AUTO_TEST_CASE(clear) {
     bloom.insert(i);
 
   bloom.clear();
-  BOOST_CHECK_EQUAL(bloom.contains(1), false);
+  BOOST_CHECK_EQUAL(bloom.probably_contains(1), false);
   BOOST_CHECK_EQUAL(bloom.count(), 0ul);
 }
 
@@ -153,7 +165,7 @@ BOOST_AUTO_TEST_CASE(testUnion) {
   bloom_union = bloom_1 | bloom_2;
 
   for (size_t i = 0; i < 200; ++i)
-    BOOST_CHECK_EQUAL(bloom_union.contains(i), true);
+    BOOST_CHECK_EQUAL(bloom_union.probably_contains(i), true);
   BOOST_CHECK_GE(bloom_union.count(), bloom_1.count());
   BOOST_CHECK_GE(bloom_union.count(), bloom_2.count());
 }
@@ -168,7 +180,7 @@ BOOST_AUTO_TEST_CASE(testUnionAssign) {
   bloom_union |= bloom_1;
 
   for (size_t i = 0; i < 100; ++i)
-    BOOST_CHECK_EQUAL(bloom_union.contains(i), true);
+    BOOST_CHECK_EQUAL(bloom_union.probably_contains(i), true);
   BOOST_CHECK_EQUAL(bloom_union.count(), bloom_1.count());
 }
 
@@ -188,7 +200,7 @@ BOOST_AUTO_TEST_CASE(testIntersect) {
 
   BOOST_CHECK_LE(bloom_intersect.count(), bloom_1.count());
   BOOST_CHECK_LE(bloom_intersect.count(), bloom_2.count());
-  BOOST_CHECK_EQUAL(bloom_intersect.contains(100), true);
+  BOOST_CHECK_EQUAL(bloom_intersect.probably_contains(100), true);
 }
 
 BOOST_AUTO_TEST_CASE(testIntersectAssign) {
@@ -201,7 +213,7 @@ BOOST_AUTO_TEST_CASE(testIntersectAssign) {
   bloom_intersect &= bloom_1;
 
   for (size_t i = 0; i < 100; ++i)
-    BOOST_CHECK_EQUAL(bloom_intersect.contains(i), false);
+    BOOST_CHECK_EQUAL(bloom_intersect.probably_contains(i), false);
 }
 
 /*
@@ -225,7 +237,7 @@ BOOST_AUTO_TEST_CASE(collisionBenchmark) {
   std::cout << "bloom size " << bloom.size() << std::endl;
   bloom.insert(INSERT_VAL);
   for (size_t i = 0; i < SEARCH_SPACE; ++i) {
-    if (bloom.contains(i) && i != INSERT_VAL) ++collisions;
+    if (bloom.probably_contains(i) && i != INSERT_VAL) ++collisions;
   }
 
   std::cout << collisions << " collisions" << std::endl;

@@ -39,7 +39,7 @@ int main () {
   }
 
   for (size_t i = INSERT_MAX; i < CONTAINS_MAX; ++i) {
-    if (bloom.contains(i)) ++collisions;
+    if (bloom.probably_contains(i)) ++collisions;
   }
 
   cout << "false positive rate after inserts: "

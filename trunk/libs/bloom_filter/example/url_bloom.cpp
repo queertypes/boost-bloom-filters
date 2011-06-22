@@ -45,7 +45,7 @@ int main () {
   }
 
   for (size_t i = INSERT_MAX; i < CONTAINS_MAX; ++i) {
-    if (bloom.contains(gen_url(i))) ++collisions;
+    if (bloom.probably_contains(gen_url(i))) ++collisions;
   }
 
   cout << "collisions: " << collisions << endl;

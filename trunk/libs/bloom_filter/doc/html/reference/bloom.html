@@ -54,10 +54,12 @@
         <code class="c_func">bloom_filter</code>();
 
         <code class="c_comment">// data structure metadata query functions</code>
-        <code class="c_keyword">static constexpr</code> <code class="c_type">size_t</code> <code class="c_func">size</code>() <code class="c_keyword">const</code>;
+        <code class="c_keyword">static constexpr</code> <code class="c_type">size_t</code> <code class="c_func">bit_capacity</code>() <code class="c_keyword">const</code>;
         <code class="c_keyword">static constexpr</code> <code class="c_type">size_t</code> <code class="c_func">num_hash_functions</code>() <code class="c_keyword">const</code>;
         <code class="c_type">double</code> <code class="c_func">false_positive_rate</code>() <code class="c_keyword">const</code>;
         <code class="c_type">size_t</code> <code class="c_func">count</code>() <code class="c_keyword">const</code>;
+        <code class="c_type">bool</code> <code class="c_func">empty</code>() <code class="c_keyword">const</code>;
+        <code class="c_type">void</code> <code class="c_func">clear</code>()</code>;
 
         <code class="c_comment">// data structures core ops</code>
         <code class="c_type">void</code> <code class="c_func">insert</code>(<code class="c_keyword">const</code> <code class="c_type">T</code>&amp;);
@@ -100,12 +102,14 @@
       <p>Function Reference</p>
       <ul>
 	<li><a href="#constructor">bloom_filter()</a></li>
-	<li><a href="#size">size()</a></li>
+	<li><a href="#bit_capacity">bit_capacity()</a></li>
 	<li><a href="#num_hash_functions">num_hash_functions()</a></li>
 	<li><a href="#false_positive_rate">false_positive_rate()</a></li>
+	<li><a href="#empty">empty()</a></li>
 	<li><a href="#count">count()</a></li>
+	<li><a href="#clear">clear()</a></li>
 	<li><a href="#insert">insert()</a></li>
-	<li><a href="#contains">contains()</a></li>
+	<li><a href="#probably_contains">probably_contains()</a></li>
 	<li><a href="#union_assign">operator|=()</a></li>
 	<li><a href="#intersect_assign">operator&amp;=()</a></li>
 	<li><a href="#union">operator|()</a></li>
@@ -125,8 +129,8 @@
     </div>
 
     <div class="func_ref">
-      <a name="size"></a>
-      <h3><code class="c_type">size_t</code> <code class="c_func">size</code>() <code class="c_keyword">const</code></h3>
+      <a name="bit_capacity"></a>
+      <h3><code class="c_type">size_t</code> <code class="c_func">bit_capacity</code>() <code class="c_keyword">const</code></h3>
       <dl>
 	<dt>Description</dt>
 	<dd>Returns the number of bits used internally by the Bloom filter..</dd>
@@ -159,6 +163,17 @@
     </div>
 
     <div class="func_ref">
+      <a name="empty"></a>
+      <h3><code class="c_type">bool</code> <code class="c_func">empty</code>() <code class="c_keyword">const</code></h3>
+      <dl>
+	<dt>Description</dt>
+	<dd>Returns true if no elements have been inserted into the Bloom filter.</dd>
+	<dt>Returns</dt>
+	<dd>std::bitset.count() == 0</dd>
+      </dl>
+    </div>
+
+    <div class="func_ref">
       <a name="count"></a>
       <h3><code class="c_type">size_t</code> <code class="c_func">count</code>() <code class="c_keyword">const</code></h3>
       <dl>
@@ -169,6 +184,16 @@
       </dl>
     </div>
 
+    <div class="func_ref">
+      <a name="clear"></a>
+      <h3><code class="c_type">void</code> <code class="c_func">clear</code>()</h3>
+      <dl>
+	<dt>Description</dt>
+	<dd>Sets all bits in the Bloom filter to 0, effectively canceling all insertions.</dd>
+	<dt>Post-condition</dt>
+	<dd>this->count() == 0</dd>
+      </dl>
+    </div>
 
     <div class="func_ref">
       <a name="insert"></a>
@@ -183,8 +208,8 @@
 
 
     <div class="func_ref">
-      <a name="contains"></a>
-      <h3><code class="c_type">bool</code> <code class="c_func">contains</code>(<code class="c_keyword">const</code> <code class="c_type">T&amp;</code>) <code class="c_keyword">const</code></h3>
+      <a name="probably_contains"></a>
+      <h3><code class="c_type">bool</code> <code class="c_func">probably_contains</code>(<code class="c_keyword">const</code> <code class="c_type">T&amp;</code>) <code class="c_keyword">const</code></h3>
       <dl>
 	<dt>Description</dt>
 	<dd>Queries an element in the Bloom filter, checking each hash function value against the set bits.</dd>

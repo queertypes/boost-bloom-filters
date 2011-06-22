@@ -51,7 +51,7 @@
       <li>Basic functions:
       <ul>
 	<li><code>void insert(const T&amp;);</code></li>
-	<li><code>bool contains(const T&amp;);</code></li>
+	<li><code>bool probably_contains(const T&amp;);</code></li>
       </ul>
       </li>
     </ul>
@@ -81,7 +81,7 @@
 	}
 
 	<code class="c_keyword">for</code> (<code class="c_type">int</code><code class="c_id"> i</code> = INSERT_MAX; i &lt; CONTAINS_MAX; ++i) {
-	  <code class="c_keyword">if</code> (bloom.contains(i)) cout &lt;&lt; "collision" &lt;&lt; endl;
+	  <code class="c_keyword">if</code> (bloom.probably_contains(i)) cout &lt;&lt; "collision" &lt;&lt; endl;
 	}
 
 	cout &lt;&lt; <code class="c_str">"collisions: "</code> 
@@ -173,7 +173,7 @@
 	}
 
 	<code class="c_keyword">for</code> (<code class="c_type">int</code><code class="c_id"> i</code> = INSERT_MAX; i &lt; CONTAINS_MAX; ++i) {
-	    <code class="c_keyword">if</code> (bloom.contains(i)) ++collisions;
+	    <code class="c_keyword">if</code> (bloom.probably_contains(i)) ++collisions;
 	}
 
 	cout &lt;&lt; <code class="c_str">"false positive rate: "</code> 
@@ -197,7 +197,7 @@
 
     <p>
       All the details of insertion and querying the Bloom filter are handled
-      transparently by the insert() and contains() functions, regardless
+      transparently by the insert() and probably_contains() functions, regardless
       of the type, bit size, and hash functions used. This makes it very
       convenient to experiment with different Bloom filter parameters in
       projects you commit to.
