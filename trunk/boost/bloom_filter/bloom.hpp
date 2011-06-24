@@ -27,12 +27,15 @@
 #include <boost/bloom_filter/detail/apply_hash.hpp>
 #include <boost/bloom_filter/hash/default.hpp>
 
+#ifndef BOOST_NO_0X_HDR_INITIALIZER_LIST
+#include <initializer_list>
+#endif 
+
 namespace boost {
   namespace bloom_filter {
     template <typename T,
 	      size_t Size,
-	      class HashFunctions = mpl::vector<boost_hash<T, 3>,
-						boost_hash<T, 37> > >
+	      class HashFunctions = mpl::vector<boost_hash<T, 3> > >
     class bloom_filter {
     public:
       typedef T value_type;
@@ -41,11 +44,26 @@ namespace boost {
     public:
       bloom_filter() {}
 
-      static BOOST_CONSTEXPR size_t size() const {
+      template <typename InputIterator>
+      bloom_filter (const InputIterator start, const InputIterator end) {
+	for (InputIterator i = start; i != end; ++i)
+	  this->insert(*i);
+      }
+
+#ifndef BOOST_NO_0X_HDR_INITIALIZER_LIST
+      bloom_filter (std::initializer_list<T> ilist) {
+	typedef std::initializer_list::const_iterator citer;
+	for (citer i = ilist.begin(), end = ilist.end(); i != end; ++i) {
+	  this->insert(*i);
+	}
+      }
+#endif
+
+      static BOOST_CONSTEXPR size_t bit_capacity() {
         return Size;
       }
 
-      static BOOST_CONSTEXPR size_t num_hash_functions() const {
+      static BOOST_CONSTEXPR size_t num_hash_functions() {
         return mpl::size<HashFunctions>::value;
       };
 
@@ -62,12 +80,23 @@ namespace boost {
         return this->bits.count();
       };
 
+      bool empty() const {
+	return this->count() == 0;
+      }
+
       void insert(const T& t) {
         static const unsigned N = mpl::size<HashFunctions>::value - 1;
         detail::apply_hash<N, T, Size, HashFunctions>::insert(t, bits);
       }
 
-      bool contains(const T& t) const {
+      template <typename InputIterator>
+      void insert(const InputIterator start, const InputIterator end) {
+	for (InputIterator i = start; i != end; ++i) {
+	  this->insert(*i);
+	}
+      }
+
+      bool probably_contains(const T& t) const {
         static const unsigned N = mpl::size<HashFunctions>::value - 1;
         return detail::apply_hash<N, T, Size, HashFunctions>::contains(t, bits);
       }
