@@ -30,6 +30,21 @@ BOOST_AUTO_TEST_CASE(defaultConstructor) {
   bloom_filter<int, 8, BoostHashFunctions> bloom2;
 }
 
+BOOST_AUTO_TEST_CASE(rangeConstructor) {
+  int elems[5] = {1,2,3,4,5};
+  bloom_filter<int, 8> bloom(elems, elems+5);
+
+  BOOST_CHECK_EQUAL(bloom.count(), 5ul);
+}
+
+#ifndef BOOST_NO_0X_HDR_INITIALIZER_LIST
+BOOST_AUTO_TEST_CASE(initListConstructor) {
+  bloom_filter<int, 8> bloom1 = {1,2,3,4,5};
+
+  BOOST_CHECK_EQUAL(bloom.count(), 5);
+}
+#endif
+
 BOOST_AUTO_TEST_CASE(assignment)
 {
   bloom_filter<int, 8> bloom1;
@@ -138,6 +153,14 @@ BOOST_AUTO_TEST_CASE(insertNoFalseNegatives) {
     bloom.insert(i);
     BOOST_CHECK_EQUAL(bloom.probably_contains(i), true);
   }
+}
+
+BOOST_AUTO_TEST_CASE(rangeInsert) {
+  int elems[5] = {1,2,3,4,5};
+  bloom_filter<size_t, 8> bloom;
+
+  bloom.insert(elems, elems+5);
+  BOOST_CHECK_EQUAL(bloom.count(), 5ul);
 }
 
 BOOST_AUTO_TEST_CASE(clear) {
