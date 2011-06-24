@@ -55,7 +55,14 @@
 }
 
 .func_ref dt {
+    margin: 0 1%;
     font-weight: bold;
+}
+
+.ref_listing {
+    font-family: monospace;
+    font-size: 1.2em;
+    margin: 0 1%;
 }
 
 .example_output {
