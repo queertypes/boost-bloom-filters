@@ -45,14 +45,14 @@ namespace boost {
       bloom_filter() {}
 
       template <typename InputIterator>
-      bloom_filter (const InputIterator start, const InputIterator end) {
+      bloom_filter(const InputIterator start, const InputIterator end) {
 	for (InputIterator i = start; i != end; ++i)
 	  this->insert(*i);
       }
 
 #ifndef BOOST_NO_0X_HDR_INITIALIZER_LIST
-      bloom_filter (std::initializer_list<T> ilist) {
-	typedef std::initializer_list::const_iterator citer;
+      bloom_filter(std::initializer_list<T> ilist) {
+	typedef typename std::initializer_list<T>::const_iterator citer;
 	for (citer i = ilist.begin(), end = ilist.end(); i != end; ++i) {
 	  this->insert(*i);
 	}
@@ -105,6 +105,12 @@ namespace boost {
         this->bits.reset();
       }
 
+      void swap(bloom_filter& other) {
+	bloom_filter tmp = other;
+	other = *this;
+	*this = tmp;
+      }
+
       bloom_filter& operator|=(const bloom_filter& rhs) {
         this->bits |= rhs.bits;
         return *this;
@@ -137,6 +143,14 @@ namespace boost {
       bloom_filter<_T, _Size, _HashFunctions> ret(lhs);
       ret &= rhs;
       return ret;
+    }
+
+    template<class _T, size_t _Size, class _HashFunctions>
+    void
+    swap(bloom_filter<_T, _Size, _HashFunctions>& lhs,
+	 bloom_filter<_T, _Size, _HashFunctions>& rhs)
+    {
+      lhs.swap(rhs);
     }
   } // namespace bloom_filter
 } // namespace boost
