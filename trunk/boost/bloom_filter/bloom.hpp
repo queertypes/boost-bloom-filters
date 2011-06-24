@@ -51,7 +51,7 @@ namespace boost {
       }
 
 #ifndef BOOST_NO_0X_HDR_INITIALIZER_LIST
-      bloom_filter(std::initializer_list<T> ilist) {
+      bloom_filter(const std::initializer_list<T>& ilist) {
 	typedef typename std::initializer_list<T>::const_iterator citer;
 	for (citer i = ilist.begin(), end = ilist.end(); i != end; ++i) {
 	  this->insert(*i);
