@@ -13,7 +13,7 @@ if ! $(BOOST_ROOT)
 
 project
     : requirements
-	<library>$(BOOST_ROOT)/libs/test/build//boost_unit_test_framework/<link>static
+	<library>$(BOOST_ROOT)/libs/test/build//boost_unit_test_framework/<link>shared
 	<include>$(BOOST_ROOT)
 	<include>../../../
         <define>BOOST_ENABLE_WARNINGS

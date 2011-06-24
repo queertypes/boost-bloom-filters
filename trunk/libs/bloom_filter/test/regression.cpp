@@ -10,6 +10,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MODULE "Boost Bloom Filter" 1
 #include <iostream>
 
