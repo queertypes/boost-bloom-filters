@@ -39,9 +39,27 @@ BOOST_AUTO_TEST_CASE(rangeConstructor) {
 
 #ifndef BOOST_NO_0X_HDR_INITIALIZER_LIST
 BOOST_AUTO_TEST_CASE(initListConstructor) {
-  bloom_filter<int, 8> bloom1 = {1,2,3,4,5};
+  bloom_filter<int, 8> bloom = {1,2,3,4,5};
 
-  BOOST_CHECK_EQUAL(bloom.count(), 5);
+  BOOST_CHECK_EQUAL(bloom.count(), 5ul);
+}
+#endif
+
+BOOST_AUTO_TEST_CASE(copyConstructor) {
+  int elems[5] = {1,2,3,4,5};
+  bloom_filter<int, 8> bloom1(elems, elems+5);
+  bloom_filter<int, 8> bloom2(bloom1);
+
+  BOOST_CHECK_EQUAL(bloom1.count(), bloom2.count());
+}
+
+#ifdef BOOST_HAS_RVALUE_REFS
+BOOST_AUTO_TEST_CASE(moveConstructor) {
+  int elems[5] = {1,2,3,4,5};
+  bloom_filter<int, 8> bloom1(elems, elems+5);
+  bloom_filter<int, 8> bloom2 = std::move(bloom1);
+
+  BOOST_CHECK_EQUAL(bloom2.count(), 5ul);
 }
 #endif
 
