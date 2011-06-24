@@ -182,6 +182,17 @@ BOOST_AUTO_TEST_CASE(clear) {
   BOOST_CHECK_EQUAL(bloom.count(), 0ul);
 }
 
+BOOST_AUTO_TEST_CASE(memberSwap) {
+  size_t elems[5] = {1,2,3,4,5};
+  bloom_filter<size_t, 8> bloom1(elems, elems+2);
+  bloom_filter<size_t, 8> bloom2(elems+2, elems+5);
+
+  bloom1.swap(bloom2);
+
+  BOOST_CHECK_EQUAL(bloom1.count(), 3ul);
+  BOOST_CHECK_EQUAL(bloom2.count(), 2ul);
+}
+
 BOOST_AUTO_TEST_CASE(testUnion) {
   bloom_filter<size_t, 32> bloom_1;
   bloom_filter<size_t, 32> bloom_2;
@@ -245,6 +256,17 @@ BOOST_AUTO_TEST_CASE(testIntersectAssign) {
 
   for (size_t i = 0; i < 100; ++i)
     BOOST_CHECK_EQUAL(bloom_intersect.probably_contains(i), false);
+}
+
+BOOST_AUTO_TEST_CASE(globalSwap) {
+  size_t elems[5] = {1,2,3,4,5};
+  bloom_filter<size_t, 8> bloom1(elems, elems+2);
+  bloom_filter<size_t, 8> bloom2(elems+2, elems+5);
+
+  swap(bloom1, bloom2);
+
+  BOOST_CHECK_EQUAL(bloom1.count(), 3ul);
+  BOOST_CHECK_EQUAL(bloom2.count(), 2ul);
 }
 
 /*
