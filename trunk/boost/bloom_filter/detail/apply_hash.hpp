@@ -13,6 +13,7 @@
 #ifndef BOOST_BLOOM_FILTER_APPLY_HASH_HPP
 #define BOOST_BLOOM_FILTER_APPLY_HASH_HPP
 
+#include <bitset>
 #include <boost/dynamic_bitset.hpp>
 #include <boost/mpl/at.hpp>
 
@@ -20,7 +21,9 @@ namespace boost {
   namespace bloom_filter {
     namespace detail {
 
-      // static bloom filter
+      /*************************************************************************
+       *                          static bloom filter
+       ************************************************************************/
       template <size_t N,
 	        typename T,
 	        size_t Size,
@@ -60,7 +63,9 @@ namespace boost {
         }
       };
 
-      // dynamic bloom filter
+      /*************************************************************************
+       *                        dynamic bloom filter
+       ************************************************************************/
       template <size_t N,
 	        typename T,
 	        class HashFunctions,

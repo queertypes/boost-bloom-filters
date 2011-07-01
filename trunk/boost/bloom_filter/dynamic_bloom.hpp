@@ -18,6 +18,7 @@
  *        of hash function application. 
  */
 #include <cmath>
+#include <cassert>
 
 #include <boost/config.hpp>
 #include <boost/mpl/vector.hpp>
@@ -26,10 +27,6 @@
 
 #include <boost/bloom_filter/detail/apply_hash.hpp>
 #include <boost/bloom_filter/hash/default.hpp>
-
-#ifndef BOOST_NO_0X_HDR_INITIALIZER_LIST
-#include <initializer_list>
-#endif 
 
 namespace boost {
   namespace bloom_filter {
@@ -53,20 +50,14 @@ namespace boost {
       explicit dynamic_bloom_filter(const size_t bit_capacity) : bits(bit_capacity) {}
       
       template <typename InputIterator>
-      dynamic_bloom_filter(const InputIterator start, 
-			   const InputIterator end) {
+      dynamic_bloom_filter(const size_t bit_capacity,
+			   const InputIterator start, 
+			   const InputIterator end) 
+	: bits(bit_capacity)
+      {
 	for (InputIterator i = start; i != end; ++i)
 	  this->insert(*i);
       }
-
-#ifndef BOOST_NO_0X_HDR_INITIALIZER_LIST
-      dynamic_bloom_filter(const std::initializer_list<T>& ilist) {
-	typedef typename std::initializer_list<T>::const_iterator citer;
-	for (citer i = ilist.begin(), end = ilist.end(); i != end; ++i) {
-	  this->insert(*i);
-	}
-      }
-#endif
 
       // query functions
       static BOOST_CONSTEXPR size_t num_hash_functions() {
@@ -76,7 +67,7 @@ namespace boost {
       double false_positive_rate() const {
         const double n = static_cast<double>(this->bits.count());
         static const double k = static_cast<double>(num_hash_functions());
-        static const double m = static_cast<double>(Size);
+        static const double m = static_cast<double>(this->bits.size());
         static const double e =
 	  2.718281828459045235360287471352662497757247093699959574966;
         return std::pow(1 - std::pow(e, -k * n / m), k);
@@ -85,6 +76,10 @@ namespace boost {
       size_t count() const {
         return this->bits.count();
       };
+
+      size_t bit_capacity() const {
+	return this->bits.size();
+      }
 
       bool empty() const {
 	return this->count() == 0;
@@ -116,8 +111,8 @@ namespace boost {
         this->bits.reset();
       }
 
-      void swap(bloom_filter& other) {
-	bloom_filter tmp = other;
+      void swap(dynamic_bloom_filter& other) {
+	dynamic_bloom_filter tmp = other;
 	other = *this;
 	*this = tmp;
       }
@@ -127,15 +122,24 @@ namespace boost {
 	bits.resize(bit_capacity);
       }
 
-      friend bool operator==(const bloom_filter&, const bloom_filter&);
-      friend bool operator!=(const bloom_filter&, const bloom_filter&);
+      template <typename _T, typename _HashFunctions, 
+		typename _Block, typename _Allocator>
+      friend bool operator==(const dynamic_bloom_filter<_T, _HashFunctions, _Block, _Allocator>&, 
+			     const dynamic_bloom_filter<_T, _HashFunctions, _Block, _Allocator>&);
 
-      bloom_filter& operator|=(const bloom_filter& rhs) {
+      template <typename _T, typename _HashFunctions, 
+		typename _Block, typename _Allocator>
+      friend bool operator!=(const dynamic_bloom_filter<_T, _HashFunctions, _Block, _Allocator>&, 
+			     const dynamic_bloom_filter<_T, _HashFunctions, _Block, _Allocator>&);
+
+      dynamic_bloom_filter& operator|=(const dynamic_bloom_filter& rhs) {
+	assert(this->bit_capacity() == rhs.bit_capacity());
         this->bits |= rhs.bits;
         return *this;
       }
 
-      bloom_filter& operator&=(const bloom_filter& rhs) {
+      dynamic_bloom_filter& operator&=(const dynamic_bloom_filter& rhs) {
+	assert(this->bit_capacity() == rhs.bit_capacity());
         this->bits &= rhs.bits;
         return *this;
       }
@@ -154,7 +158,8 @@ namespace boost {
 					 HashFunctions, 
 					 Block, Allocator>& rhs)
     {
-      bloom_filter<_T, _Size, _HashFunctions> ret(lhs);
+      assert(lhs.bit_capacity() == rhs.bit_capacity());
+      dynamic_bloom_filter<T, HashFunctions, Block, Allocator> ret(lhs);
       ret |= rhs;
       return ret;
     }
@@ -169,7 +174,8 @@ namespace boost {
 					 HashFunctions, 
 					 Block, Allocator>& rhs)
     {
-      bloom_filter<_T, _Size, _HashFunctions> ret(lhs);
+      assert(lhs.bit_capacity() == rhs.bit_capacity());
+      dynamic_bloom_filter<T, HashFunctions, Block, Allocator> ret(lhs);
       ret &= rhs;
       return ret;
     }
