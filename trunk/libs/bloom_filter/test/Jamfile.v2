@@ -20,8 +20,14 @@ project
         <warnings>all
     ;
 
-    test-suite "basic"
+    test-suite "regression"
         :
-	[ run regression.cpp ]
+	[ run bloom-pass.cpp ]
+	[ run dynamic_bloom-pass.cpp ]
         ;
 
+    test-suite "fail"
+	:
+	[ run-fail dynamic_bloom_union-fail.cpp ]
+	[ run-fail dynamic_bloom_intersect-fail.cpp ]
+	;
