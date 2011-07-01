@@ -50,8 +50,8 @@ namespace boost {
       // constructors
       dynamic_bloom_filter() {}
       
-      explicit dynamic_bloom_filter(const size_t bit_capacity);
-
+      explicit dynamic_bloom_filter(const size_t bit_capacity) : bits(bit_capacity) {}
+      
       template <typename InputIterator>
       dynamic_bloom_filter(const InputIterator start, 
 			   const InputIterator end) {
@@ -93,7 +93,8 @@ namespace boost {
       // core operations
       void insert(const T& t) {
         static const unsigned N = mpl::size<HashFunctions>::value - 1;
-        //detail::apply_hash<N, T, Size, HashFunctions>::insert(t, bits);
+        detail::dynamic_apply_hash<N, T, HashFunctions, Block, Allocator>::
+	  insert(t, bits, bits.size());
       }
 
       template <typename InputIterator>
@@ -105,8 +106,9 @@ namespace boost {
 
       bool probably_contains(const T& t) const {
         static const unsigned N = mpl::size<HashFunctions>::value - 1;
-        //return detail::apply_hash<N, T, Size, HashFunctions>::contains(t, bits);
-	return false;
+        return detail::
+	  dynamic_apply_hash<N, T, HashFunctions, Block, Allocator>::
+	  contains(t, bits, bits.size());
       }
 
       // auxilliary operations
@@ -120,7 +122,13 @@ namespace boost {
 	*this = tmp;
       }
 
-      void resize(const size_t bit_capacity);
+      void resize(const size_t bit_capacity) {
+	bits.clear();
+	bits.resize(bit_capacity);
+      }
+
+      friend bool operator==(const bloom_filter&, const bloom_filter&);
+      friend bool operator!=(const bloom_filter&, const bloom_filter&);
 
       bloom_filter& operator|=(const bloom_filter& rhs) {
         this->bits |= rhs.bits;
@@ -164,6 +172,33 @@ namespace boost {
       bloom_filter<_T, _Size, _HashFunctions> ret(lhs);
       ret &= rhs;
       return ret;
+    }
+
+
+    template<class T, class HashFunctions,
+	     class Block, class Allocator>
+    bool
+    operator==(const dynamic_bloom_filter<T, 
+					  HashFunctions, 
+					  Block, Allocator>& lhs,
+	       const dynamic_bloom_filter<T, 
+					  HashFunctions, 
+					  Block, Allocator>& rhs)
+    {
+      return lhs.bits == rhs.bits;
+    }
+
+    template<class T, class HashFunctions,
+	     class Block, class Allocator>
+    bool
+    operator!=(const dynamic_bloom_filter<T, 
+					  HashFunctions, 
+					  Block, Allocator>& lhs,
+	       const dynamic_bloom_filter<T, 
+					  HashFunctions, 
+					  Block, Allocator>& rhs)
+    {
+      return !(lhs == rhs);
     }
 
     template<class T, class HashFunctions,
