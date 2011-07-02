@@ -270,3 +270,24 @@ BOOST_AUTO_TEST_CASE(globalSwap) {
   BOOST_CHECK_EQUAL(bloom2.count(), 2ul);
 }
 
+BOOST_AUTO_TEST_CASE(equalityOperator) {
+  bloom_filter<int, 8> bloom1;
+  bloom_filter<int, 8> bloom2;
+
+  BOOST_CHECK_EQUAL(bloom1 == bloom2, true);
+  bloom1.insert(1);
+  BOOST_CHECK_EQUAL(bloom1 == bloom2, false);
+  bloom2.insert(1);
+  BOOST_CHECK_EQUAL(bloom1 == bloom2, true);
+}
+
+BOOST_AUTO_TEST_CASE(inequalityOperator) {
+  bloom_filter<int, 8> bloom1;
+  bloom_filter<int, 8> bloom2;
+
+  BOOST_CHECK_EQUAL(bloom1 != bloom2, false);
+  bloom1.insert(1);
+  BOOST_CHECK_EQUAL(bloom1 != bloom2, true);
+  bloom2.insert(1);
+  BOOST_CHECK_EQUAL(bloom1 != bloom2, false);
+}
