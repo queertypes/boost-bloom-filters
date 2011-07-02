@@ -68,13 +68,13 @@ BOOST_AUTO_TEST_CASE(countMulti)
     bloom.insert(i);
   }
 
-  BOOST_CHECK_EQUAL(bloom.count(), 100);
+  BOOST_CHECK_EQUAL(bloom.count(), 100ul);
 
   for (size_t i = 0; i < 100; ++i) {
     bloom.insert(i);
   }
 
-  BOOST_CHECK_EQUAL(bloom.count(), 100);
+  BOOST_CHECK_EQUAL(bloom.count(), 100ul);
 }
 
 BOOST_AUTO_TEST_CASE(rangeConstructor) {
@@ -227,7 +227,7 @@ BOOST_AUTO_TEST_CASE(rangeInsert) {
   BOOST_CHECK_EQUAL(bloom.count(), 5ul);
 }
 
-BOOST_AUTO_TEST_CASE(remove) {
+BOOST_AUTO_TEST_CASE(_remove) {
   counting_bloom_filter<size_t, NUM_BINS> bloom;
   
   bloom.insert(1);
