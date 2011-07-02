@@ -41,12 +41,11 @@
     </p>
     
     <p>
-      Testing is performed as a series of test cases that evaluate the functionality of a test element. The current state of testing is as follows:
+      Testing is performed as a series of test cases that evaluate the functionality of a test element. The naming convention isn't fleshed out yet. However, all tests expected to pass are named *-pass.*. All tests expected to fail are named *-fail.*. Tests are also named to help identify which class they are testing. The current state of testing is as follows:
     </p>
     <ul>
-      <li>A single test file</li>
-      <li>Covers all operations of Bloom filter class</li>
-      <li>Covers construction using single and multiple HashFn parameters.</li>
+      <li>A regression suite per class covering each function and constructor</li>
+      <li>A series of failing test suites that check for classes doing the right thing when pre-conditions on usage aren't met.</li>
     </ul>
 
     <p>

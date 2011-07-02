@@ -25,7 +25,7 @@
     <hr/>
 
     <div class="spirit-nav">
-      <a accesskey="p" href="../reference.html">
+      <a accesskey="p" href="bloom.html">
 	<img src="../../../../../doc/src/images/prev.png" alt="Prev"/>
       </a>
       <a accesskey="u" href="../reference.html">
@@ -34,31 +34,34 @@
       <a accesskey="h" href="../index.html">
 	<img src="../../../../../doc/src/images/home.png" alt="Home"/>
       </a>
-      <a accesskey="n" href="dynamic_bloom.html">
+      <a accesskey="n" href="hash/default.html">
 	<img src="../../../../../doc/src/images/next.png" alt="Next"/>
       </a>
     </div>
 
-    <h1>Basic Bloom Filter</h1>
+    <h1>Basic Dynamic Bloom Filter</h1>
     <div class="listing">
       <code class="c_keyword">template</code> &lt;<code class="c_keyword">typename</code> <code class="c_type">T</code>,
-                <code class="c_type">size_t</code> <code class="c_type">Size</code>,
-                <code class="c_keyword">class</code> <code class="c_type">HashFunctions</code> = <code class="c_namespace">mpl::</code><code class="c_type">vector</code>&lt;<code class="c_type">boost_hash</code>&lt;<code class="c_type">T</code>, 3&gt; &gt; &gt;
-      <code class="c_keyword">class</code> <code class="c_id">bloom_filter</code> {
+                <code class="c_keyword">class</code> <code class="c_type">HashFunctions</code> = <code class="c_namespace">mpl::</code><code class="c_type">vector</code>&lt;<code class="c_type">boost_hash</code>&lt;<code class="c_type">T</code>, 3&gt; &gt;,
+		<code class="c_keyword">typename</code> <code class="c_type">Block</code> = <code class="c_type">size_t</code>,
+		<code class="c_keyword">typename</code> <code class="c_type">Allocator</code> = <code class="c_namespace">std::</code><code class="c_type">allocator</code>&lt;<code class="c_type">Block</code>&gt; &gt;
+      <code class="c_keyword">class</code> <code class="c_type">dynamic_bloom_filter</code> {
         <code class="c_comment">// exported typedefs</code>
         <code class="c_keyword">typedef</code> <code class="c_type">T value_type</code>;
         <code class="c_keyword">typedef</code> <code class="c_type">T key_type</code>;
         <code class="c_keyword">typedef</code> <code class="c_type">HashFunctions hash_function_type</code>;
+        <code class="c_keyword">typedef</code> <code class="c_type">Block block_type</code>;
+        <code class="c_keyword">typedef</code> <code class="c_type">Allocator allocator_type</code>;
 
         <code class="c_comment">// constructors</code>
-        <code class="c_func">bloom_filter</code>();
-        <code class="c_func">bloom_filter</code>(<code class="c_keyword">const</code> <code class="c_namespace">std::initializer_list</code>&lt;<code class="c_type">T</code>&gt;&amp;); <code class="c_comment">// requires C++11</code>
+        <code class="c_func">dynamic_bloom_filter</code>();
+        <code class="c_keyword">explicit</code> <code class="c_func">dynamic_bloom_filter</code>(<code class="c_keyword">const</code> <code class="c_type">size_t</code> <code class="c_id">bit_capacity</code>);
 
 	&lt;<code class="c_keyword">typename</code> <code class="c_type">InputIterator</code>&gt;	
-        <code class="c_func">bloom_filter</code>(<code class="c_keyword">const</code> <code class="c_type">InputIterator</code> <code class="c_id">start</code>, <code class="c_keyword">const</code> <code class="c_type">InputIterator</code> <code class="c_id">end</code>);
+        <code class="c_func">dynamic_bloom_filter</code>(<code class="c_keyword">const</code> <code class="c_type">InputIterator</code> <code class="c_id">start</code>, <code class="c_keyword">const</code> <code class="c_type">InputIterator</code> <code class="c_id">end</code>);
 
         <code class="c_comment">// data structure metadata query functions</code>
-        <code class="c_keyword">static constexpr</code> <code class="c_type">size_t</code> <code class="c_func">bit_capacity</code>() <code class="c_keyword">const</code>;
+        <code class="c_type">size_t</code> <code class="c_func">bit_capacity</code>() <code class="c_keyword">const</code>;
         <code class="c_keyword">static constexpr</code> <code class="c_type">size_t</code> <code class="c_func">num_hash_functions</code>() <code class="c_keyword">const</code>;
         <code class="c_type">double</code> <code class="c_func">false_positive_rate</code>() <code class="c_keyword">const</code>;
         <code class="c_type">size_t</code> <code class="c_func">count</code>() <code class="c_keyword">const</code>;
@@ -74,44 +77,54 @@
 
 	<code class="c_comment">// auxilliary ops</code>
         <code class="c_type">void</code> <code class="c_func">clear</code>();
-        <code class="c_type">void</code> <code class="c_func">swap</code>(<code class="c_type">bloom_filter</code>&amp;);
+        <code class="c_type">void</code> <code class="c_func">swap</code>(<code class="c_type">dynamic_bloom_filter</code>&amp;);
+        <code class="c_type">void</code> <code class="c_func">resize</code>(<code class="c_keyword">const</code> <code class="c_type">size_t</code> <code class="c_id">new_capacity</code>);
         
         <code class="c_comment">// union assign/intersect assign</code>
-        <code class="c_type">bloom_filter</code>&amp; <code class="c_func">operator|=</code>(<code class="c_keyword">const</code> <code class="c_type">bloom_filter</code>&amp;);
-        <code class="c_type">bloom_filter</code>&amp; <code class="c_func">operator&amp;=</code>(<code class="c_keyword">const</code> <code class="c_type">bloom_filter</code>&amp;);       
+        <code class="c_type">dynamic_bloom_filter</code>&amp; <code class="c_func">operator|=</code>(<code class="c_keyword">const</code> <code class="c_type">dynamic_bloom_filter</code>&amp;);
+        <code class="c_type">dynamic_bloom_filter</code>&amp; <code class="c_func">operator&amp;=</code>(<code class="c_keyword">const</code> <code class="c_type">dynamic_bloom_filter</code>&amp;);       
       };
 
       <code class="c_comment">// union</code>
-      <code class="c_keyword">template</code> &lt;<code class="c_keyword">typename</code> <code class="c_type">T</code>, <code class="c_type">size_t</code> <code class="c_type">Size</code>,
-		<code class="c_keyword">class</code> <code class="c_type">HashFunctions</code>&gt;
-      <code class="c_type">bloom_filter</code>&lt;<code class="c_type">T, Size, HashFunctions</code>&gt;
-      <code class="c_func">operator|</code>(<code class="c_keyword">const</code> <code class="c_type">bloom_filter</code>&lt;<code class="c_type">T, Size, HashFunctions</code>&gt;&amp; <code class="c_id">lhs</code>,
-	        <code class="c_keyword">const</code> <code class="c_type">bloom_filter</code>&lt;<code class="c_type">T, Size, HashFunctions</code>&gt;&amp; <code class="c_id">rhs</code>);
+      <code class="c_keyword">template</code> &lt;<code class="c_keyword">typename</code> <code class="c_type">T</code>,
+                <code class="c_keyword">class</code> <code class="c_type">HashFunctions</code>,
+		<code class="c_keyword">typename</code> <code class="c_type">Block</code>,
+		<code class="c_keyword">typename</code> <code class="c_type">Allocator</code>&gt;
+      <code class="c_type">dynamic_bloom_filter</code>&lt;<code class="c_type">T, HashFunctions, Block, Allocator</code>&gt;
+      <code class="c_func">operator|</code>(<code class="c_keyword">const</code> <code class="c_type">dynamic_bloom_filter</code>&lt;<code class="c_type">T, HashFunctions, Block, Allocator</code>&gt;&amp; <code class="c_id">lhs</code>,
+	        <code class="c_keyword">const</code> <code class="c_type">dynamic_bloom_filter</code>&lt;<code class="c_type">T, HashFunctions, Block, Allocator</code>&gt;&amp; <code class="c_id">rhs</code>);
 
       <code class="c_comment">// intersect</code>
-      <code class="c_keyword">template</code> &lt;<code class="c_keyword">typename</code> <code class="c_type">T</code>, <code class="c_type">size_t</code> <code class="c_type">Size</code>,
-		<code class="c_keyword">class</code> <code class="c_type">HashFunctions</code>&gt;
-      <code class="c_type">bloom_filter</code>&lt;<code class="c_type">T, Size, HashFunctions</code>&gt;
-      <code class="c_func">operator&amp;</code>(<code class="c_keyword">const</code> <code class="c_type">bloom_filter</code>&lt;<code class="c_type">T, Size, HashFunctions</code>&gt;&amp; <code class="c_id">lhs</code>,
-	        <code class="c_keyword">const</code> <code class="c_type">bloom_filter</code>&lt;<code class="c_type">T, Size, HashFunctions</code>&gt;&amp; <code class="c_id">rhs</code>);
+      <code class="c_keyword">template</code> &lt;<code class="c_keyword">typename</code> <code class="c_type">T</code>,
+                <code class="c_keyword">class</code> <code class="c_type">HashFunctions</code>,
+		<code class="c_keyword">typename</code> <code class="c_type">Block</code>,
+		<code class="c_keyword">typename</code> <code class="c_type">Allocator</code>&gt;
+      <code class="c_type">dynamic_bloom_filter</code>&lt;<code class="c_type">T, HashFunctions, Block, Allocator</code>&gt;
+      <code class="c_func">operator&amp;</code>(<code class="c_keyword">const</code> <code class="c_type">dynamic_bloom_filter</code>&lt;<code class="c_type">T, HashFunctions, Block, Allocator</code>&gt;&amp; <code class="c_id">lhs</code>,
+	        <code class="c_keyword">const</code> <code class="c_type">dynamic_bloom_filter</code>&lt;<code class="c_type">T, HashFunctions, Block, Allocator</code>&gt;&amp; <code class="c_id">rhs</code>);
 
-      <code class="c_keyword">template</code> &lt;<code class="c_keyword">typename</code> <code class="c_type">T</code>, <code class="c_type">size_t</code> <code class="c_type">Size</code>,
-		<code class="c_keyword">class</code> <code class="c_type">HashFunctions</code>&gt;
-      <code class="c_type">void</code> <code class="c_func">swap</code>(<code class="c_type">bloom_filter</code>&lt;<code class="c_type">T, Size, HashFunctions</code>&gt;&amp; <code class="c_id">lhs</code>,
-	        <code class="c_type">bloom_filter</code>&lt;<code class="c_type">T, Size, HashFunctions</code>&gt;&amp; <code class="c_id">rhs</code>);
+      <code class="c_comment">// global swap</code>
+      <code class="c_keyword">template</code> &lt;<code class="c_keyword">typename</code> <code class="c_type">T</code>,
+                <code class="c_keyword">class</code> <code class="c_type">HashFunctions</code>,
+		<code class="c_keyword">typename</code> <code class="c_type">Block</code>,
+		<code class="c_keyword">typename</code> <code class="c_type">Allocator</code>&gt;
+      <code class="c_type">void</code> <code class="c_func">swap</code>(<code class="c_type">dynamic_bloom_filter</code>&lt;<code class="c_type">T, HashFunctions, Block, Allocator</code>&gt;&amp; <code class="c_id">lhs</code>,
+	        <code class="c_type">dynamic_bloom_filter</code>&lt;<code class="c_type">T, HashFunctions, Block, Allocator</code>&gt;&amp; <code class="c_id">rhs</code>);
 
-      <code class="c_comment">// equality</code>
-      <code class="c_keyword">template</code> &lt;<code class="c_keyword">typename</code> <code class="c_type">T</code>, <code class="c_type">size_t</code> <code class="c_type">Size</code>,
-		<code class="c_keyword">class</code> <code class="c_type">HashFunctions</code>&gt;
-      <code class="c_type">bool</code>
-      <code class="c_func">operator==</code>(<code class="c_keyword">const</code> <code class="c_type">bloom_filter</code>&lt;<code class="c_type">T, Size, HashFunctions</code>&gt;&amp; <code class="c_id">lhs</code>,
-	         <code class="c_keyword">const</code> <code class="c_type">bloom_filter</code>&lt;<code class="c_type">T, Size, HashFunctions</code>&gt;&amp; <code class="c_id">rhs</code>);
+      <code class="c_keyword">template</code> &lt;<code class="c_keyword">typename</code> <code class="c_type">T</code>,
+                <code class="c_keyword">class</code> <code class="c_type">HashFunctions</code>,
+		<code class="c_keyword">typename</code> <code class="c_type">Block</code>,
+		<code class="c_keyword">typename</code> <code class="c_type">Allocator</code>&gt;
+      <code class="c_type">bool</code> <code class="c_func">operator==</code>(<code class="c_keyword">const</code> <code class="c_type">dynamic_bloom_filter</code>&lt;<code class="c_type">T, HashFunctions, Block, Allocator</code>&gt;&amp; <code class="c_id">lhs</code>,
+	              <code class="c_keyword">const</code> <code class="c_type">dynamic_bloom_filter</code>&lt;<code class="c_type">T, HashFunctions, Block, Allocator</code>&gt;&amp; <code class="c_id">rhs</code>);
 
-      <code class="c_keyword">template</code> &lt;<code class="c_keyword">typename</code> <code class="c_type">T</code>, <code class="c_type">size_t</code> <code class="c_type">Size</code>,
-		<code class="c_keyword">class</code> <code class="c_type">HashFunctions</code>&gt;
-      <code class="c_type">bool</code>
-      <code class="c_func">operator!=</code>(<code class="c_keyword">const</code> <code class="c_type">bloom_filter</code>&lt;<code class="c_type">T, Size, HashFunctions</code>&gt;&amp; <code class="c_id">lhs</code>,
-	         <code class="c_keyword">const</code> <code class="c_type">bloom_filter</code>&lt;<code class="c_type">T, Size, HashFunctions</code>&gt;&amp; <code class="c_id">rhs</code>);
+      <code class="c_keyword">template</code> &lt;<code class="c_keyword">typename</code> <code class="c_type">T</code>,
+                <code class="c_keyword">class</code> <code class="c_type">HashFunctions</code>,
+		<code class="c_keyword">typename</code> <code class="c_type">Block</code>,
+		<code class="c_keyword">typename</code> <code class="c_type">Allocator</code>&gt;
+      <code class="c_type">bool</code> <code class="c_func">operator!=</code>(<code class="c_keyword">const</code> <code class="c_type">dynamic_bloom_filter</code>&lt;<code class="c_type">T, HashFunctions, Block, Allocator</code>&gt;&amp; <code class="c_id">lhs</code>,
+	              <code class="c_keyword">const</code> <code class="c_type">dynamic_bloom_filter</code>&lt;<code class="c_type">T, HashFunctions, Block, Allocator</code>&gt;&amp; <code class="c_id">rhs</code>);
+
     </div>
     <p>
       The basic Bloom filter data structure. Supports insertion and query. Allows setting of bit capacity, type, and hash functions at compile-time. This structure is best used when: 
@@ -126,18 +139,22 @@
     <dl>
       <dt>T</dt>
       <dd>The type used for all Bloom filter operations.</dd>
-      <dt>Size</dt>
-      <dd>The size in bits of the underlying std::bitset used by the Bloom filter.</dd>
       <dt>HashFunctions</dt>
-      <dd>The set of hash functions used by the Bloom filter. Currently required to be an <a href="http://www.boost.org/doc/libs/1_46_1/libs/mpl/doc/refmanual/vector.html">mpl::vector</a> of <a href="../tutorial.html">Hashers</a>.</dd>
+      <dd>The set of hash functions used by the Bloom filter. Currently required to be an <a href="http://www.boost.org/doc/libs/release/libs/mpl/doc/refmanual/vector.html">mpl::vector</a> of <a href="../tutorial.html">Hashers</a>.</dd>
+      <dt>Block</dt>
+      <dd>Used internally by the <a href="http://www.boost.org/doc/libs/release/libs/dynamic_bitset/dynamic_bitset.html">
+	  dynamic bitset</a>.</dd>
+      <dt>Allocator</dt>
+      <dd>Used internally by the <a href="http://www.boost.org/doc/libs/release/libs/dynamic_bitset/dynamic_bitset.html">
+	  dynamic bitset</a>.</dd>
     </dl>
 
     <div class="toc">
       <p>Function Reference</p>
       <ul>
-	<li><a href="#default_constructor">bloom_filter()</a></li>
-	<li><a href="#range_constructor">bloom_filter(start, end)</a></li>
-	<li><a href="#ilist_constructor">bloom_filter(initializer_list)</a></li>
+	<li><a href="#default_constructor">dynamic_bloom_filter()</a></li>
+	<li><a href="#capacity_constructor">dynamic_bloom_filter(capacity)</a></li>
+	<li><a href="#range_constructor">dynamic_bloom_filter(start, end)</a></li>
 	<li><a href="#bit_capacity">bit_capacity()</a></li>
 	<li><a href="#num_hash_functions">num_hash_functions()</a></li>
 	<li><a href="#false_positive_rate">false_positive_rate()</a></li>
@@ -148,6 +165,7 @@
 	<li><a href="#probably_contains">probably_contains(T)</a></li>
 	<li><a href="#clear">clear()</a></li>
 	<li><a href="#swap">swap(bloom)</a></li>
+	<li><a href="#resize">resize(new_capacity)</a></li>
 	<li><a href="#union_assign">operator|=(bloom)</a></li>
 	<li><a href="#intersect_assign">operator&amp;=(bloom)</a></li>
 	<li><a href="#union">operator|(bloom, bloom)</a></li>
@@ -162,30 +180,30 @@
 
     <div class="func_ref">
       <a name="default_constructor"></a>
-      <div class="ref_listing"><code class="c_func">bloom_filter</code>();</div>
+      <div class="ref_listing"><code class="c_func">dynamic_bloom_filter</code>();</div>
       <dl>
 	<dt>Description</dt>
-	<dd>Constructs a bloom_filter object with all bits set to 0.</dd>
+	<dd>Constructs a dynamic_bloom_filter object with all bits set to 0 and a default size determined by the underlying dynamic bitset.</dd>
+	<dt>Warning</dt>
+	<dd>Be sure to set the capacity using <a href="#resize">resize()</a>.</dd>
+      </dl>
+    </div>
+
+    <div class="func_ref">
+      <a name="capacity_constructor"></a>
+      <div class="ref_listing"><code class="c_func">dynamic_bloom_filter</code>(<code class="c_keyword">const</code> <code class="c_type">size_t</code> <code class="c_id">capacity</code>);</div>
+      <dl>
+	<dt>Description</dt>
+	<dd>Constructs a dynamic_bloom_filter with all bits set to 0 and bit_capacity set to capacity.</dd>
       </dl>
     </div>
 
     <div class="func_ref">
       <a name="range_constructor"></a>
-      <div class="ref_listing"><code class="c_func">bloom_filter</code>(<code class="c_keyword">const</code> <code class="c_type">InputIterator</code> <code class="c_id">start</code>, <code class="c_keyword">const</code> <code class="c_type">InputIterator</code> <code class="c_id">end</code>);</div>
+      <div class="ref_listing"><code class="c_func">dynamic_bloom_filter</code>(<code class="c_keyword">const</code> <code class="c_type">InputIterator</code> <code class="c_id">start</code>, <code class="c_keyword">const</code> <code class="c_type">InputIterator</code> <code class="c_id">end</code>);</div>
       <dl>
 	<dt>Description</dt>
-	<dd>Constructs a bloom_filter by inserting all the elements in the range (start, end).</dd>
-      </dl>
-    </div>
-
-    <div class="func_ref">
-      <a name="ilist_constructor"></a>
-      <div class="ref_listing"><code class="c_func">bloom_filter</code>(<code class="c_keyword">const</code> <code class="c_namespace">std::initializer</code>&lt;<code class="c_type">T</code>&gt;&amp;);</div>
-      <dl>
-	<dt>Description</dt>
-	<dd>Constructs a bloom_filter by inserting all elements in the initializer list.</dd>
-	<dt>Warning</dt>
-	<dd>Only available in C++11-supporting compilers.</dd>
+	<dd>Constructs a dynamic_bloom_filter by inserting all the elements in the range (start, end).</dd>
       </dl>
     </div>
 
@@ -194,9 +212,9 @@
       <div class="ref_listing"><code class="c_type">size_t</code> <code class="c_func">bit_capacity</code>() <code class="c_keyword">const</code>;</div>
       <dl>
 	<dt>Description</dt>
-	<dd>Returns the number of bits used internally by the Bloom filter..</dd>
+	<dd>Returns the number of bits used internally by the Bloom filter.</dd>
 	<dt>Returns</dt>
-	<dd>Value of template parameter Size.</dd>
+	<dd>this->bits.size()</dd>
       </dl>
     </div>
 
@@ -230,7 +248,7 @@
 	<dt>Description</dt>
 	<dd>Returns true if no elements have been inserted into the Bloom filter.</dd>
 	<dt>Returns</dt>
-	<dd>std::bitset.count() == 0</dd>
+	<dd>this->bits.count() == 0</dd>
       </dl>
     </div>
 
@@ -241,7 +259,7 @@
 	<dt>Description</dt>
 	<dd>Returns the number of bits currently set in the Bloom filter.</dd>
 	<dt>Returns</dt>
-	<dd>std::bitset.count().</dd>
+	<dd>this->bits.count().</dd>
       </dl>
     </div>
 
@@ -296,7 +314,18 @@
       <div class="ref_listing"><code class="c_type">void</code> <code class="c_func">swap</code>(<code class="c_type">bloom_filter</code>&amp;);</div>
       <dl>
 	<dt>Description</dt>
-	<dd>Swaps the bits in this Bloom filter with the argument Bloom filter.</dd>
+	<dd>Swaps the bits and the bit capacity in this Bloom filter with the argument Bloom filter.</dd>
+      </dl>
+    </div>
+
+    <div class="func_ref">
+      <a name="resize"></a>
+      <div class="ref_listing"><code class="c_type">void</code> <code class="c_func">resize</code>(<code class="c_type">size_t</code> <code class="c_id">new_capacity</code>);</div>
+      <dl>
+	<dt>Description</dt>
+	<dd>Changes the capacity of the Bloom filter to new_capacity.</dd>
+	<dt>Warning</dt>
+	<dd>All bits are set to 0 (all inserts are lost) - resize wisely.</dd>
       </dl>
     </div>
 
@@ -306,6 +335,8 @@
       <dl>
 	<dt>Description</dt>
 	<dd>Performs a union.</dd>
+	<dt>Pre-condition</dt>
+	<dd>The bit capacity of the two Bloom filters must match.</dd>
 	<dt>Returns</dt>
 	<dd>Returns a reference to <code class="c_keyword">this</code>.</dd>
 	<dt>Post-condition</dt>
@@ -319,6 +350,8 @@
       <dl>
 	<dt>Description</dt>
 	<dd>Performs an intersection.</dd>
+	<dt>Pre-condition</dt>
+	<dd>The bit capacity of the two Bloom filters must match.</dd>
 	<dt>Returns</dt>
 	<dd>Returns a reference to <code class="c_keyword">this</code>.</dd>
 	<dt>Post-condition</dt>
@@ -332,6 +365,8 @@
       <dl>
 	<dt>Description</dt>
 	<dd>Performs a union.</dd>
+	<dt>Pre-condition</dt>
+	<dd>The bit capacity of the two Bloom filters must match.</dd>
 	<dt>Returns</dt>
 	<dd>Returns a new, stack-allocated Bloom filter that is the result of performing a union between the lhs and the rhs.</dd>
 	<dt>Post-condition</dt>
@@ -345,6 +380,8 @@
       <dl>
 	<dt>Description</dt>
 	<dd>Performs an intersection.</dd>
+	<dt>Pre-condition</dt>
+	<dd>The bit capacity of the two Bloom filters must match.</dd>
 	<dt>Returns</dt>
 	<dd>Returns a new, stack-allocated Bloom filter that is the result of performing an intersect between the lhs and the rhs.</dd>
 	<dt>Post-condition</dt>
@@ -357,7 +394,7 @@
       <div class="ref_listing"><code class="c_type">void</code> <code class="c_func">swap</code>(<code class="c_type">bloom_filter</code>&amp;, <code class="c_type">bloom_filter</code>&amp;);</div>
       <dl>
 	<dt>Description</dt>
-	<dd>Swaps the bits between the argument Bloom filters.</dd>
+	<dd>Swaps the bits and the bit capacity between the argument Bloom filters.</dd>
       </dl>
     </div>
 
@@ -385,7 +422,7 @@
     <hr/>
 
     <div class="spirit-nav">
-      <a accesskey="p" href="../reference.html">
+      <a accesskey="p" href="bloom.html">
 	<img src="../../../../../doc/src/images/prev.png" alt="Prev"/>
       </a>
       <a accesskey="u" href="../reference.html">
@@ -394,7 +431,7 @@
       <a accesskey="h" href="../index.html">
 	<img src="../../../../../doc/src/images/home.png" alt="Home"/>
       </a>
-      <a accesskey="n" href="dynamic_bloom.html">
+      <a accesskey="n" href="hash/default.html">
 	<img src="../../../../../doc/src/images/next.png" alt="Next"/>
       </a>
     </div>
