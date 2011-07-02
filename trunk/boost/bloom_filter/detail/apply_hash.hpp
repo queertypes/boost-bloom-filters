@@ -33,6 +33,7 @@ namespace boost {
         static void insert(const T& t, std::bitset<Size>& _bits) {
 	  typedef typename boost::mpl::at_c<HashFunctions, N>::type Hash;
 	  static Hash hasher;
+
 	  _bits[hasher(t) % Size] = true;
 	  apply_hash<N-1, T, Size, HashFunctions>::insert(t, _bits);
         }
@@ -40,6 +41,7 @@ namespace boost {
         static bool contains(const T& t, const std::bitset<Size>& _bits) {
 	  typedef typename boost::mpl::at_c<HashFunctions, N>::type Hash;
 	  static Hash hasher;
+
 	  return (_bits[hasher(t) % Size] && 
 		  apply_hash<N-1, T, Size, HashFunctions>::contains(t, _bits));
         }
@@ -53,12 +55,14 @@ namespace boost {
         static void insert(const T& t, std::bitset<Size>& _bits) {
 	  typedef typename boost::mpl::at_c<HashFunctions, 0>::type Hash;
 	  static Hash hasher;
+
 	  _bits[hasher(t) % Size] = true;
         }
 
         static bool contains(const T& t, const std::bitset<Size>& _bits) {
 	  typedef typename boost::mpl::at_c<HashFunctions, 0>::type Hash;
 	  static Hash hasher;
+
 	  return (_bits[hasher(t) % Size]);
         }
       };
@@ -77,6 +81,7 @@ namespace boost {
 			   const size_t size) {
 	  typedef typename boost::mpl::at_c<HashFunctions, N>::type Hash;
 	  static Hash hasher;
+
 	  _bits[hasher(t) % size] = true;
 	  dynamic_apply_hash<N-1, 
 			     T, 
@@ -90,6 +95,7 @@ namespace boost {
 			     const size_t size) {
 	  typedef typename boost::mpl::at_c<HashFunctions, N>::type Hash;
 	  static Hash hasher;
+
 	  return (_bits[hasher(t) % size] && 
 		  dynamic_apply_hash<N-1, 
 				     T, 
@@ -110,6 +116,7 @@ namespace boost {
 			   const size_t size) {
 	  typedef typename boost::mpl::at_c<HashFunctions, 0>::type Hash;
 	  static Hash hasher;
+
 	  _bits[hasher(t) % size] = true;
         }
 
@@ -118,6 +125,7 @@ namespace boost {
 			     const size_t size) {
 	  typedef typename boost::mpl::at_c<HashFunctions, 0>::type Hash;
 	  static Hash hasher;
+
 	  return (_bits[hasher(t) % size]);
         }
       };
