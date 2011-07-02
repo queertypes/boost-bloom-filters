@@ -48,7 +48,7 @@ namespace boost {
 
       // a slot is one element position in the array
       // a bin is a segment of a slot 
-      static const size_t slot_bits = sizeof(Block) * 4;
+      static const size_t slot_bits = sizeof(Block) * 8;
       static const size_t bins_per_slot = slot_bits / BitsPerBin;
       static const size_t array_size = bins_per_slot * NumBins + 1;
 
