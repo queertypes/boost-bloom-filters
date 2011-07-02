@@ -49,8 +49,13 @@ namespace boost {
       // a slot is one element position in the array
       // a bin is a segment of a slot 
       static const size_t slot_bits = sizeof(Block) * 4;
-      static const size_t array_size = (slot_bits / BitsPerBin) * NumBins + 1;
+      static const size_t elements_per_slot = slot_bits / BitsPerBin;
+      static const size_t array_size = elements_per_slot * NumBins + 1;
+
+    private:
       typedef boost::array<Block, array_size> bucket_type;
+      typedef typename bucket_type::iterator bucket_iterator;
+      typedef typename bucket_type::const_iterator bucket_const_iterator;
       
     public:
       typedef T value_type;
@@ -78,7 +83,7 @@ namespace boost {
 #endif
 
       static BOOST_CONSTEXPR size_t bit_capacity() {
-        return NumBlocks * sizeof(Block);
+        return NumBins * BitsPerBin;
       }
 
       static BOOST_CONSTEXPR size_t num_hash_functions() {
@@ -128,7 +133,7 @@ namespace boost {
       //return false;
 
       void clear() {
-	for (bucket_type::const_iterator i = blocks.begin(), end = blocks.end();
+	for (bucket_iterator i = blocks.begin(), end = blocks.end();
 	     i != end; ++i) {
 	  *i = 0;
 	}
@@ -145,7 +150,7 @@ namespace boost {
 
       // equality comparison operators
       template <typename _T, size_t _Bins, size_t _BitsPerBin, 
-		typename _HashFns, typename Block>
+		typename _HashFns, typename _Block>
       friend bool 
       operator==(const counting_bloom_filter<_T, _Bins, _BitsPerBin,
 					     _HashFns, _Block>& lhs,
@@ -153,7 +158,7 @@ namespace boost {
 					     _HashFns, _Block>& rhs);
 			     
       template <typename _T, size_t _Bins, size_t _BitsPerBin, 
-		typename _HashFns, typename Block>
+		typename _HashFns, typename _Block>
       friend bool 
       operator!=(const counting_bloom_filter<_T, _Bins, _BitsPerBin,
 					     _HashFns, _Block>& lhs,
@@ -211,17 +216,17 @@ namespace boost {
 	     typename Block>
     bool
     operator==(const counting_bloom_filter<T, NumBins, BitsPerBin, 
-					  HashFunctions, Block>& lhs,
-	      const counting_bloom_filter<T, NumBins, BitsPerBin,
-					  HashFunctions, Block>& rhs);
+					   HashFunctions, Block>& lhs,
+	       const counting_bloom_filter<T, NumBins, BitsPerBin,
+					   HashFunctions, Block>& rhs);
 
     template<class T, size_t NumBins, size_t BitsPerBin, class HashFunctions,
 	     typename Block>
     bool
     operator!=(const counting_bloom_filter<T, NumBins, BitsPerBin, 
-					  HashFunctions, Block>& lhs,
-	      const counting_bloom_filter<T, NumBins, BitsPerBin,
-					  HashFunctions, Block>& rhs);
+					   HashFunctions, Block>& lhs,
+	       const counting_bloom_filter<T, NumBins, BitsPerBin,
+					   HashFunctions, Block>& rhs);
 
   } // namespace bloom_filter
 } // namespace boost
