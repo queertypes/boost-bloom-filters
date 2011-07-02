@@ -44,7 +44,7 @@ namespace boost {
       // it doesn't make sense to ever support using a BitsPerBin value larger
       // than the number of bits per Block. In that case, the user shouldn't
       // be using a Bloom filter to represent their data.
-      BOOST_STATIC_ASSERT( (BitsPerBin <= (sizeof(Block) * 4) ) );
+      BOOST_STATIC_ASSERT( (BitsPerBin <= (sizeof(Block) * 8) ) );
 
       // a slot is one element position in the array
       // a bin is a segment of a slot 
