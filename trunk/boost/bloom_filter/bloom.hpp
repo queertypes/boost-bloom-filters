@@ -40,6 +40,7 @@ namespace boost {
     public:
       typedef T value_type;
       typedef T key_type;
+      typedef HashFunctions hash_function_type;
 
     public:
       bloom_filter() {}

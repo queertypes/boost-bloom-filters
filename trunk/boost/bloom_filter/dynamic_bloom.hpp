@@ -117,9 +117,9 @@ namespace boost {
 	*this = tmp;
       }
 
-      void resize(const size_t bit_capacity) {
+      void resize(const size_t new_capacity) {
 	bits.clear();
-	bits.resize(bit_capacity);
+	bits.resize(new_capacity);
       }
 
       template <typename _T, typename _HashFunctions, 
@@ -129,8 +129,14 @@ namespace boost {
 
       template <typename _T, typename _HashFunctions, 
 		typename _Block, typename _Allocator>
-      friend bool operator!=(const dynamic_bloom_filter<_T, _HashFunctions, _Block, _Allocator>&, 
-			     const dynamic_bloom_filter<_T, _HashFunctions, _Block, _Allocator>&);
+      friend bool operator!=(const dynamic_bloom_filter<_T, 
+							_HashFunctions, 
+							_Block, 
+							_Allocator>&, 
+			     const dynamic_bloom_filter<_T, 
+							_HashFunctions, 
+							_Block, 
+							_Allocator>&);
 
       dynamic_bloom_filter& operator|=(const dynamic_bloom_filter& rhs) {
 	assert(this->bit_capacity() == rhs.bit_capacity());
