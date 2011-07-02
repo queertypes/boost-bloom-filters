@@ -121,9 +121,35 @@ namespace boost {
         return *this;
       }
 
+      template<class _T, size_t _Size, class _HashFunctions>
+      friend bool
+      operator==(const bloom_filter<_T, _Size, _HashFunctions>&,
+		 const bloom_filter<_T, _Size, _HashFunctions>&);
+
+      template<class _T, size_t _Size, class _HashFunctions>
+      friend bool
+      operator!=(const bloom_filter<_T, _Size, _HashFunctions>&,
+		 const bloom_filter<_T, _Size, _HashFunctions>&);
+      
     private:
       std::bitset<Size> bits;
     };
+
+    template<class _T, size_t _Size, class _HashFunctions>
+    bool
+    operator==(const bloom_filter<_T, _Size, _HashFunctions>& lhs,
+	       const bloom_filter<_T, _Size, _HashFunctions>& rhs)
+    {
+      return (lhs.bits == rhs.bits);
+    }
+
+    template<class _T, size_t _Size, class _HashFunctions>
+    bool
+    operator!=(const bloom_filter<_T, _Size, _HashFunctions>& lhs,
+	       const bloom_filter<_T, _Size, _HashFunctions>& rhs)
+    {
+      return !(lhs == rhs);
+    }
 
     template<class _T, size_t _Size, class _HashFunctions>
     bloom_filter<_T, _Size, _HashFunctions>
