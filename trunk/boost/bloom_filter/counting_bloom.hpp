@@ -18,12 +18,15 @@
  *        of hash function application.
  */
 #include <cmath>
-#include <boost/array.hpp>
+#include <iostream>
 
+#include <boost/array.hpp>
 #include <boost/config.hpp>
 #include <boost/mpl/vector.hpp>
 #include <boost/mpl/size.hpp>
 #include <boost/static_assert.hpp>
+#include <boost/type_traits/is_integral.hpp>
+#include <boost/type_traits/is_unsigned.hpp>
 
 #include <boost/bloom_filter/detail/counting_apply_hash.hpp>
 #include <boost/bloom_filter/hash/default.hpp>
@@ -41,16 +44,32 @@ namespace boost {
 	      typename Block = size_t>
     class counting_bloom_filter {
 
+      // Block needs to be an integral type
+      BOOST_STATIC_ASSERT( boost::is_integral<Block>::value == true);
+
+      // Block needs to be an unsigned type
+      BOOST_STATIC_ASSERT( boost::is_unsigned<Block>::value == true);
+
       // it doesn't make sense to ever support using a BitsPerBin value larger
       // than the number of bits per Block. In that case, the user shouldn't
       // be using a Bloom filter to represent their data.
       BOOST_STATIC_ASSERT( (BitsPerBin <= (sizeof(Block) * 8) ) );
 
+      // because of the nature of this implementation, the Bloom filter
+      // can have internal fragmentation if the calculation for 
+      // bins_per_slot has a remainder. The severity of the  internal
+      // fragmentation is equal to the remainder * the number of slots.
+      BOOST_STATIC_ASSERT( ((sizeof(Block) * 8) % BitsPerBin) == 0);
+
       // a slot is one element position in the array
-      // a bin is a segment of a slot 
+      // a bin is a segment of a slot
       static const size_t slot_bits = sizeof(Block) * 8;
       static const size_t bins_per_slot = slot_bits / BitsPerBin;
-      static const size_t array_size = bins_per_slot * NumBins + 1;
+      static const size_t bin_bits = NumBins * BitsPerBin;
+      static const size_t array_size = bin_bits / slot_bits + 1;
+      static const size_t effective_num_bins = array_size * bins_per_slot;
+      static const size_t mask = 
+	static_cast<Block>(0 - 1) >> (slot_bits - BitsPerBin);
 
     private:
       typedef boost::array<Block, array_size> bucket_type;
@@ -64,17 +83,24 @@ namespace boost {
       typedef Block block_type;
 
     public:
-      counting_bloom_filter() {}
+      counting_bloom_filter() 
+      {
+	this->clear();
+      }
 
       template <typename InputIterator>
       counting_bloom_filter(const InputIterator start, 
 			    const InputIterator end) {
+	this->clear();
+
 	for (InputIterator i = start; i != end; ++i)
 	  this->insert(*i);
       }
 
 #ifndef BOOST_NO_0X_HDR_INITIALIZER_LIST
       counting_bloom_filter(const std::initializer_list<T>& ilist) {
+	this->clear();
+
 	typedef typename std::initializer_list<T>::const_iterator citer;
 	for (citer i = ilist.begin(), end = ilist.end(); i != end; ++i) {
 	  this->insert(*i);
@@ -98,9 +124,39 @@ namespace boost {
 	  2.718281828459045235360287471352662497757247093699959574966;
         return std::pow(1 - std::pow(e, -k * n / m), k);
       };
-			   
+
+      // returns the number of bins that have at least 1 bit set
       size_t count() const {
-        return 0;
+	size_t ret = 0;
+
+	/*
+	std::cout << "Num Bins: " << NumBins << "\n"
+		  << "Bins Per Slot: " << bins_per_slot << "\n"
+		  << "Bits Per Bin: " << BitsPerBin << "\n"
+		  << "Array Size: " << array_size << "\n";
+	*/
+
+	for (bucket_const_iterator i = this->bits.begin(), 
+	       end = this->bits.end(); 
+	     i != end; ++i) {
+	  for (size_t bin = 0; bin < bins_per_slot; ++bin) {
+	    size_t offset_bits = bin * BitsPerBin;
+	    size_t target_bits = (*i >> offset_bits) & mask; 
+
+	    /*
+	    std::cout << "(count) targeting pos: " << std::distance(i, end) - 1
+		      << " with offset: " << offset_bits
+		      << " and bin: " << bin 
+		      << " with slot value: " << *i
+		      << " and bin value: " << target_bits << "\n";
+	    */
+	    
+	    if (target_bits > 0)
+	      ++ret;
+	  }
+	}
+
+        return ret;
       };
 
       bool empty() const {
