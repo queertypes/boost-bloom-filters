@@ -329,10 +329,10 @@ namespace boost {
 
       //-----------------------------------------------------------------------------
 
-      void murmurhash3_x64_128(const void *const key, const size_t len,
-			       const size_t seed, const void * out )
+      void murmurhash3_x64_128(const void *const __restrict__ key, const size_t len,
+			       const size_t seed, const void *__restrict__ out )
       {
-	const uint8_t * data = static_cast<const uint8_t*>(key);
+	const uint8_t *const __restrict__ data = static_cast<const uint8_t*>(key);
 	const int nblocks = len / 16;
 
 	uint64_t h1 = seed;
@@ -344,7 +344,7 @@ namespace boost {
 	//----------
 	// body
 
-	const uint64_t *const blocks = reinterpret_cast<const uint64_t *>(data);
+	const uint64_t *const __restrict__ blocks = reinterpret_cast<const uint64_t *>(data);
 
 	for(int i = 0; i < nblocks; i++)
 	  {
@@ -363,7 +363,7 @@ namespace boost {
 	//----------
 	// tail
 
-	const uint8_t *const tail = static_cast<const uint8_t*>(data + nblocks*16);
+	const uint8_t *const __restrict__ tail = static_cast<const uint8_t*>(data + nblocks*16);
 
 	uint64_t k1 = 0;
 	uint64_t k2 = 0;
