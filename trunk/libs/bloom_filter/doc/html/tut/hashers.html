@@ -40,6 +40,76 @@
 
     <h1 class="title">Customizing Hash Functions</h1>
 
+    <p>
+      A Hasher is a function object that overloads operator() such that the following interface is satisfied:
+    </p>
+
+    <div class="listing">
+      <code class="c_keyword">template</code> &lt;<code class="c_keyword">typename</code> <code class="c_type">T</code>&gt;
+      <code class="c_keyword">struct</code> <code class="c_id">ExampleHasher</code> {
+        <code class="c_type">size_t</code> <code class="c_func">operator</code>()(<code class="c_keyword">const</code> <code class="c_type">T</code>&amp;) <code class="c_keyword">const</code>;
+      };
+    </div>
+    <p>
+      In practice, it would be wise to also provide a Seed template parameter. By 
+      default, boost_hash is defined for users in 
+      <a href="../reference/hash/default.html">boost/bloom_filter/hash/default.hpp</a>. This can be used to define 
+      Bloom filters with additonal hashing functions easily, as demonstrated below:
+    </p>
+
+    <div class="listing">
+      <code class="c_comment">// link: <a href="../../example/advanced_bloom.cpp">advanced_bloom.cpp</a></code>
+      <code class="c_comment">// advanced Boost.BloomFilter program</code>
+      <code class="c_keyword">#include</code> <code class="c_include">&lt;boost/bloom_filter/basic_bloom_filter.hpp&gt;</code>
+      <code class="c_keyword">#include</code> <code class="c_include">&lt;iostream&gt;</code>
+      <code class="c_keyword">using namespace</code> <code class="c_namespace">boost::bloom_filters</code>;
+      <code class="c_keyword">using namespace</code> <code class="c_namespace">std</code>;
+	
+      <code class="c_type">int</code> <code class="c_func">main</code>() {
+        <code class="c_keyword">typedef</code> <code class="c_namespace">boost::mpl::vector</code>&lt;<code class="c_type">boost_hash</code>&lt;<code class="c_type">int, 0</code>&gt; &gt; <code class="c_type">HashFns</code>;
+
+        <code class="c_keyword">static const</code> <code class="c_type">size_t</code> <code class="c_id">INSERT_MAX</code> = 5000;
+        <code class="c_keyword">static const</code> <code class="c_type">size_t</code> <code class="c_id">CONTAINS_MAX</code> = 10000;
+        <code class="c_keyword">static const</code> <code class="c_type">size_t</code> <code class="c_id">NUM_BITS</code> = 8192;
+
+        <code class="c_type">basic_bloom_filter</code>&lt;int, NUM_BITS, HashFns&gt; <code class="c_id">bloom</code>;
+        <code class="c_type">size_t</code><code class="c_id"> collisions</code> = 0;
+
+	cout &lt;&lt; <code class="c_str">"bloom filter storage size: "</code> 
+	     &lt;&lt; sizeof(bloom) &lt;&lt; <code class="c_str">" bytes"</code>
+	     &lt;&lt; endl;
+
+	cout &lt;&lt; <code class="c_str">"false positive rate: "</code> 
+	     &lt;&lt; bloom.false_positive_rate() * 100.0 &lt;&lt; <code class="c_str">"%"</code>
+	     &lt;&lt; endl;
+
+	<code class="c_keyword">for</code> (<code class="c_type">int</code><code class="c_id"> i</code> = 0; i &lt; INSERT_MAX; ++i) {
+	  bloom.insert(i);
+	}
+
+	<code class="c_keyword">for</code> (<code class="c_type">int</code><code class="c_id"> i</code> = INSERT_MAX; i &lt; CONTAINS_MAX; ++i) {
+	    <code class="c_keyword">if</code> (bloom.probably_contains(i)) ++collisions;
+	}
+
+	cout &lt;&lt; <code class="c_str">"false positive rate: "</code> 
+	     &lt;&lt; bloom.false_positive_rate() * 100.0 &lt;&lt; <code class="c_str">"%"</code>
+	     &lt;&lt; endl;
+
+	cout &lt;&lt; <code class="c_str">"collisions (false positives): "</code>
+	     &lt;&lt; collisions
+	     &lt;&lt; endl;
+
+	<code class="c_keyword">return</code> 0;
+      }
+    </div>
+    <div class="example_output">
+      $&gt; ./advanced_bloom
+      bloom filter storage size: 1024 bytes
+      false positive rate before inserts: 0%
+      false positive rate after inserts: 45.684%
+      collisions (false positives): 1808
+    </div>
+
     <hr/>
     <div class="spirit-nav">
       <a accesskey="p" href="false_positive.html">

@@ -9,6 +9,15 @@
  * See http://www.boost.org/libs/bloom_filter for documentation.
  *
  ******************************************************************************/
+
+.toc
+{
+    margin: 0 4% 0 4%;
+    padding: 0 1pc 0.5pc 1pc;
+    font-size: 80%;
+    line-height: 1.15;
+}
+
 .toc ul, .toc li {padding: 0; list-style:none;}
 .toc ul {margin: 0 0 0 0;}
 .toc p {font-weight: bold;}
@@ -35,6 +44,10 @@
 .header p a {
     font-size: 1.1em;
     margin-right: 7%;
+}
+
+p {
+    margin: 1% 1%;
 }
 
 .listing {
