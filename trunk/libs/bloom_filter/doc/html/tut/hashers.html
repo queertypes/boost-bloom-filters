@@ -66,7 +66,7 @@
       <code class="c_keyword">using namespace</code> <code class="c_namespace">std</code>;
 	
       <code class="c_type">int</code> <code class="c_func">main</code>() {
-        <code class="c_keyword">typedef</code> <code class="c_namespace">boost::mpl::vector</code>&lt;<code class="c_type">boost_hash</code>&lt;<code class="c_type">int, 0</code>&gt; &gt; <code class="c_type">HashFns</code>;
+        <code class="c_keyword">typedef</code> <code class="c_namespace">boost::mpl::vector</code>&lt;<code class="c_type">boost_hash</code>&lt;<code class="c_type">int, 0</code>&gt;, <code class="c_type">boost_hash</code>&lt;<code class="c_type">int, 1</code>&gt; &gt; <code class="c_type">HashFns</code>;
 
         <code class="c_keyword">static const</code> <code class="c_type">size_t</code> <code class="c_id">INSERT_MAX</code> = 5000;
         <code class="c_keyword">static const</code> <code class="c_type">size_t</code> <code class="c_id">CONTAINS_MAX</code> = 10000;
@@ -109,6 +109,16 @@
       false positive rate after inserts: 45.684%
       collisions (false positives): 1808
     </div>
+
+    <p>
+      All it takes to customize the hashers used by a given Bloom filter is to 
+      type-define a Boost.MPL vector of hashers and pass this as the HashFns 
+      template parameter of the Bloom filter. All this is handled at compile-time,
+      so no cost is incurred at run-time for instantiation, regardless of the
+      complexity of the Hasher vector. The mechanics of insertion, querying, and
+      element removal are all handled transparently by this scheme. This makes it
+      very convenient to experiment with many different types of Hash vectors.
+    </p>
 
     <hr/>
     <div class="spirit-nav">
