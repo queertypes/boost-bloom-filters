@@ -47,6 +47,7 @@
 	<li><a href="tut/inserting.html">Inserting Elements</a></li>
 	<li><a href="tut/querying.html">Querying Elements</a></li>
 	<li><a href="tut/removing.html">Removing Elements</a></li>
+	<li><a href="tut/joining.html">Intersections and Unions</a></li>
 	<li><a href="tut/tips.html">Tips &amp; Best Practices</a></li>
       </ul>
     </div>
@@ -55,7 +56,18 @@
     <h3>Overview</h3>
 
     <p>
-      There are two primitive operations that are supported by all Bloom filters: <em>insert</em> and <em>probably_contains</em>. A third operation, <em>remove</em>, is supported by counting Bloom filters, and a few similar variants. In order to control the false positive rate of a Bloom filter, you can control the number of hash functions used, as well as the bit capacity. 
+      There are two primitive operations that are supported by all Bloom 
+      filters: <em>insert</em> and <em>probably_contains</em>. A third 
+      operation, <em>remove</em>, is supported by counting Bloom filters. 
+      To effectively use a Bloom filter, the only other concept to understand 
+      is the false positive rate. 
+    </p>
+
+    <p>
+      Bloom filters also support the intersect and union operations. 
+      The intersection of two Bloom filters represents the elements
+      that are in both bloom filters. The union of two Bloom filters
+      represents the elements that are in either Bloom filter. 
     </p>
 
     <h3>Types of Bloom Filters Provided</h3>
@@ -63,52 +75,6 @@
       <li>Basic Bloom filter (<a href="reference/bloom.html">basic_bloom_filter</a>, <a href="reference/dynamic_bloom.html">dynamic_bloom_filter</a>)</li>
       <li>Counting Bloom filter (<a href="reference/counting_bloom.html">counting_bloom_filter</a>)</li>
     </ul>
-
-    <h4>Basic Bloom Filter</h4>
-
-    <p>
-      To use this Bloom filter, there are two template parameters to be aware of and two functions to utilize:
-    </p>
-
-    <ul>
-      <li>Template parameters:
-      <ul>
-	<li>Type: the type of elements this Bloom filter will store</li>
-	<li>Size: the number of bits used to store the Bloom filter state</li>
-      </ul>
-      </li>
-      <li>Basic functions:
-      <ul>
-	<li><code>void insert(const T&amp;);</code></li>
-	<li><code>bool probably_contains(const T&amp;);</code></li>
-      </ul>
-      </li>
-    </ul>
-
-    <ul>
-      <li>Advanced template parameters:
-      <ul>
-	<li><code>HashFunctions</code>:
-	a boost::mpl::vector of Hasher objects.</li>
-      </ul>
-      </li>
-      <li>Advanced state monitoring functions:
-      <ul>
-	<li><code>size_t size() const</code>: returns the value of the template parameter Size</li>
-	<li><code>size_t num_hash_functions() const</code>: returns the number of hash functions used to define this Bloom filter.</li>
-	<li><code>double false_positive_rate() const </code>: returns the current false positive rate</li>
-      </ul>
-      </li>
-    </ul>
-
-
-    <p>
-      All the details of insertion and querying the Bloom filter are handled
-      transparently by the insert() and probably_contains() functions, regardless
-      of the type, bit size, and hash functions used. This makes it very
-      convenient to experiment with different Bloom filter parameters in
-      projects you commit to.
-    </p>
 
     <hr/>
     <div class="spirit-nav">

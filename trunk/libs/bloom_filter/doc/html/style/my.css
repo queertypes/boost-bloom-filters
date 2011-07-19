@@ -34,6 +34,10 @@
     font-family: sans;
 }
 
+.warning {
+    color: red;
+}
+
 .header img {
     float: left;
     position: absolute; top: 4px; left: 4px;

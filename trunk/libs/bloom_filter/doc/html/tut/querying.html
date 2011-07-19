@@ -40,6 +40,22 @@
 
     <h1 class="title">Querying Elements</h1>
 
+    <p>
+      Querying a Bloom filter is also straightforward. The function to
+      remember is <em>probably_contains</em>, named as such to emphasize
+      the probabilistic nature of the data structure.
+    </p>
+
+    <div class="example">
+      <code class="c_type">basic_bloom_filter</code>&lt;<code class="c_type">int</code>, 1000&gt; <code class="c_id">bloom</code>;
+      
+      bloom.probably_contains(1); <code class="c_comment">// false</code>
+      bloom.insert(1);
+      bloom.probably_contains(1); <code class="c_comment">// true</code>
+      bloom.probably_contains(2); <code class="c_comment">// false</code>
+      bloom.probably_contains(1001); <code class="c_comment">// true, false positive</code>
+    </div>
+
     <hr/>
     <div class="spirit-nav">
       <a accesskey="p" href="inserting.html">

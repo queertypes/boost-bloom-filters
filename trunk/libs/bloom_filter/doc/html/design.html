@@ -39,14 +39,15 @@
     
     <div class="toc">
       <ul>
-	<li><a href="#overview">Overview</a></li>
+	<li><a href="#basic_bloom">Basic Bloom Filter</a></li>
+	<li><a href="#dynamic_bloom">Dynamic Basic Bloom Filter</a></li>
+	<li><a href="#cbf">Counting Bloom Filter</a></li>
 	<li><a href="#default_hash">Default Hash Functions</a></li>
 	<li><a href="#c++0x">C++0x Considerations</a></li>
 	<li><a href="#future">Future Directions</a></li>
       </ul>
     </div>
 
-    <a name="overview"></a>
     <h4>Overview</h4>
     <p>
       This Bloom filter implementation is designed to allow compile-time determination of storage space(in bits), insertion/query type, and hash functions. The design goals were:
