@@ -11,17 +11,17 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
-#include <boost/bloom_filter/bloom.hpp>
-#include <boost/bloom_filter/dynamic_bloom.hpp>
-#include <boost/bloom_filter/counting_bloom.hpp>
+#include <boost/bloom_filter/basic_bloom_filter.hpp>
+#include <boost/bloom_filter/dynamic_bloom_filter.hpp>
+#include <boost/bloom_filter/counting_bloom_filter.hpp>
 #include <boost/unordered_set.hpp>
 #include <set>
-using boost::bloom_filter::bloom_filter;
-using boost::bloom_filter::dynamic_bloom_filter;
-using boost::bloom_filter::counting_bloom_filter;
+using boost::bloom_filters::basic_bloom_filter;
+using boost::bloom_filters::dynamic_bloom_filter;
+using boost::bloom_filters::counting_bloom_filter;
 using boost::unordered_set;
 
-typedef bloom_filter<int, 1000> basic_bloom;
+typedef basic_bloom_filter<int, 1000> basic_bloom;
 typedef dynamic_bloom_filter<int> basic_dynamic_bloom;
 typedef counting_bloom_filter<int, 1000> counting_bloom;
 

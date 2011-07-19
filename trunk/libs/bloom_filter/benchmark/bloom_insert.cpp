@@ -14,14 +14,14 @@
 #include "detail/generator.hpp"
 #include "detail/benchmark.hpp"
 
-#include <boost/bloom_filter/bloom.hpp>
+#include <boost/bloom_filter/basic_bloom_filter.hpp>
 #include <boost/progress.hpp>
 #include <iostream>
 using namespace std;
 using boost::detail::Pow;
 using boost::detail::benchmark;
 using boost::detail::generator;
-using boost::bloom_filter::bloom_filter;
+using boost::bloom_filters::basic_bloom_filter;
 
 int main()
 {
@@ -35,7 +35,7 @@ int main()
   for (size_t i = 0; i < REPEAT; ++i, ++progress) {
     benchmark<int, OPS, 
 	      generator<int>,
-	      bloom_filter<int, BITS> > bench;    
+	      basic_bloom_filter<int, BITS> > bench;    
 
     bench.run();
 
