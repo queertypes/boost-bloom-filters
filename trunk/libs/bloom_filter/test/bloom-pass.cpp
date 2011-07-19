@@ -14,12 +14,12 @@
 #define BOOST_TEST_MODULE "Boost Bloom Filter" 1
 #include <iostream>
 
-#include <boost/bloom_filter/bloom.hpp>
+#include <boost/bloom_filter/basic_bloom_filter.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
 
-using boost::bloom_filter::bloom_filter;
-using boost::bloom_filter::boost_hash;
+using boost::bloom_filters::basic_bloom_filter;
+using boost::bloom_filters::boost_hash;
 
 BOOST_AUTO_TEST_CASE(defaultConstructor) {
   typedef boost::mpl::vector<
@@ -27,20 +27,20 @@ BOOST_AUTO_TEST_CASE(defaultConstructor) {
     boost_hash<int, 17>,
     boost_hash<int, 19> > BoostHashFunctions;
   
-  bloom_filter<int, 8> bloom1;
-  bloom_filter<int, 8, BoostHashFunctions> bloom2;
+  basic_bloom_filter<int, 8> bloom1;
+  basic_bloom_filter<int, 8, BoostHashFunctions> bloom2;
 }
 
 BOOST_AUTO_TEST_CASE(rangeConstructor) {
   int elems[5] = {1,2,3,4,5};
-  bloom_filter<int, 8> bloom(elems, elems+5);
+  basic_bloom_filter<int, 8> bloom(elems, elems+5);
 
   BOOST_CHECK_EQUAL(bloom.count(), 5ul);
 }
 
 #ifndef BOOST_NO_0X_HDR_INITIALIZER_LIST
 BOOST_AUTO_TEST_CASE(initListConstructor) {
-  bloom_filter<int, 8> bloom = {1,2,3,4,5};
+  basic_bloom_filter<int, 8> bloom = {1,2,3,4,5};
 
   BOOST_CHECK_EQUAL(bloom.count(), 5ul);
 }
@@ -48,16 +48,16 @@ BOOST_AUTO_TEST_CASE(initListConstructor) {
 
 BOOST_AUTO_TEST_CASE(copyConstructor) {
   int elems[5] = {1,2,3,4,5};
-  bloom_filter<int, 8> bloom1(elems, elems+5);
-  bloom_filter<int, 8> bloom2(bloom1);
+  basic_bloom_filter<int, 8> bloom1(elems, elems+5);
+  basic_bloom_filter<int, 8> bloom2(bloom1);
 
   BOOST_CHECK_EQUAL(bloom1.count(), bloom2.count());
 }
 
 BOOST_AUTO_TEST_CASE(assignment)
 {
-  bloom_filter<int, 8> bloom1;
-  bloom_filter<int, 8> bloom2;
+  basic_bloom_filter<int, 8> bloom1;
+  basic_bloom_filter<int, 8> bloom2;
 
   for (size_t i = 0; i < 200; ++i) {
     bloom1.insert(i);
@@ -72,9 +72,9 @@ BOOST_AUTO_TEST_CASE(assignment)
 }
 
 BOOST_AUTO_TEST_CASE(bit_capacity) {
-  bloom_filter<size_t, 8> bloom_8;
-  bloom_filter<size_t, 256> bloom_256;
-  bloom_filter<size_t, 2048> bloom_2048;
+  basic_bloom_filter<size_t, 8> bloom_8;
+  basic_bloom_filter<size_t, 256> bloom_256;
+  basic_bloom_filter<size_t, 2048> bloom_2048;
   
   BOOST_CHECK_EQUAL(bloom_8.bit_capacity(), 8ul);
   BOOST_CHECK_EQUAL(bloom_256.bit_capacity(), 256ul);
@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE(bit_capacity) {
 }
 
 BOOST_AUTO_TEST_CASE(empty) {
-  bloom_filter<size_t, 8> bloom;
+  basic_bloom_filter<size_t, 8> bloom;
   
   BOOST_CHECK_EQUAL(bloom.empty(), true);
   bloom.insert(1);
@@ -92,11 +92,11 @@ BOOST_AUTO_TEST_CASE(empty) {
 }
 
 BOOST_AUTO_TEST_CASE(numHashFunctions) {
-  bloom_filter<size_t, 8> bloom_3;
-  bloom_filter<size_t, 8, boost::mpl::vector<
+  basic_bloom_filter<size_t, 8> bloom_3;
+  basic_bloom_filter<size_t, 8, boost::mpl::vector<
     boost_hash<size_t, 1>,
     boost_hash<size_t, 2> > > bloom_2;
-  bloom_filter<size_t, 8, boost::mpl::vector<
+  basic_bloom_filter<size_t, 8, boost::mpl::vector<
     boost_hash<size_t, 1>,
     boost_hash<size_t, 2>,
     boost_hash<size_t, 3>,
@@ -111,7 +111,7 @@ BOOST_AUTO_TEST_CASE(numHashFunctions) {
 }
 
 BOOST_AUTO_TEST_CASE(falsePositiveRate) {
-  bloom_filter<size_t, 64> bloom;
+  basic_bloom_filter<size_t, 64> bloom;
 
   BOOST_CHECK_EQUAL(bloom.false_positive_rate(), 0.0);
 
@@ -141,7 +141,7 @@ BOOST_AUTO_TEST_CASE(falsePositiveRate) {
 }
 
 BOOST_AUTO_TEST_CASE(probably_contains) {
-  bloom_filter<size_t, 8> bloom;
+  basic_bloom_filter<size_t, 8> bloom;
 
   bloom.insert(1);
   BOOST_CHECK_EQUAL(bloom.probably_contains(1), true);
@@ -150,13 +150,13 @@ BOOST_AUTO_TEST_CASE(probably_contains) {
 }
 
 BOOST_AUTO_TEST_CASE(doesNotContain) {
-  bloom_filter<size_t, 8> bloom;
+  basic_bloom_filter<size_t, 8> bloom;
 
   BOOST_CHECK_EQUAL(bloom.probably_contains(1), false);
 }
 
 BOOST_AUTO_TEST_CASE(insertNoFalseNegatives) {
-  bloom_filter<size_t, 2048> bloom;
+  basic_bloom_filter<size_t, 2048> bloom;
 
   for (size_t i = 0; i < 100; ++i) {
     bloom.insert(i);
@@ -166,14 +166,14 @@ BOOST_AUTO_TEST_CASE(insertNoFalseNegatives) {
 
 BOOST_AUTO_TEST_CASE(rangeInsert) {
   int elems[5] = {1,2,3,4,5};
-  bloom_filter<size_t, 8> bloom;
+  basic_bloom_filter<size_t, 8> bloom;
 
   bloom.insert(elems, elems+5);
   BOOST_CHECK_EQUAL(bloom.count(), 5ul);
 }
 
 BOOST_AUTO_TEST_CASE(clear) {
-  bloom_filter<size_t, 8> bloom;
+  basic_bloom_filter<size_t, 8> bloom;
 
   for (size_t i = 0; i < 1000; ++i)
     bloom.insert(i);
@@ -185,8 +185,8 @@ BOOST_AUTO_TEST_CASE(clear) {
 
 BOOST_AUTO_TEST_CASE(memberSwap) {
   size_t elems[5] = {1,2,3,4,5};
-  bloom_filter<size_t, 8> bloom1(elems, elems+2);
-  bloom_filter<size_t, 8> bloom2(elems+2, elems+5);
+  basic_bloom_filter<size_t, 8> bloom1(elems, elems+2);
+  basic_bloom_filter<size_t, 8> bloom2(elems+2, elems+5);
 
   bloom1.swap(bloom2);
 
@@ -195,9 +195,9 @@ BOOST_AUTO_TEST_CASE(memberSwap) {
 }
 
 BOOST_AUTO_TEST_CASE(testUnion) {
-  bloom_filter<size_t, 300> bloom_1;
-  bloom_filter<size_t, 300> bloom_2;
-  bloom_filter<size_t, 300> bloom_union;
+  basic_bloom_filter<size_t, 300> bloom_1;
+  basic_bloom_filter<size_t, 300> bloom_2;
+  basic_bloom_filter<size_t, 300> bloom_union;
 
   for (size_t i = 0; i < 100; ++i)
     bloom_1.insert(i);
@@ -214,8 +214,8 @@ BOOST_AUTO_TEST_CASE(testUnion) {
 }
 
 BOOST_AUTO_TEST_CASE(testUnionAssign) {
-  bloom_filter<size_t, 300> bloom_1;
-  bloom_filter<size_t, 300> bloom_union;
+  basic_bloom_filter<size_t, 300> bloom_1;
+  basic_bloom_filter<size_t, 300> bloom_union;
 
   for (size_t i = 0; i < 100; ++i) 
     bloom_1.insert(i);
@@ -228,9 +228,9 @@ BOOST_AUTO_TEST_CASE(testUnionAssign) {
 }
 
 BOOST_AUTO_TEST_CASE(testIntersect) {
-  bloom_filter<size_t, 300> bloom_1;
-  bloom_filter<size_t, 300> bloom_2;
-  bloom_filter<size_t, 300> bloom_intersect;
+  basic_bloom_filter<size_t, 300> bloom_1;
+  basic_bloom_filter<size_t, 300> bloom_2;
+  basic_bloom_filter<size_t, 300> bloom_intersect;
 
   // overlap at 100
   for (size_t i = 0; i < 101; ++i) 
@@ -247,8 +247,8 @@ BOOST_AUTO_TEST_CASE(testIntersect) {
 }
 
 BOOST_AUTO_TEST_CASE(testIntersectAssign) {
-  bloom_filter<size_t, 300> bloom_1;
-  bloom_filter<size_t, 300> bloom_intersect;
+  basic_bloom_filter<size_t, 300> bloom_1;
+  basic_bloom_filter<size_t, 300> bloom_intersect;
 
   for (size_t i = 0; i < 100; ++i) 
     bloom_1.insert(i);
@@ -261,8 +261,8 @@ BOOST_AUTO_TEST_CASE(testIntersectAssign) {
 
 BOOST_AUTO_TEST_CASE(globalSwap) {
   size_t elems[5] = {1,2,3,4,5};
-  bloom_filter<size_t, 8> bloom1(elems, elems+2);
-  bloom_filter<size_t, 8> bloom2(elems+2, elems+5);
+  basic_bloom_filter<size_t, 8> bloom1(elems, elems+2);
+  basic_bloom_filter<size_t, 8> bloom2(elems+2, elems+5);
 
   swap(bloom1, bloom2);
 
@@ -271,8 +271,8 @@ BOOST_AUTO_TEST_CASE(globalSwap) {
 }
 
 BOOST_AUTO_TEST_CASE(equalityOperator) {
-  bloom_filter<int, 8> bloom1;
-  bloom_filter<int, 8> bloom2;
+  basic_bloom_filter<int, 8> bloom1;
+  basic_bloom_filter<int, 8> bloom2;
 
   BOOST_CHECK_EQUAL(bloom1 == bloom2, true);
   bloom1.insert(1);
@@ -282,8 +282,8 @@ BOOST_AUTO_TEST_CASE(equalityOperator) {
 }
 
 BOOST_AUTO_TEST_CASE(inequalityOperator) {
-  bloom_filter<int, 8> bloom1;
-  bloom_filter<int, 8> bloom2;
+  basic_bloom_filter<int, 8> bloom1;
+  basic_bloom_filter<int, 8> bloom2;
 
   BOOST_CHECK_EQUAL(bloom1 != bloom2, false);
   bloom1.insert(1);

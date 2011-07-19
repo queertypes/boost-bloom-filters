@@ -14,12 +14,12 @@
 #define BOOST_TEST_MODULE "Boost Bloom Filter" 1
 #include <iostream>
 
-#include <boost/bloom_filter/counting_bloom.hpp>
+#include <boost/bloom_filter/counting_bloom_filter.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
 
-using boost::bloom_filter::counting_bloom_filter;
-using boost::bloom_filter::boost_hash;
+using boost::bloom_filters::counting_bloom_filter;
+using boost::bloom_filters::boost_hash;
 
 typedef unsigned char small_block_type;
 typedef unsigned short med_block_type;

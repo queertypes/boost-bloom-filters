@@ -13,11 +13,11 @@
 #define BOOST_TEST_DYN_LINK 1
 #define BOOST_TEST_MODULE "Boost Bloom Filter" 1
 
-#include <boost/bloom_filter/dynamic_bloom.hpp>
+#include <boost/bloom_filter/dynamic_bloom_filter.hpp>
 #include <boost/test/unit_test.hpp>
 
-using boost::bloom_filter::dynamic_bloom_filter;
-using boost::bloom_filter::boost_hash;
+using boost::bloom_filters::dynamic_bloom_filter;
+using boost::bloom_filters::boost_hash;
 
 BOOST_AUTO_TEST_CASE(testIntersectFailDifferentSize) {
   dynamic_bloom_filter<size_t> bloom_1(300);
