@@ -23,6 +23,11 @@
 .toc p {font-weight: bold;}
 .copyright {font-style: italic;}
 
+.math {
+    font-family:"Unicode Symbols";
+    margin: 1% 2%;
+}
+
 .header {
     height: 94px;
     position: relative;
