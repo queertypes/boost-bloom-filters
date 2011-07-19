@@ -63,6 +63,15 @@ p {
     margin: 0 5%;
 }
 
+.example {
+    white-space: pre;
+    background: #d0d0d0;
+    border: 1px solid;
+    font-family: monospace;
+    display: block;
+    margin: 0 5%;
+}
+
 .func_ref {
     background-color: #f0f0f0;
     display: block;
