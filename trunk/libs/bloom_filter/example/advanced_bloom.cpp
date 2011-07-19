@@ -11,9 +11,9 @@
 //////////////////////////////////////////////////////////////////////////////
 
 // advanced Boost.BloomFilter program
-#include <boost/bloom_filter/bloom.hpp>
+#include <boost/bloom_filter/basic_bloom_filter.hpp>
 #include <iostream>
-using namespace boost::bloom_filter;
+using namespace boost::bloom_filters;
 using namespace std;
 
 int main () {
@@ -23,7 +23,7 @@ int main () {
   static const size_t CONTAINS_MAX = 10000;
   static const size_t NUM_BITS = 8192;
 
-  bloom_filter<int, NUM_BITS, HashFns> bloom;
+  basic_bloom_filter<int, NUM_BITS, HashFns> bloom;
   size_t collisions = 0;
 
   cout << "bloom filter storage size: "

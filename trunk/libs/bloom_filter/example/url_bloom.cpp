@@ -11,11 +11,11 @@
 //////////////////////////////////////////////////////////////////////////////
 
 // introductory Boost.BloomFilter program
-#include <boost/bloom_filter/bloom.hpp>
+#include <boost/bloom_filter/basic_bloom_filter.hpp>
 #include <sstream>
 #include <string>
 #include <iostream>
-using namespace boost::bloom_filter;
+using namespace boost::bloom_filters;
 using namespace std;
 
 const string gen_url(const size_t num)
@@ -37,7 +37,7 @@ int main () {
   static const size_t CONTAINS_MAX = 10000;
   static const size_t NUM_BITS = 32768; // 8KB
 
-  bloom_filter<string, NUM_BITS> bloom;
+  basic_bloom_filter<string, NUM_BITS> bloom;
   size_t collisions = 0;
 
   for (size_t i = 0; i < INSERT_MAX; ++i) {

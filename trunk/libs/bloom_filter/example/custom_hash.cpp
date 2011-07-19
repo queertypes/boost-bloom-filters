@@ -12,11 +12,11 @@
 
 // example demonstrating how to overload default hash function
 // in order to support user-defined type
-#include <boost/bloom_filter/bloom.hpp>
+#include <boost/bloom_filter/basic_bloom_filter.hpp>
 #include <sstream>
 #include <string>
 #include <iostream>
-using namespace boost::bloom_filter;
+using namespace boost::bloom_filters;
 using namespace std;
 
 class URL {
@@ -34,7 +34,7 @@ private:
 // provide an overload for your class
 // alternatively, implement own Hasher that can handle your type
 namespace boost {
-  namespace bloom_filter {
+  namespace bloom_filters {
     template <size_t Seed>
     struct boost_hash<URL, Seed> {
       size_t operator()(const URL& t) {
@@ -63,7 +63,7 @@ int main () {
   static const size_t CONTAINS_MAX = 10000;
   static const size_t NUM_BITS = 32768; // 8KB
 
-  bloom_filter<URL, NUM_BITS> bloom;
+  basic_bloom_filter<URL, NUM_BITS> bloom;
   size_t collisions = 0;
 
   for (size_t i = 0; i < INSERT_MAX; ++i) {
