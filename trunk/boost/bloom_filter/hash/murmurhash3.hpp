@@ -73,7 +73,7 @@ namespace boost {
 
 	dispatcher(&t, sizeof(T), Seed, &out);
 	
-	return out[1];
+	return out[0];
       }
     };
 
