@@ -28,6 +28,10 @@
     margin: 1% 2%;
 }
 
+.complexity {
+    font-family: "Unicode Symbols";
+}
+
 .header {
     height: 94px;
     position: relative;
@@ -76,6 +80,21 @@ p {
     margin: 0 5%;
 }
 
+.template_ref {
+    display: block;
+    background: #e0e0e0;
+    border: 1px solid;
+    margin: 1% 1%;
+}
+
+.template_ref dl {
+    margin: 1% 1%;
+}
+
+.template_ref dl dt {
+    font-weight: bold;
+}
+
 .func_ref {
     background-color: #f0f0f0;
     display: block;
@@ -119,7 +138,7 @@ p {
 }
 
 .c_keyword {
-    color: fuchsia;
+    color: #800080;
 }
 
 .c_namespace {
@@ -131,7 +150,7 @@ p {
 }
 
 .c_id {
-    color: red;
+    color: #ff7700;
 }
 
 .c_func {

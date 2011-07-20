@@ -75,7 +75,7 @@
     <a name="default_hash"></a>
     <h4>Default Hash Functions</h4>
     <p>
-      To make the Bloom filter easy to use, the HashFunctions template partameter has a default value. This way, if the user wishes to use a Bloom filter for a quick, non-critical task, the user has the ability to just declare and use.
+      To make the Bloom filter easy to use, the HashFunctions template parameter has a default value. This way, if the user wishes to use a Bloom filter for a quick, non-critical task, the user has the ability to just declare and use.
     </p>
     <p>
       The default hash function set consists of three boost_hash function objects. These are implemented by computing Boost.Functional hash_value and incrementing the result by the seed. The boost_hash function object is made available in the file boost/bloom_filter/hash/default.hpp for users that wish to use more or fewer hash functions to use their Bloom filter without having to create their own hash function object.

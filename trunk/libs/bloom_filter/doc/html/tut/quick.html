@@ -65,7 +65,7 @@
 	}
 
 	<code class="c_keyword">for</code> (<code class="c_type">int</code><code class="c_id"> i</code> = INSERT_MAX; i &lt; CONTAINS_MAX; ++i) {
-	  <code class="c_keyword">if</code> (bloom.probably_contains(i)) cout &lt;&lt; "collision" &lt;&lt; endl;
+	  <code class="c_keyword">if</code> (bloom.probably_contains(i)) ++collisions;
 	}
 
 	cout &lt;&lt; <code class="c_str">"collisions: "</code> 
