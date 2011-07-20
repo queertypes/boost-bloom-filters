@@ -97,7 +97,7 @@ p {
 
 .template_ref dl dd {
     margin-left: 12px;
-    margin-bottom: 4px;
+    margin-bottom: 8px;
 }
 
 .func_ref {
@@ -109,9 +109,14 @@ p {
     border: solid 1px;
 }
 
-.func_ref dt {
+.func_ref dl dt {
     margin: 0 1%;
     font-weight: bold;
+}
+
+.func_ref dl dd {
+    margin-left: 24px;
+    margin-bottom: 8px;
 }
 
 .ref_listing {
