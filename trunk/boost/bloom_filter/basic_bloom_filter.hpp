@@ -10,8 +10,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef BOOST_BLOOM_FILTER_BLOOM_HPP
-#define BOOST_BLOOM_FILTER_BLOOM_HPP 1
+#ifndef BOOST_BLOOM_FILTER_BLOOM_FILTER_HPP
+#define BOOST_BLOOM_FILTER_BLOOM_FILTER_HPP 1
 /**
  * \author Alejandro Cabrera
  * \brief A generic Bloom filter providing compile-time unrolling
@@ -32,27 +32,27 @@
 #endif 
 
 namespace boost {
-  namespace bloom_filter {
+  namespace bloom_filters {
     template <typename T,
 	      size_t Size,
 	      class HashFunctions = mpl::vector<boost_hash<T, 3> > >
-    class bloom_filter {
+    class basic_bloom_filter {
     public:
       typedef T value_type;
       typedef T key_type;
       typedef HashFunctions hash_function_type;
 
     public:
-      bloom_filter() {}
+      basic_bloom_filter() {}
 
       template <typename InputIterator>
-      bloom_filter(const InputIterator start, const InputIterator end) {
+      basic_bloom_filter(const InputIterator start, const InputIterator end) {
 	for (InputIterator i = start; i != end; ++i)
 	  this->insert(*i);
       }
 
 #ifndef BOOST_NO_0X_HDR_INITIALIZER_LIST
-      bloom_filter(const std::initializer_list<T>& ilist) {
+      basic_bloom_filter(const std::initializer_list<T>& ilist) {
 	typedef typename std::initializer_list<T>::const_iterator citer;
 	for (citer i = ilist.begin(), end = ilist.end(); i != end; ++i) {
 	  this->insert(*i);
@@ -106,31 +106,31 @@ namespace boost {
         this->bits.reset();
       }
 
-      void swap(bloom_filter& other) {
-	bloom_filter tmp = other;
+      void swap(basic_bloom_filter& other) {
+	basic_bloom_filter tmp = other;
 	other = *this;
 	*this = tmp;
       }
 
-      bloom_filter& operator|=(const bloom_filter& rhs) {
+      basic_bloom_filter& operator|=(const basic_bloom_filter& rhs) {
         this->bits |= rhs.bits;
         return *this;
       }
 
-      bloom_filter& operator&=(const bloom_filter& rhs) {
+      basic_bloom_filter& operator&=(const basic_bloom_filter& rhs) {
         this->bits &= rhs.bits;
         return *this;
       }
 
       template<class _T, size_t _Size, class _HashFunctions>
       friend bool
-      operator==(const bloom_filter<_T, _Size, _HashFunctions>&,
-		 const bloom_filter<_T, _Size, _HashFunctions>&);
+      operator==(const basic_bloom_filter<_T, _Size, _HashFunctions>&,
+		 const basic_bloom_filter<_T, _Size, _HashFunctions>&);
 
       template<class _T, size_t _Size, class _HashFunctions>
       friend bool
-      operator!=(const bloom_filter<_T, _Size, _HashFunctions>&,
-		 const bloom_filter<_T, _Size, _HashFunctions>&);
+      operator!=(const basic_bloom_filter<_T, _Size, _HashFunctions>&,
+		 const basic_bloom_filter<_T, _Size, _HashFunctions>&);
       
     private:
       std::bitset<Size> bits;
@@ -138,47 +138,47 @@ namespace boost {
 
     template<class _T, size_t _Size, class _HashFunctions>
     bool
-    operator==(const bloom_filter<_T, _Size, _HashFunctions>& lhs,
-	       const bloom_filter<_T, _Size, _HashFunctions>& rhs)
+    operator==(const basic_bloom_filter<_T, _Size, _HashFunctions>& lhs,
+	       const basic_bloom_filter<_T, _Size, _HashFunctions>& rhs)
     {
       return (lhs.bits == rhs.bits);
     }
 
     template<class _T, size_t _Size, class _HashFunctions>
     bool
-    operator!=(const bloom_filter<_T, _Size, _HashFunctions>& lhs,
-	       const bloom_filter<_T, _Size, _HashFunctions>& rhs)
+    operator!=(const basic_bloom_filter<_T, _Size, _HashFunctions>& lhs,
+	       const basic_bloom_filter<_T, _Size, _HashFunctions>& rhs)
     {
       return !(lhs == rhs);
     }
 
     template<class _T, size_t _Size, class _HashFunctions>
-    bloom_filter<_T, _Size, _HashFunctions>
-    operator|(const bloom_filter<_T, _Size, _HashFunctions>& lhs,
-	      const bloom_filter<_T, _Size, _HashFunctions>& rhs)
+    basic_bloom_filter<_T, _Size, _HashFunctions>
+    operator|(const basic_bloom_filter<_T, _Size, _HashFunctions>& lhs,
+	      const basic_bloom_filter<_T, _Size, _HashFunctions>& rhs)
     {
-      bloom_filter<_T, _Size, _HashFunctions> ret(lhs);
+      basic_bloom_filter<_T, _Size, _HashFunctions> ret(lhs);
       ret |= rhs;
       return ret;
     }
 
     template<class _T, size_t _Size, class _HashFunctions>
-    bloom_filter<_T, _Size, _HashFunctions>
-    operator&(const bloom_filter<_T, _Size, _HashFunctions>& lhs,
-	      const bloom_filter<_T, _Size, _HashFunctions>& rhs)
+    basic_bloom_filter<_T, _Size, _HashFunctions>
+    operator&(const basic_bloom_filter<_T, _Size, _HashFunctions>& lhs,
+	      const basic_bloom_filter<_T, _Size, _HashFunctions>& rhs)
     {
-      bloom_filter<_T, _Size, _HashFunctions> ret(lhs);
+      basic_bloom_filter<_T, _Size, _HashFunctions> ret(lhs);
       ret &= rhs;
       return ret;
     }
 
     template<class _T, size_t _Size, class _HashFunctions>
     void
-    swap(bloom_filter<_T, _Size, _HashFunctions>& lhs,
-	 bloom_filter<_T, _Size, _HashFunctions>& rhs)
+    swap(basic_bloom_filter<_T, _Size, _HashFunctions>& lhs,
+	 basic_bloom_filter<_T, _Size, _HashFunctions>& rhs)
     {
       lhs.swap(rhs);
     }
-  } // namespace bloom_filter
+  } // namespace bloom_filters
 } // namespace boost
 #endif

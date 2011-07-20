@@ -19,7 +19,7 @@
 #include <boost/mpl/at.hpp>
 
 namespace boost {
-  namespace bloom_filter {
+  namespace bloom_filters {
     namespace detail {
 
       /*************************************************************************

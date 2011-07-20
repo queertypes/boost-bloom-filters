@@ -45,7 +45,7 @@
 #include <boost/cstdint.hpp>
 
 namespace boost {
-  namespace hash {
+  namespace bloom_filters {
 
     // forward declarations
     namespace detail {

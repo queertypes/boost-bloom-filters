@@ -19,7 +19,7 @@
 #include <boost/functional/hash.hpp>
 
 namespace boost {
-  namespace bloom_filter {
+  namespace bloom_filters {
   template <typename T, size_t Seed>
     struct boost_hash {
       size_t operator()(const T& t) {

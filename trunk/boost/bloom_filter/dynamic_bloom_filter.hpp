@@ -10,8 +10,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef BOOST_BLOOM_FILTER_DYNAMIC_BLOOM_HPP
-#define BOOST_BLOOM_FILTER_DYNAMIC_BLOOM_HPP 1
+#ifndef BOOST_BLOOM_FILTER_DYNAMIC_BLOOM_FILTER_HPP
+#define BOOST_BLOOM_FILTER_DYNAMIC_BLOOM_FILTER_HPP 1
 /**
  * \author Alejandro Cabrera
  * \brief A generic Bloom filter providing compile-time unrolling
@@ -29,7 +29,7 @@
 #include <boost/bloom_filter/hash/default.hpp>
 
 namespace boost {
-  namespace bloom_filter {
+  namespace bloom_filters {
     template <typename T,
 	      class HashFunctions = mpl::vector<boost_hash<T, 3> >,
 	      class Block = size_t,

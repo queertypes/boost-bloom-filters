@@ -10,8 +10,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef BOOST_BLOOM_FILTER_COUNTING_BLOOM_HPP
-#define BOOST_BLOOM_FILTER_COUNTING_BLOOM_HPP 1
+#ifndef BOOST_BLOOM_FILTER_COUNTING_BLOOM_FILTER_HPP
+#define BOOST_BLOOM_FILTER_COUNTING_BLOOM_FILTER_HPP 1
 /**
  * \author Alejandro Cabrera
  * \brief A generic counting Bloom filter providing compile-time unrolling
@@ -36,7 +36,7 @@
 #endif 
 
 namespace boost {
-  namespace bloom_filter {
+  namespace bloom_filters {
     template <typename T,
 	      size_t NumBins,
 	      size_t BitsPerBin = 4,
