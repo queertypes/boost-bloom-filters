@@ -51,10 +51,13 @@
       };
     </div>
     <p>
-      In practice, it would be wise to also provide a Seed template parameter. By 
-      default, boost_hash is defined for users in 
-      <a href="../reference/hash/default.html">boost/bloom_filter/hash/default.hpp</a>. This can be used to define 
-      Bloom filters with additonal hashing functions easily, as demonstrated below:
+      In practice, it may be useful to also provide a Seed template parameter. 
+      Depending on how the Seed is incorporated into the hash value, it may be
+      possible to provide multiple independent hash values using only a 
+      single Hasher. By default, boost_hash is defined for users in 
+      <a href="../reference/hash/default.html">boost/bloom_filter/hash/default.hpp</a>. 
+      This can be used to define Bloom filters with additonal hashing functions easily, 
+      as demonstrated below:
     </p>
 
     <div class="listing">
