@@ -95,6 +95,11 @@ p {
     font-weight: bold;
 }
 
+.template_ref dl dd {
+    margin-left: 12px;
+    margin-bottom: 4px;
+}
+
 .func_ref {
     background-color: #f0f0f0;
     display: block;

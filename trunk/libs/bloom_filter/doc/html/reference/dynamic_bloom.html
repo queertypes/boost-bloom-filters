@@ -34,7 +34,7 @@
       <a accesskey="h" href="../index.html">
 	<img src="../../../../../doc/src/images/home.png" alt="Home"/>
       </a>
-      <a accesskey="n" href="hash/default.html">
+      <a accesskey="n" href="counting_bloom.html">
 	<img src="../../../../../doc/src/images/next.png" alt="Next"/>
       </a>
     </div>
@@ -127,12 +127,12 @@
 
     </div>
     <p>
-      The basic Bloom filter data structure. Supports insertion and query. Allows setting of bit capacity, type, and hash functions at compile-time. This structure is best used when: 
+      The dynamic basic Bloom filter data structure. Allows setting of type and hash functions at compile-time. This structure is best used when: 
     </p>
     <ul>
       <li>element removal is not needed</li> 
-      <li>the number of insertions can be reliably upper-bounded ahead of time</li> 
-      <li>storage requirements are strict</li>      
+      <li>the number of insertions <strong>cannot</strong> be reliably upper-bounded ahead of time</li> 
+      <li>the Bloom filter will be larger than stack space allows</li>
     </ul>
 
     <h2>Template Parameters Reference</h2>
@@ -501,7 +501,7 @@
       <a accesskey="h" href="../index.html">
 	<img src="../../../../../doc/src/images/home.png" alt="Home"/>
       </a>
-      <a accesskey="n" href="hash/default.html">
+      <a accesskey="n" href="counting_bloom.html">
 	<img src="../../../../../doc/src/images/next.png" alt="Next"/>
       </a>
     </div>

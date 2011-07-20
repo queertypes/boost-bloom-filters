@@ -25,7 +25,7 @@
     <hr/>
 
     <div class="spirit-nav">
-      <a accesskey="p" href="../reference.html">
+      <a accesskey="p" href="dynamic_bloom.html">
 	<img src="../../../../../doc/src/images/prev.png" alt="Prev"/>
       </a>
       <a accesskey="u" href="../reference.html">
@@ -34,28 +34,38 @@
       <a accesskey="h" href="../index.html">
 	<img src="../../../../../doc/src/images/home.png" alt="Home"/>
       </a>
-      <a accesskey="n" href="dynamic_bloom.html">
+      <a accesskey="n" href="hash/default.html">
 	<img src="../../../../../doc/src/images/next.png" alt="Next"/>
       </a>
     </div>
 
-    <h1>Basic Bloom Filter</h1>
+    <h1>Counting Bloom Filter</h1>
     <div class="listing">
       <code class="c_keyword">template</code> &lt;<code class="c_keyword">typename</code> <code class="c_type">T</code>,
-                <code class="c_type">size_t</code> <code class="c_type">Size</code>,
-                <code class="c_keyword">class</code> <code class="c_type">HashFunctions</code> = <code class="c_namespace">mpl::</code><code class="c_type">vector</code>&lt;<code class="c_type">boost_hash</code>&lt;<code class="c_type">T</code>, 3&gt; &gt; &gt;
-      <code class="c_keyword">class</code> <code class="c_id">bloom_filter</code> {
+                <code class="c_type">size_t</code> <code class="c_type">NumBins</code>,
+                <code class="c_type">size_t</code> <code class="c_type">BitsPerBin</code> = 4,
+                <code class="c_keyword">class</code> <code class="c_type">HashFunctions</code> = <code class="c_namespace">mpl::</code><code class="c_type">vector</code>&lt;<code class="c_type">boost_hash</code>&lt;<code class="c_type">T</code>, 3&gt; &gt;, 
+		<code class="c_keyword">typename</code> <code class="c_type">Block</code> = size_t&gt;
+      <code class="c_keyword">class</code> <code class="c_type">counting_bloom_filter</code> {
+
+        <code class="c_comment">// restrictions on template parameters</code>
+        <code class="c_keyword">static_assert</code>( <code class="c_namespace">boost::</code>is_integral&lt;<code class="c_type">Block</code>&gt;::value == true);
+        <code class="c_keyword">static_assert</code>( <code class="c_namespace">boost::</code>is_unsigned&lt;<code class="c_type">Block</code>&gt;::value == true);
+        <code class="c_keyword">static_assert</code>( (<code class="c_type">BitsPerBin</code> &lt;= (<code class="c_keyword">sizeof</code>(<code class="c_type">Block</code>) * 8) ) );
+        <code class="c_keyword">static_assert</code>( ((<code class="c_keyword">sizeof</code>(<code class="c_type">Block</code>) * 8) % <code class="c_type">BitsPerBin</code>) == 0);
+
         <code class="c_comment">// exported typedefs</code>
         <code class="c_keyword">typedef</code> <code class="c_type">T value_type</code>;
         <code class="c_keyword">typedef</code> <code class="c_type">T key_type</code>;
         <code class="c_keyword">typedef</code> <code class="c_type">HashFunctions hash_function_type</code>;
+        <code class="c_keyword">typedef</code> <code class="c_type">Block block_type</code>;
 
         <code class="c_comment">// constructors</code>
-        <code class="c_func">bloom_filter</code>();
-        <code class="c_func">bloom_filter</code>(<code class="c_keyword">const</code> <code class="c_namespace">std::initializer_list</code>&lt;<code class="c_type">T</code>&gt;&amp;); <code class="c_comment">// requires C++11</code>
+        <code class="c_func">counting_bloom_filter</code>();
+        <code class="c_func">counting_bloom_filter</code>(<code class="c_keyword">const</code> <code class="c_namespace">std::initializer_list</code>&lt;<code class="c_type">T</code>&gt;&amp;); <code class="c_comment">// requires C++11</code>
 
 	&lt;<code class="c_keyword">typename</code> <code class="c_type">InputIterator</code>&gt;	
-        <code class="c_func">bloom_filter</code>(<code class="c_keyword">const</code> <code class="c_type">InputIterator</code> <code class="c_id">start</code>, <code class="c_keyword">const</code> <code class="c_type">InputIterator</code> <code class="c_id">end</code>);
+        <code class="c_func">counting_bloom_filter</code>(<code class="c_keyword">const</code> <code class="c_type">InputIterator</code> <code class="c_id">start</code>, <code class="c_keyword">const</code> <code class="c_type">InputIterator</code> <code class="c_id">end</code>);
 
         <code class="c_comment">// data structure metadata query functions</code>
         <code class="c_keyword">static constexpr</code> <code class="c_type">size_t</code> <code class="c_func">bit_capacity</code>() <code class="c_keyword">const</code>;
@@ -72,72 +82,103 @@
 
         <code class="c_type">bool</code> <code class="c_func">probably_contains</code>(<code class="c_keyword">const</code> <code class="c_type">T</code>&amp;) <code class="c_keyword">const</code>;
 
+        <code class="c_type">void</code> <code class="c_func">remove</code>(<code class="c_keyword">const</code> <code class="c_type">T</code>&amp;);
+
+	&lt;<code class="c_keyword">typename</code> <code class="c_type">InputIterator</code>&gt;	
+        <code class="c_type">void</code> <code class="c_func">remove</code>(<code class="c_keyword">const</code> <code class="c_type">InputIterator</code> <code class="c_id">start</code>, <code class="c_keyword">const</code> <code class="c_type">InputIterator</code> <code class="c_id">end</code>);
+
 	<code class="c_comment">// auxilliary ops</code>
         <code class="c_type">void</code> <code class="c_func">clear</code>();
-        <code class="c_type">void</code> <code class="c_func">swap</code>(<code class="c_type">bloom_filter</code>&amp;);
+        <code class="c_type">void</code> <code class="c_func">swap</code>(<code class="c_type">counting_bloom_filter</code>&amp;);
         
         <code class="c_comment">// union assign/intersect assign</code>
-        <code class="c_type">bloom_filter</code>&amp; <code class="c_func">operator|=</code>(<code class="c_keyword">const</code> <code class="c_type">bloom_filter</code>&amp;);
-        <code class="c_type">bloom_filter</code>&amp; <code class="c_func">operator&amp;=</code>(<code class="c_keyword">const</code> <code class="c_type">bloom_filter</code>&amp;);       
+        <code class="c_type">counting_bloom_filter</code>&amp; <code class="c_func">operator|=</code>(<code class="c_keyword">const</code> <code class="c_type">counting_bloom_filter</code>&amp;);
+        <code class="c_type">counting_bloom_filter</code>&amp; <code class="c_func">operator&amp;=</code>(<code class="c_keyword">const</code> <code class="c_type">counting_bloom_filter</code>&amp;);       
       };
 
       <code class="c_comment">// union</code>
-      <code class="c_keyword">template</code> &lt;<code class="c_keyword">typename</code> <code class="c_type">T</code>, <code class="c_type">size_t</code> <code class="c_type">Size</code>,
-		<code class="c_keyword">class</code> <code class="c_type">HashFunctions</code>&gt;
-      <code class="c_type">bloom_filter</code>&lt;<code class="c_type">T, Size, HashFunctions</code>&gt;
-      <code class="c_func">operator|</code>(<code class="c_keyword">const</code> <code class="c_type">bloom_filter</code>&lt;<code class="c_type">T, Size, HashFunctions</code>&gt;&amp; <code class="c_id">lhs</code>,
-	        <code class="c_keyword">const</code> <code class="c_type">bloom_filter</code>&lt;<code class="c_type">T, Size, HashFunctions</code>&gt;&amp; <code class="c_id">rhs</code>);
+      <code class="c_keyword">template</code> &lt;<code class="c_keyword">typename</code> <code class="c_type">T</code>, 
+                <code class="c_type">size_t</code> <code class="c_type">NumBins</code>,
+                <code class="c_type">size_t</code> <code class="c_type">BitsPerBin</code>,
+		<code class="c_keyword">class</code> <code class="c_type">HashFunctions</code>,
+		<code class="c_keyword">typename</code> <code class="c_type">Block</code>&gt;
+      <code class="c_type">counting_bloom_filter</code>&lt;<code class="c_type">T, NumBins, BitsPerBin, HashFunctions, Block</code>&gt;
+      <code class="c_func">operator|</code>(<code class="c_keyword">const</code> <code class="c_type">counting_bloom_filter</code>&lt;<code class="c_type">T, NumBins, BitsPerBin, HashFunctions, Block</code>&gt;&amp; <code class="c_id">lhs</code>,
+	        <code class="c_keyword">const</code> <code class="c_type">counting_bloom_filter</code>&lt;<code class="c_type">T, NumBins, BitsPerBin, HashFunctions, Block</code>&gt;&amp; <code class="c_id">rhs</code>);
 
       <code class="c_comment">// intersect</code>
-      <code class="c_keyword">template</code> &lt;<code class="c_keyword">typename</code> <code class="c_type">T</code>, <code class="c_type">size_t</code> <code class="c_type">Size</code>,
-		<code class="c_keyword">class</code> <code class="c_type">HashFunctions</code>&gt;
-      <code class="c_type">bloom_filter</code>&lt;<code class="c_type">T, Size, HashFunctions</code>&gt;
-      <code class="c_func">operator&amp;</code>(<code class="c_keyword">const</code> <code class="c_type">bloom_filter</code>&lt;<code class="c_type">T, Size, HashFunctions</code>&gt;&amp; <code class="c_id">lhs</code>,
-	        <code class="c_keyword">const</code> <code class="c_type">bloom_filter</code>&lt;<code class="c_type">T, Size, HashFunctions</code>&gt;&amp; <code class="c_id">rhs</code>);
+      <code class="c_keyword">template</code> &lt;<code class="c_keyword">typename</code> <code class="c_type">T</code>, 
+                <code class="c_type">size_t</code> <code class="c_type">NumBins</code>,
+                <code class="c_type">size_t</code> <code class="c_type">BitsPerBin</code>,
+		<code class="c_keyword">class</code> <code class="c_type">HashFunctions</code>,
+		<code class="c_keyword">typename</code> <code class="c_type">Block</code>&gt;
+      <code class="c_type">counting_bloom_filter</code>&lt;<code class="c_type">T, NumBins, BitsPerBin, HashFunctions, Block</code>&gt;
+      <code class="c_func">operator&amp;</code>(<code class="c_keyword">const</code> <code class="c_type">counting_bloom_filter</code>&lt;<code class="c_type">T, NumBins, BitsPerBin, HashFunctions, Block</code>&gt;&amp; <code class="c_id">lhs</code>,
+	        <code class="c_keyword">const</code> <code class="c_type">counting_bloom_filter</code>&lt;<code class="c_type">T, NumBins, BitsPerBin, HashFunctions, Block</code>&gt;&amp; <code class="c_id">rhs</code>);
 
-      <code class="c_keyword">template</code> &lt;<code class="c_keyword">typename</code> <code class="c_type">T</code>, <code class="c_type">size_t</code> <code class="c_type">Size</code>,
-		<code class="c_keyword">class</code> <code class="c_type">HashFunctions</code>&gt;
-      <code class="c_type">void</code> <code class="c_func">swap</code>(<code class="c_type">bloom_filter</code>&lt;<code class="c_type">T, Size, HashFunctions</code>&gt;&amp; <code class="c_id">lhs</code>,
-	        <code class="c_type">bloom_filter</code>&lt;<code class="c_type">T, Size, HashFunctions</code>&gt;&amp; <code class="c_id">rhs</code>);
+      <code class="c_keyword">template</code> &lt;<code class="c_keyword">typename</code> <code class="c_type">T</code>, 
+                <code class="c_type">size_t</code> <code class="c_type">NumBins</code>,
+                <code class="c_type">size_t</code> <code class="c_type">BitsPerBin</code>,
+		<code class="c_keyword">class</code> <code class="c_type">HashFunctions</code>,
+		<code class="c_keyword">typename</code> <code class="c_type">Block</code>&gt;
+      <code class="c_type">void</code> <code class="c_func">swap</code>(<code class="c_type">counting_bloom_filter</code>&lt;<code class="c_type">T, NumBins, BitsPerBin, HashFunctions, Block</code>&gt;&amp; <code class="c_id">lhs</code>,
+	        <code class="c_type">counting_bloom_filter</code>&lt;<code class="c_type">T, NumBins, BitsPerBin, HashFunctions, Block</code>&gt;&amp; <code class="c_id">rhs</code>);
 
       <code class="c_comment">// equality</code>
-      <code class="c_keyword">template</code> &lt;<code class="c_keyword">typename</code> <code class="c_type">T</code>, <code class="c_type">size_t</code> <code class="c_type">Size</code>,
-		<code class="c_keyword">class</code> <code class="c_type">HashFunctions</code>&gt;
+      <code class="c_keyword">template</code> &lt;<code class="c_keyword">typename</code> <code class="c_type">T</code>, 
+                <code class="c_type">size_t</code> <code class="c_type">NumBins</code>,
+                <code class="c_type">size_t</code> <code class="c_type">BitsPerBin</code>,
+		<code class="c_keyword">class</code> <code class="c_type">HashFunctions</code>,
+		<code class="c_keyword">typename</code> <code class="c_type">Block</code>&gt;
       <code class="c_type">bool</code>
-      <code class="c_func">operator==</code>(<code class="c_keyword">const</code> <code class="c_type">bloom_filter</code>&lt;<code class="c_type">T, Size, HashFunctions</code>&gt;&amp; <code class="c_id">lhs</code>,
-	         <code class="c_keyword">const</code> <code class="c_type">bloom_filter</code>&lt;<code class="c_type">T, Size, HashFunctions</code>&gt;&amp; <code class="c_id">rhs</code>);
+      <code class="c_func">operator==</code>(<code class="c_keyword">const</code> <code class="c_type">counting_bloom_filter</code>&lt;<code class="c_type">T, NumBins, BitsPerBin, HashFunctions, Block</code>&gt;&amp; <code class="c_id">lhs</code>,
+	         <code class="c_keyword">const</code> <code class="c_type">counting_bloom_filter</code>&lt;<code class="c_type">T, NumBins, BitsPerBin, HashFunctions, Block</code>&gt;&amp; <code class="c_id">rhs</code>);
 
-      <code class="c_keyword">template</code> &lt;<code class="c_keyword">typename</code> <code class="c_type">T</code>, <code class="c_type">size_t</code> <code class="c_type">Size</code>,
-		<code class="c_keyword">class</code> <code class="c_type">HashFunctions</code>&gt;
+      <code class="c_keyword">template</code> &lt;<code class="c_keyword">typename</code> <code class="c_type">T</code>, 
+                <code class="c_type">size_t</code> <code class="c_type">NumBins</code>,
+                <code class="c_type">size_t</code> <code class="c_type">BitsPerBin</code>,
+		<code class="c_keyword">class</code> <code class="c_type">HashFunctions</code>,
+		<code class="c_keyword">typename</code> <code class="c_type">Block</code>&gt;
       <code class="c_type">bool</code>
-      <code class="c_func">operator!=</code>(<code class="c_keyword">const</code> <code class="c_type">bloom_filter</code>&lt;<code class="c_type">T, Size, HashFunctions</code>&gt;&amp; <code class="c_id">lhs</code>,
-	         <code class="c_keyword">const</code> <code class="c_type">bloom_filter</code>&lt;<code class="c_type">T, Size, HashFunctions</code>&gt;&amp; <code class="c_id">rhs</code>);
+      <code class="c_func">operator!=</code>(<code class="c_keyword">const</code> <code class="c_type">counting_bloom_filter</code>&lt;<code class="c_type">T, NumBins, BitsPerBin, HashFunctions, Block</code>&gt;&amp; <code class="c_id">lhs</code>,
+	         <code class="c_keyword">const</code> <code class="c_type">counting_bloom_filter</code>&lt;<code class="c_type">T, NumBins, BitsPerBin, HashFunctions, Block</code>&gt;&amp; <code class="c_id">rhs</code>);
     </div>
     <p>
-      The basic Bloom filter data structure. Supports insertion and query. Allows setting of bit capacity, type, and hash functions at compile-time. This structure is best used when: 
+      The compile-time counting Bloom filter class. Allows for customizing the number 
+      of bins used, as well as the bits used per bin. Even the granularity of bit 
+      operations can be modified via the Block parameter. Best used when:
     </p>
     <ul>
-      <li>element removal is not needed</li> 
-      <li>the number of insertions can be reliably upper-bounded ahead of time</li> 
-      <li>storage requirements are strict</li>      
+      <li>element removal is needed</li> 
+      <li>the number of insertions can be reliably upper-bounded ahead of time</li>
+      <li>storage requirements are strict: e.g., less than or equal to 1MB</li>
     </ul>
 
     <h2>Template Parameters Reference</h2>
-    <dl>
-      <dt>T</dt>
-      <dd>The type used for all Bloom filter operations.</dd>
-      <dt>Size</dt>
-      <dd>The size in bits of the underlying std::bitset used by the Bloom filter.</dd>
-      <dt>HashFunctions</dt>
-      <dd>The set of hash functions used by the Bloom filter. Currently required to be an <a href="http://www.boost.org/doc/libs/1_46_1/libs/mpl/doc/refmanual/vector.html">mpl::vector</a> of <a href="../tutorial.html">Hashers</a>.</dd>
-    </dl>
-
+    <div class="template_ref">
+      <dl>
+	<dt>T</dt>
+	<dd>The type used for all Bloom filter operations.</dd>
+	<dt>NumBins</dt>
+	<dd>A bin is used to store an occurrence of a single hashed element. 
+	This parameter sets the number of bins used.</dd>
+	<dt>BitsPerBin</dt>
+	<dd>The number of bits used for each bin.</dd>
+	<dt>HashFunctions</dt>
+	<dd>The set of hash functions used by the Bloom filter. Currently required to be an <a href="http://www.boost.org/doc/libs/1_46_1/libs/mpl/doc/refmanual/vector.html">mpl::vector</a> of <a href="../tutorial.html">Hashers</a>.</dd>
+	<dt>Block</dt>
+	<dd>An implementation detail - determines the granularity of the
+	bit operations. Smaller types reduce fragmentation. Larger types
+	improve throughput.</dd>
+      </dl>
+    </div>
+    
     <div class="toc">
-      <p>Function Reference</p>
+      <p>Function Reference (W.I.P.)</p>
       <ul>
-	<li><a href="#default_constructor">bloom_filter()</a></li>
-	<li><a href="#range_constructor">bloom_filter(start, end)</a></li>
-	<li><a href="#ilist_constructor">bloom_filter(initializer_list)</a></li>
+	<li><a href="#default_constructor">counting_bloom_filter()</a></li>
+	<li><a href="#range_constructor">counting_bloom_filter(start, end)</a></li>
+	<li><a href="#ilist_constructor">counting_bloom_filter(initializer_list)</a></li>
 	<li><a href="#bit_capacity">bit_capacity()</a></li>
 	<li><a href="#num_hash_functions">num_hash_functions()</a></li>
 	<li><a href="#false_positive_rate">false_positive_rate()</a></li>
@@ -145,6 +186,8 @@
 	<li><a href="#count">count()</a></li>
 	<li><a href="#insert">insert(T)</a></li>
 	<li><a href="#range_insert">insert(start, end)</a></li>
+	<li><a href="#remove">remove(T)</a></li>
+	<li><a href="#range_remove">remove(start, end)</a></li>
 	<li><a href="#probably_contains">probably_contains(T)</a></li>
 	<li><a href="#clear">clear()</a></li>
 	<li><a href="#swap">swap(bloom)</a></li>
@@ -162,28 +205,28 @@
 
     <div class="func_ref">
       <a name="default_constructor"></a>
-      <div class="ref_listing"><code class="c_func">bloom_filter</code>();</div>
+      <div class="ref_listing"><code class="c_func">counting_bloom_filter</code>();</div>
       <dl>
 	<dt>Description</dt>
-	<dd>Constructs a bloom_filter object with all bits set to 0.</dd>
+	<dd>Constructs a counting_bloom_filter object with all bits set to 0.</dd>
       </dl>
     </div>
 
     <div class="func_ref">
       <a name="range_constructor"></a>
-      <div class="ref_listing"><code class="c_func">bloom_filter</code>(<code class="c_keyword">const</code> <code class="c_type">InputIterator</code> <code class="c_id">start</code>, <code class="c_keyword">const</code> <code class="c_type">InputIterator</code> <code class="c_id">end</code>);</div>
+      <div class="ref_listing"><code class="c_func">counting_bloom_filter</code>(<code class="c_keyword">const</code> <code class="c_type">InputIterator</code> <code class="c_id">start</code>, <code class="c_keyword">const</code> <code class="c_type">InputIterator</code> <code class="c_id">end</code>);</div>
       <dl>
 	<dt>Description</dt>
-	<dd>Constructs a bloom_filter by inserting all the elements in the range (start, end).</dd>
+	<dd>Constructs a counting_bloom_filter by inserting all the elements in the range (start, end).</dd>
       </dl>
     </div>
 
     <div class="func_ref">
       <a name="ilist_constructor"></a>
-      <div class="ref_listing"><code class="c_func">bloom_filter</code>(<code class="c_keyword">const</code> <code class="c_namespace">std::initializer</code>&lt;<code class="c_type">T</code>&gt;&amp;);</div>
+      <div class="ref_listing"><code class="c_func">counting_bloom_filter</code>(<code class="c_keyword">const</code> <code class="c_namespace">std::initializer</code>&lt;<code class="c_type">T</code>&gt;&amp;);</div>
       <dl>
 	<dt>Description</dt>
-	<dd>Constructs a bloom_filter by inserting all elements in the initializer list.</dd>
+	<dd>Constructs a counting_bloom_filter by inserting all elements in the initializer list.</dd>
 	<dt>Warning</dt>
 	<dd>Only available in C++11-supporting compilers.</dd>
       </dl>
@@ -268,6 +311,28 @@
     </div>
 
     <div class="func_ref">
+      <a name="remove"></a>
+      <div class="ref_listing"><code class="c_type">void</code> <code class="c_func">remove</code>(<code class="c_keyword">const</code> <code class="c_type">T&amp;</code>);</div>
+      <dl>
+	<dt>Description</dt>
+	<dd>Removes an element into the Bloom filter.</dd>
+	<dt>Post-condition</dt>
+	<dd>At least 1 bit and at most num_hash_functions() bits of the Bloom filter will have been set.</dd>
+      </dl>
+    </div>
+
+    <div class="func_ref">
+      <a name="range_remove"></a>
+      <div class="ref_listing"><code class="c_type">void</code> <code class="c_func">remove</code>(<code class="c_keyword">const</code> <code class="c_type">InputIterator</code> <code class="c_id">start</code>, <code class="c_keyword">const</code> <code class="c_type">InputIterator</code> <code class="c_id">end</code>);</div>
+      <dl>
+	<dt>Description</dt>
+	<dd>Removes all elements in range (start, end).</dd>
+	<dt>Post-condition</dt>
+	<dd>At least n bits and at most (n * num_hash_functions()) bits of the Bloom filter will have been set, where n = distance(start, end).</dd>
+      </dl>
+    </div>
+
+    <div class="func_ref">
       <a name="probably_contains"></a>
       <div class="ref_listing"><code class="c_type">bool</code> <code class="c_func">probably_contains</code>(<code class="c_keyword">const</code> <code class="c_type">T&amp;</code>) <code class="c_keyword">const</code>;</div>
       <dl>
@@ -293,7 +358,7 @@
 
     <div class="func_ref">
       <a name="swap"></a>
-      <div class="ref_listing"><code class="c_type">void</code> <code class="c_func">swap</code>(<code class="c_type">bloom_filter</code>&amp;);</div>
+      <div class="ref_listing"><code class="c_type">void</code> <code class="c_func">swap</code>(<code class="c_type">counting_bloom_filter</code>&amp;);</div>
       <dl>
 	<dt>Description</dt>
 	<dd>Swaps the bits in this Bloom filter with the argument Bloom filter.</dd>
@@ -302,7 +367,7 @@
 
     <div class="func_ref">
       <a name="union_assign"></a>
-      <div class="ref_listing"><code class="c_type">bloom_filter&amp;</code> <code class="c_func">operator|=</code>(<code class="c_keyword">const</code> <code class="c_type">bloom_filter&amp;</code>);</div>
+      <div class="ref_listing"><code class="c_type">counting_bloom_filter&amp;</code> <code class="c_func">operator|=</code>(<code class="c_keyword">const</code> <code class="c_type">counting_bloom_filter&amp;</code>);</div>
       <dl>
 	<dt>Description</dt>
 	<dd>Performs a union.</dd>
@@ -315,7 +380,7 @@
 
     <div class="func_ref">
       <a name="intersect_assign"></a>
-      <div class="ref_listing"><code class="c_type">bloom_filter&amp;</code> <code class="c_func">operator&amp;=</code>(<code class="c_keyword">const</code> <code class="c_type">bloom_filter&amp;</code>);</div>
+      <div class="ref_listing"><code class="c_type">counting_bloom_filter&amp;</code> <code class="c_func">operator&amp;=</code>(<code class="c_keyword">const</code> <code class="c_type">counting_bloom_filter&amp;</code>);</div>
       <dl>
 	<dt>Description</dt>
 	<dd>Performs an intersection.</dd>
@@ -328,7 +393,7 @@
 
     <div class="func_ref">
       <a name="union"></a>
-      <div class="ref_listing"><code class="c_type">bloom_filter&amp;</code> <code class="c_func">operator|</code>(<code class="c_keyword">const</code> <code class="c_type">bloom_filter&amp;</code> <code class="c_id">lhs</code>, <code class="c_keyword">const</code> <code class="c_type">bloom_filter&amp;</code> <code class="c_id">rhs</code>);</div>
+      <div class="ref_listing"><code class="c_type">counting_bloom_filter&amp;</code> <code class="c_func">operator|</code>(<code class="c_keyword">const</code> <code class="c_type">counting_bloom_filter&amp;</code> <code class="c_id">lhs</code>, <code class="c_keyword">const</code> <code class="c_type">counting_bloom_filter&amp;</code> <code class="c_id">rhs</code>);</div>
       <dl>
 	<dt>Description</dt>
 	<dd>Performs a union.</dd>
@@ -341,7 +406,7 @@
 
     <div class="func_ref">
       <a name="intersect"></a>
-      <div class="ref_listing"><code class="c_type">bloom_filter&amp;</code> <code class="c_func">operator&amp;</code>(<code class="c_keyword">const</code> <code class="c_type">bloom_filter&amp;</code> <code class="c_id">lhs</code>, <code class="c_keyword">const</code> <code class="c_type">bloom_filter&amp;</code> <code class="c_id">rhs</code>);</div>
+      <div class="ref_listing"><code class="c_type">counting_bloom_filter&amp;</code> <code class="c_func">operator&amp;</code>(<code class="c_keyword">const</code> <code class="c_type">counting_bloom_filter&amp;</code> <code class="c_id">lhs</code>, <code class="c_keyword">const</code> <code class="c_type">counting_bloom_filter&amp;</code> <code class="c_id">rhs</code>);</div>
       <dl>
 	<dt>Description</dt>
 	<dd>Performs an intersection.</dd>
@@ -354,7 +419,7 @@
 
     <div class="func_ref">
       <a name="global_swap"></a>
-      <div class="ref_listing"><code class="c_type">void</code> <code class="c_func">swap</code>(<code class="c_type">bloom_filter</code>&amp;, <code class="c_type">bloom_filter</code>&amp;);</div>
+      <div class="ref_listing"><code class="c_type">void</code> <code class="c_func">swap</code>(<code class="c_type">counting_bloom_filter</code>&amp;, <code class="c_type">counting_bloom_filter</code>&amp;);</div>
       <dl>
 	<dt>Description</dt>
 	<dd>Swaps the bits between the argument Bloom filters.</dd>
@@ -363,7 +428,7 @@
 
     <div class="func_ref">
       <a name="operator_equality"></a>
-      <div class="ref_listing"><code class="c_type">bool</code> <code class="c_func">operator==</code>(<code class="c_keyword">const</code> <code class="c_type">bloom_filter&amp;</code> <code class="c_id">lhs</code>, <code class="c_keyword">const</code> <code class="c_type">bloom_filter&amp;</code> <code class="c_id">rhs</code>);</div>
+      <div class="ref_listing"><code class="c_type">bool</code> <code class="c_func">operator==</code>(<code class="c_keyword">const</code> <code class="c_type">counting_bloom_filter&amp;</code> <code class="c_id">lhs</code>, <code class="c_keyword">const</code> <code class="c_type">counting_bloom_filter&amp;</code> <code class="c_id">rhs</code>);</div>
       <dl>
 	<dt>Description</dt>
 	<dd>Compares the bits of the argument Bloom filters for equality.</dd>
@@ -374,7 +439,7 @@
 
     <div class="func_ref">
       <a name="operator_inequality"></a>
-      <div class="ref_listing"><code class="c_type">bool</code> <code class="c_func">operator!=</code>(<code class="c_keyword">const</code> <code class="c_type">bloom_filter&amp;</code> <code class="c_id">lhs</code>, <code class="c_keyword">const</code> <code class="c_type">bloom_filter&amp;</code> <code class="c_id">rhs</code>);</div>
+      <div class="ref_listing"><code class="c_type">bool</code> <code class="c_func">operator!=</code>(<code class="c_keyword">const</code> <code class="c_type">counting_bloom_filter&amp;</code> <code class="c_id">lhs</code>, <code class="c_keyword">const</code> <code class="c_type">counting_bloom_filter&amp;</code> <code class="c_id">rhs</code>);</div>
       <dl>
 	<dt>Description</dt>
 	<dd>Compares the bits of the argument Bloom filters for equality.</dd>
@@ -385,7 +450,7 @@
     <hr/>
 
     <div class="spirit-nav">
-      <a accesskey="p" href="../reference.html">
+      <a accesskey="p" href="dynamic_bloom.html">
 	<img src="../../../../../doc/src/images/prev.png" alt="Prev"/>
       </a>
       <a accesskey="u" href="../reference.html">
@@ -394,7 +459,7 @@
       <a accesskey="h" href="../index.html">
 	<img src="../../../../../doc/src/images/home.png" alt="Home"/>
       </a>
-      <a accesskey="n" href="dynamic_bloom.html">
+      <a accesskey="n" href="hash/default.html">
 	<img src="../../../../../doc/src/images/next.png" alt="Next"/>
       </a>
     </div>
