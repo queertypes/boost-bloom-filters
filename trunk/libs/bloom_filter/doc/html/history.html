@@ -36,10 +36,48 @@
     </div>
 
     <h1 class="title">Version history</h1>
+    <h3>v0.4.4 (July 24nd)</h3>
+    <ul>
+      <li><strong>New!</strong>
+	<ul>
+	  <li>murmurhash3 Hasher</li>
+	</ul>
+      </li>
+      <li><strong>API Changes</strong>
+	<ul>
+	  <li>Added exception classes for bin_underflow and bin_overflow</li>
+	  <li>bloom_filter -&gt; basic_bloom_filter</li>
+	  <li>bloom.hpp -&gt; basic_bloom_filter.hpp</li>
+	  <li>dynamic_bloom.hpp -&gt; dynamic_bloom_filter.hpp</li>
+	  <li>counting_bloom.hpp -&gt; counting_bloom_filter.hpp</li>
+	  <li>namespace bloom_filter -&gt; namespace bloom_filters</li>
+	</ul>
+      </li>
+      <li><strong>Documentation Changes</strong>
+	<ul>
+	  <li>Restructured tutorial into various modules</li>
+	  <li>Added reference for counting_bloom_filter</li>
+	  <li>Updated bibliography - restructured into three sections</li>
+	  <li>Updated design - restructured into a section per Bloom filter variant</li>
+	</ul>
+      </li>
+    </ul>
+
+    <h3>v0.4.0 (July 2nd)</h3>
+    <ul>
+      <li><strong>New!</strong>
+	<ul>
+	  <li>Compiling counting Bloom filter available</li>
+	</ul>
+      </li>
+      <li><strong>Test Changes</strong>
+	<ul>
+	  <li>Added regression suite for counting Bloom filter</li>
+	</ul>
+      </li>
+    </ul>
+
     <h3>v0.3.0 (July 2nd)</h3>
-    <p>
-      Big version jump. The dynamic Bloom filter is completed ahead of schedule. All that's left to do is a few documentation updates.
-    </p>
     <ul>
       <li><strong>New!</strong>
 	<ul>
@@ -61,7 +99,9 @@
       </li>
     </ul>
     <p>
-      Version 0.4.0 is expected to arrive by July 4th with the introduction of a solid interface for the counting Bloom filter as well as up to date documentation.
+      Version 0.4.0 is expected to arrive by July 4th with the introduction of a 
+      solid interface for the counting Bloom filter as well as up to date 
+      documentation.
     </p>
 
     <h3>v0.2.0 (June 24th)</h3>
