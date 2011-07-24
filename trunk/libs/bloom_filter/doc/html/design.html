@@ -127,7 +127,7 @@
     </p>
 
     <a name="default_hash"></a>
-    <h4>Default Hash Functions</h4>
+    <h3>Default Hash Functions</h3>
     <p>
       To make the Bloom filter easier to use, the HashFunctions template parameter 
       has a default value. This way, if the user wishes to use a Bloom filter for 
@@ -142,7 +142,7 @@
     </div>
 
     <a name="c++0x"></a>
-    <h4>C++0x Considerations</h4>
+    <h3>C++0x Considerations</h3>
     <p>
       Currently, this implementation uses boost::mpl::vector, boost::mpl::size, and boost::mpl::at_c for managing the hash function set. When C++0x is widely implemented, it may be beneficial to implement hash function set management in terms of std::tuple, std::tuple_size, and std::tuple_element. This will have to be investigated.
     </p>
@@ -154,7 +154,7 @@
     </p>
 
     <a name="future"></a>
-    <h4>Future Directions</h4>
+    <h3>Future Directions</h3>
     <p>
       There are a few planned features that have not yet made it to the Bloom filter package:
     </p>
@@ -173,7 +173,6 @@
       <ul>
 	<li><del>Counting Bloom filter (deletion support): <a href="http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.96.6789&amp;rep=rep1&amp;type=pdf">
 	Summary Cache. Fan et al. ACM SIGCOMM. 1998.</a></del></li>
-	</li>
 	<li>Scaling Bloom filter (constant false positive rate): <a href="http://www.google.com/url?sa=t&amp;source=web&amp;cd=1&amp;ved=0CBsQFjAA&amp;url=http%3A%2F%2Fgsd.di.uminho.pt%2Fmembers%2Fcbm%2Fps%2Fdbloom.pdf&amp;ei=ZH_2TbboIeeu0AH5o4XtDA&amp;usg=AFQjCNFGN0RS1-bUCxZJwUmD0C8cTnllQg&amp;sig2=__OvO8j0bdnj5gDH0xt4mw">
 	Scalable Bloom Filter. </a>Almeida et al. Elsevier. 2007.
 	</li>
