@@ -50,6 +50,21 @@
 	<li><a href="reference/hash/murmurhash3.html">murmurhash3</a></li>
       </ul>
     </div>
+
+    <p>
+      In the following sections, when describing complexity, the variables n and k will be used as follows:
+    </p>
+    <ul>
+      <li>n - the number of bits or bins in the Bloom filter.</li>
+      <li>n - the number of elements to be inserted/removed from a range operation.</li>
+      <li>k - the number of hash functions a Bloom filter contains.</li>
+    </ul>
+
+    <p>
+      The meaning of the variable <em>n</em> will depend on the context. If
+      the context involves an insertion, construction, or removal, the meaning
+      is the second version.
+    </p>
     
     <hr/>
     <div class="spirit-nav">

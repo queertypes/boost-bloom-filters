@@ -174,7 +174,7 @@
     </div>
     
     <div class="toc">
-      <p>Function Reference (W.I.P.)</p>
+      <p>Function Reference</p>
       <ul>
 	<li><a href="#default_constructor">counting_bloom_filter()</a></li>
 	<li><a href="#range_constructor">counting_bloom_filter(start, end)</a></li>
@@ -209,6 +209,8 @@
       <dl>
 	<dt>Description</dt>
 	<dd>Constructs a counting_bloom_filter object with all bits set to 0.</dd>
+	<dt>Complexity</dt>
+	<dd><span class="complexity">O(1)</span>.</dd>
       </dl>
     </div>
 
@@ -218,6 +220,8 @@
       <dl>
 	<dt>Description</dt>
 	<dd>Constructs a counting_bloom_filter by inserting all the elements in the range (start, end).</dd>
+	<dt>Complexity</dt>
+	<dd><span class="complexity">O(n*k)</span>.</dd>
       </dl>
     </div>
 
@@ -229,6 +233,8 @@
 	<dd>Constructs a counting_bloom_filter by inserting all elements in the initializer list.</dd>
 	<dt>Warning</dt>
 	<dd>Only available in C++11-supporting compilers.</dd>
+	<dt>Complexity</dt>
+	<dd><span class="complexity">O(n*k)</span>.</dd>
       </dl>
     </div>
 
@@ -240,6 +246,8 @@
 	<dd>Returns the number of bits used internally by the Bloom filter..</dd>
 	<dt>Returns</dt>
 	<dd>Value of template parameter Size.</dd>
+	<dt>Complexity</dt>
+	<dd><span class="complexity">O(1)</span>.</dd>
       </dl>
     </div>
 
@@ -252,6 +260,8 @@
 	<dd>Returns the number of hash functions used by the Bloom filter.</dd>
 	<dt>Returns</dt>
 	<dd>mpl::size&lt;HashFunctions&gt;.</dd>
+	<dt>Complexity</dt>
+	<dd><span class="complexity">O(1)</span>.</dd>
       </dl>
     </div>
 
@@ -263,6 +273,8 @@
 	<dd>Returns the current false positive rate based upon the number of hash functions used (k), the number of bits available (m), and the number of bits set (n).</dd>
 	<dt>Returns</dt>
 	<dd>A double precision value calculated as (1 - e^(k*n/m))^k.</dd>
+	<dt>Complexity</dt>
+	<dd><span class="complexity">O(1)</span>.</dd>
       </dl>
     </div>
 
@@ -273,7 +285,9 @@
 	<dt>Description</dt>
 	<dd>Returns true if no elements have been inserted into the Bloom filter.</dd>
 	<dt>Returns</dt>
-	<dd>std::bitset.count() == 0</dd>
+	<dd>this->count() == 0</dd>
+	<dt>Complexity</dt>
+	<dd><span class="complexity">O(n)</span>.</dd>
       </dl>
     </div>
 
@@ -282,9 +296,12 @@
       <div class="ref_listing"><code class="c_type">size_t</code> <code class="c_func">count</code>() <code class="c_keyword">const</code>;</div>
       <dl>
 	<dt>Description</dt>
-	<dd>Returns the number of bits currently set in the Bloom filter.</dd>
+	<dd>Returns the number of bins contaning a set bit.</dd>
 	<dt>Returns</dt>
-	<dd>std::bitset.count().</dd>
+	<dd>The number of bins that have an element in them. Note that this is 
+	different than the number of insertions committed.</dd>
+	<dt>Complexity</dt>
+	<dd><span class="complexity">O(n)</span>.</dd>
       </dl>
     </div>
 
@@ -296,6 +313,11 @@
 	<dd>Inserts an element into the Bloom filter.</dd>
 	<dt>Post-condition</dt>
 	<dd>At least 1 bit and at most num_hash_functions() bits of the Bloom filter will have been set.</dd>
+	<dd>Throws</dd>
+	<dt>May throw bin_overflow exception if an insertion makes the value of 
+	a bin greater than 2**BitsPerBin</dt>
+	<dt>Complexity</dt>
+	<dd><span class="complexity">O(k)</span>.</dd>
       </dl>
     </div>
 
@@ -307,6 +329,11 @@
 	<dd>Inserts all elements in range (start, end).</dd>
 	<dt>Post-condition</dt>
 	<dd>At least n bits and at most (n * num_hash_functions()) bits of the Bloom filter will have been set, where n = distance(start, end).</dd>
+	<dd>Throws</dd>
+	<dt>May throw bin_overflow exception if an insertion makes the value of 
+	a bin greater than 2**BitsPerBin</dt>
+	<dt>Complexity</dt>
+	<dd><span class="complexity">O(n*k)</span>.</dd>
       </dl>
     </div>
 
@@ -318,6 +345,11 @@
 	<dd>Removes an element into the Bloom filter.</dd>
 	<dt>Post-condition</dt>
 	<dd>At least 1 bit and at most num_hash_functions() bits of the Bloom filter will have been set.</dd>
+	<dd>Throws</dd>
+	<dt>May throw bin_underflow exception if a removal makes the value of 
+	a bin less than 0.</dt>
+	<dt>Complexity</dt>
+	<dd><span class="complexity">O(k)</span>.</dd>
       </dl>
     </div>
 
@@ -329,6 +361,11 @@
 	<dd>Removes all elements in range (start, end).</dd>
 	<dt>Post-condition</dt>
 	<dd>At least n bits and at most (n * num_hash_functions()) bits of the Bloom filter will have been set, where n = distance(start, end).</dd>
+	<dd>Throws</dd>
+	<dt>May throw bin_underflow exception if a removal makes the value of 
+	a bin less than 0.</dt>
+	<dt>Complexity</dt>
+	<dd><span class="complexity">O(n*k)</span>.</dd>
       </dl>
     </div>
 
@@ -342,6 +379,8 @@
 	<dd>True if all hash functions agree with the bitset; false otherwise.</dd>
 	<dt>Warning</dt>
 	<dd>It may return a false positive if there are hash collisions - this means that depending on the Size of the Bloom filter and the hash functions used, there is a probability that the Bloom filter will return true even though the element was never inserted.</dd>
+	<dt>Complexity</dt>
+	<dd><span class="complexity">O(k)</span>.</dd>
       </dl>
     </div>
 
@@ -353,6 +392,8 @@
 	<dd>Sets all bits in the Bloom filter to 0, effectively canceling all insertions.</dd>
 	<dt>Post-condition</dt>
 	<dd>this->count() == 0</dd>
+	<dt>Complexity</dt>
+	<dd><span class="complexity">O(n)</span>.</dd>
       </dl>
     </div>
 
@@ -362,6 +403,8 @@
       <dl>
 	<dt>Description</dt>
 	<dd>Swaps the bits in this Bloom filter with the argument Bloom filter.</dd>
+	<dt>Complexity</dt>
+	<dd><span class="complexity">O(1)</span>.</dd>
       </dl>
     </div>
 
@@ -370,11 +413,13 @@
       <div class="ref_listing"><code class="c_type">counting_bloom_filter&amp;</code> <code class="c_func">operator|=</code>(<code class="c_keyword">const</code> <code class="c_type">counting_bloom_filter&amp;</code>);</div>
       <dl>
 	<dt>Description</dt>
-	<dd>Performs a union.</dd>
+	<dd>Performs a union on a per-bin basis.</dd>
 	<dt>Returns</dt>
 	<dd>Returns a reference to <code class="c_keyword">this</code>.</dd>
 	<dt>Post-condition</dt>
 	<dd>The number of bits set in <code class="c_keyword">this</code> will be greater than or equal to the number of bits set before the operation.</dd>
+	<dt>Complexity</dt>
+	<dd><span class="complexity">O(n)</span>.</dd>
       </dl>
     </div>
 
@@ -383,11 +428,13 @@
       <div class="ref_listing"><code class="c_type">counting_bloom_filter&amp;</code> <code class="c_func">operator&amp;=</code>(<code class="c_keyword">const</code> <code class="c_type">counting_bloom_filter&amp;</code>);</div>
       <dl>
 	<dt>Description</dt>
-	<dd>Performs an intersection.</dd>
+	<dd>Performs an intersection on a per-bin basis.</dd>
 	<dt>Returns</dt>
 	<dd>Returns a reference to <code class="c_keyword">this</code>.</dd>
 	<dt>Post-condition</dt>
 	<dd>The number of bits set in <code class="c_keyword">this</code> will be less than or equal to the number of bits set before the operation.</dd>
+	<dt>Complexity</dt>
+	<dd><span class="complexity">O(n)</span>.</dd>
       </dl>
     </div>
 
@@ -396,11 +443,13 @@
       <div class="ref_listing"><code class="c_type">counting_bloom_filter&amp;</code> <code class="c_func">operator|</code>(<code class="c_keyword">const</code> <code class="c_type">counting_bloom_filter&amp;</code> <code class="c_id">lhs</code>, <code class="c_keyword">const</code> <code class="c_type">counting_bloom_filter&amp;</code> <code class="c_id">rhs</code>);</div>
       <dl>
 	<dt>Description</dt>
-	<dd>Performs a union.</dd>
+	<dd>Performs a union on a per-bin basis.</dd>
 	<dt>Returns</dt>
 	<dd>Returns a new, stack-allocated Bloom filter that is the result of performing a union between the lhs and the rhs.</dd>
 	<dt>Post-condition</dt>
 	<dd>The number of bits set in the new filter will be greater than or equal to the number of bits set in max(lhs.count(), rhs.count()).</dd>
+	<dt>Complexity</dt>
+	<dd><span class="complexity">O(n)</span>.</dd>
       </dl>
     </div>
 
@@ -409,11 +458,13 @@
       <div class="ref_listing"><code class="c_type">counting_bloom_filter&amp;</code> <code class="c_func">operator&amp;</code>(<code class="c_keyword">const</code> <code class="c_type">counting_bloom_filter&amp;</code> <code class="c_id">lhs</code>, <code class="c_keyword">const</code> <code class="c_type">counting_bloom_filter&amp;</code> <code class="c_id">rhs</code>);</div>
       <dl>
 	<dt>Description</dt>
-	<dd>Performs an intersection.</dd>
+	<dd>Performs an intersection on a per-bin basis.</dd>
 	<dt>Returns</dt>
 	<dd>Returns a new, stack-allocated Bloom filter that is the result of performing an intersect between the lhs and the rhs.</dd>
 	<dt>Post-condition</dt>
 	<dd>The number of bits set in the new filter will be less than or equal to the number of bits set in min(lhs.count(), rhs.count()).</dd>
+	<dt>Complexity</dt>
+	<dd><span class="complexity">O(n)</span>.</dd>
       </dl>
     </div>
 
@@ -423,6 +474,8 @@
       <dl>
 	<dt>Description</dt>
 	<dd>Swaps the bits between the argument Bloom filters.</dd>
+	<dt>Complexity</dt>
+	<dd><span class="complexity">O(1)</span>.</dd>
       </dl>
     </div>
 
@@ -434,6 +487,8 @@
 	<dd>Compares the bits of the argument Bloom filters for equality.</dd>
 	<dt>Returns</dt>
 	<dd>True if the bits match, false otherwise.</dd>
+	<dt>Complexity</dt>
+	<dd><span class="complexity">O(n)</span>.</dd>
       </dl>
     </div>
 
@@ -445,6 +500,8 @@
 	<dd>Compares the bits of the argument Bloom filters for equality.</dd>
 	<dt>Returns</dt>
 	<dd>True if the bits don't match, false otherwise.</dd>
+	<dt>Complexity</dt>
+	<dd><span class="complexity">O(n)</span>.</dd>
       </dl>
     </div>
     <hr/>
