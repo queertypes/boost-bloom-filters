@@ -39,49 +39,106 @@
     
     <div class="toc">
       <ul>
-	<li><a href="#basic_bloom">Basic Bloom Filter</a></li>
-	<li><a href="#dynamic_bloom">Dynamic Basic Bloom Filter</a></li>
-	<li><a href="#cbf">Counting Bloom Filter</a></li>
+	<li><a href="#basic_bloom">Basic Bloom Filters</a></li>
+	<li><a href="#cbf">Counting Bloom Filters</a></li>
 	<li><a href="#default_hash">Default Hash Functions</a></li>
 	<li><a href="#c++0x">C++0x Considerations</a></li>
 	<li><a href="#future">Future Directions</a></li>
       </ul>
     </div>
 
-    <h4>Overview</h4>
+    <h3>Overview</h3>
     <p>
-      This Bloom filter implementation is designed to allow compile-time determination of storage space(in bits), insertion/query type, and hash functions. The design goals were:
+      This project was initiated with a few design goals in mind. In particular,
+      these data structures should be easy to use, easy to customize, efficient,
+      and as portable as possible without damaging the usability for most users.
+    </p>
+    <p>
+      These Bloom filters should be very easy to experiment with, as well. 
+      This project acknowedlges that no solution is ideal for every problem.
+      With these Bloom filters, part of the design focused on how to 
+      maximize the configurability without sacrificing the safety of the
+      data structure. Upfront templating is used to a great extent
+      in order to make these goals a reality.
+    </p>
+    <p>
+      For each Bloom filter variant, a fully static version and a partially
+      dynamic version is provided. The static version is meant to be used
+      when the stack is not a limiting factor - for smaller data sets. It 
+      is meant to be slightly faster than the dynamic variant. The dynamic
+      variants requests its storage from the heap, and as a result,
+      can be as large as main memory and not incur any performance
+      penalty.
+    </p>
+
+    <a name="basic_bloom"></a>
+    <h3>Basic Bloom Filters</h3>
+    <p>
+      The basic Bloom filter implementation is designed to allow compile-time
+      determination of storage space(in bits), insertion/query type, and 
+      hash functions. The design goals were:
     </p>
     <ul>
       <li>Easy to use correctly</li>
-      <li>Not difficult to customize regarding use of hash functions</li>
+      <li>Easy to use multiple, different hash functions</li>
       <li>Fast</li>
       <li>Compact - the amount of space used by the Bloom filter is capped by the size of the underlying std::bitset</li>
       <li>Type-safe - its impossible to insert an element of the wrong type into the Bloom filter.</li>
       <li>Type-safe - its impossible to perform a union or intersect operation between incompatible Bloom filters.</li>
     </ul>
     <p>
-      To meet these design goals, the Bloom filter is implemented using template parameters. There are three templates:
+      To meet these goals, the implementation performs as much work as possible
+      at compile-time. For the static variant, most of the operations can be
+      optimized away at compile time using c++0x mode in GCC. In all cases,
+      all core operations are broken down into 2 steps, performed 
+      for each hasher:
+    </p>
+    <ol>
+      <li>Generate a hash value - this is the index.</li>
+      <li>Perform the core operation at that index.</li>
+    </ol>
+
+    <a name="cbf"></a>
+    <h3>Counting Bloom Filters</h3>
+    <p>
+      The counting Bloom filter implementation is designed to allow compile-time
+      determination of number of bins, bits per bin, insertion/removal/query element type, 
+      bit operation genularity, and hash functions. The design goals were:
     </p>
     <ul>
-      <li>Size - number of bits to use for state representation</li>
-      <li>Type - type of elements to hash</li>
-      <li>HashFunctions - a boost::mpl::vector of hash functions objects</li>
+      <li>Easy to use correctly</li>
+      <li>Easy to customize the storage: bits per bin and number of bins.</li>
+      <li>Easy to use multiple, different hash functions</li>
+      <li>Fast</li>
+      <li>Compact - the amount of space used by the counting Bloom filter is at most 
+      a few bytes greater than the number of bins multiplied by the number of bits per bin.</li>
+      <li>Type-safe - its impossible to insert/remove an element of the wrong type into the Bloom filter.</li>
+      <li>Type-safe - its impossible to perform a union or intersect operation between 
+      incompatible Bloom filters.</li>
     </ul>
     <p>
-      Currently, the Bloom filter executes the hash functions one at a time. It is not hard to imagine an implementation that dispatches lightweight threads to perform each of the k hash functions. 
+      To meet these goals, the static variant allows customization of many details
+      at compile-time. The dynamic variant allows customization of all parameters
+      except number of bins at compile-time. Furthermore, if a bin underflow or 
+      overflow would occur, an exception is thrown. Exceptions are used since
+      they interfere the least with the common case path, protecting performance.
+      This protects the user from introducing false negatives into the operation
+      of their Bloom filter.
     </p>
 
     <a name="default_hash"></a>
     <h4>Default Hash Functions</h4>
     <p>
-      To make the Bloom filter easy to use, the HashFunctions template parameter has a default value. This way, if the user wishes to use a Bloom filter for a quick, non-critical task, the user has the ability to just declare and use.
-    </p>
-    <p>
-      The default hash function set consists of three boost_hash function objects. These are implemented by computing Boost.Functional hash_value and incrementing the result by the seed. The boost_hash function object is made available in the file boost/bloom_filter/hash/default.hpp for users that wish to use more or fewer hash functions to use their Bloom filter without having to create their own hash function object.
+      To make the Bloom filter easier to use, the HashFunctions template parameter 
+      has a default value. This way, if the user wishes to use a Bloom filter for 
+      a quick, non-critical task, the user has the ability to just declare and use.
     </p>
     <div class="warning">
-      <strong>Be warned</strong> - the Boost default hash function when hashing integral types returns the unsigned version of the integer itself. This makes it such that using the default Bloom filter works against you. In this case, it's best to use a single boost_hash function object with seed set to 0.
+      Be aware: it is not wise to use multiple hash functions of the same type
+      as the elements of your HashFunctions vector. This introduces a problem
+      where the hashes calculated are not independent, therefore reducing
+      the effectiveness of the Bloom filter, e.g., as the number of hash
+      functions increases, so does the false positive rate. 
     </div>
 
     <a name="c++0x"></a>
@@ -114,9 +171,8 @@
       </li>
       <li>Bloom filter variations implemented as separate classes:
       <ul>
-	<li>Counting Bloom filter (deletion support): <a href="http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.96.6789&amp;rep=rep1&amp;type=pdf">
-	Summary Cache. Fan et al. ACM SIGCOMM. 1998.
-      </a>
+	<li><del>Counting Bloom filter (deletion support): <a href="http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.96.6789&amp;rep=rep1&amp;type=pdf">
+	Summary Cache. Fan et al. ACM SIGCOMM. 1998.</a></del></li>
 	</li>
 	<li>Scaling Bloom filter (constant false positive rate): <a href="http://www.google.com/url?sa=t&amp;source=web&amp;cd=1&amp;ved=0CBsQFjAA&amp;url=http%3A%2F%2Fgsd.di.uminho.pt%2Fmembers%2Fcbm%2Fps%2Fdbloom.pdf&amp;ei=ZH_2TbboIeeu0AH5o4XtDA&amp;usg=AFQjCNFGN0RS1-bUCxZJwUmD0C8cTnllQg&amp;sig2=__OvO8j0bdnj5gDH0xt4mw">
 	Scalable Bloom Filter. </a>Almeida et al. Elsevier. 2007.
