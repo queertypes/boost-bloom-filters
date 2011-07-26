@@ -27,8 +27,3 @@ project
 	[ run counting_bloom-pass.cpp ]
         ;
 
-    test-suite "fail"
-	:
-	[ run-fail dynamic_bloom_union-fail.cpp ]
-	[ run-fail dynamic_bloom_intersect-fail.cpp ]
-	;

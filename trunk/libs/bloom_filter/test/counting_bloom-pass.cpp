@@ -18,7 +18,11 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
 
+#include <boost/bloom_filter/detail/exceptions.hpp>
+
 using boost::bloom_filters::counting_bloom_filter;
+using boost::bloom_filters::detail::bin_underflow_exception;
+using boost::bloom_filters::detail::bin_overflow_exception;
 using boost::bloom_filters::boost_hash;
 
 typedef unsigned char small_block_type;
@@ -205,8 +209,7 @@ BOOST_AUTO_TEST_CASE(probably_contains) {
 
   bloom.insert(1);
   BOOST_CHECK_EQUAL(bloom.probably_contains(1), true);
-  BOOST_CHECK_LE(bloom.count(), 3ul);
-  BOOST_CHECK_GE(bloom.count(), 1ul);
+  BOOST_CHECK_EQUAL(bloom.count(), 1ul);
 }
 
 BOOST_AUTO_TEST_CASE(doesNotContain) {
@@ -224,12 +227,47 @@ BOOST_AUTO_TEST_CASE(insertNoFalseNegatives) {
   }
 }
 
-BOOST_AUTO_TEST_CASE(insertOverflowAsExpected) {
-  counting_bloom_filter<size_t, 8, BITS_PER_BIN_ONE> bloom;
+BOOST_AUTO_TEST_CASE(insertOverflowExceptionThrown) {
+  counting_bloom_filter<size_t, 8, 2> bloom;
+  bool exception_occurred = false;
 
   bloom.insert(1);
   BOOST_CHECK_EQUAL(bloom.probably_contains(1), true);
+
   bloom.insert(1);
+  BOOST_CHECK_EQUAL(bloom.probably_contains(1), true);
+
+  bloom.insert(1);
+  BOOST_CHECK_EQUAL(bloom.probably_contains(1), true);
+
+  bloom.insert(1);
+  BOOST_CHECK_EQUAL(bloom.probably_contains(1), true);
+
+  try {
+    bloom.insert(1);
+  }
+
+  catch (bin_overflow_exception e) {
+    exception_occurred = true;
+  }
+
+  BOOST_CHECK_EQUAL(exception_occurred, true);
+  BOOST_CHECK_EQUAL(bloom.probably_contains(1), true);
+}
+
+BOOST_AUTO_TEST_CASE(insertUnderflowExceptionThrown) {
+  counting_bloom_filter<size_t, 8, 2> bloom;
+  bool exception_occurred = false;
+
+  try {
+    bloom.remove(1);
+  }
+
+  catch (bin_underflow_exception e) {
+    exception_occurred = true;
+  }
+
+  BOOST_CHECK_EQUAL(exception_occurred, true);
   BOOST_CHECK_EQUAL(bloom.probably_contains(1), false);
 }
 

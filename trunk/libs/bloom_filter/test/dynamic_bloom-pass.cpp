@@ -11,7 +11,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #define BOOST_TEST_DYN_LINK 1
-#define BOOST_TEST_MODULE "Boost Bloom Filter" 1
+#define BOOST_TEST_MODULE "Boost Dynamic Bloom Filter" 1
 #include <iostream>
 
 #include <boost/bloom_filter/dynamic_bloom_filter.hpp>
@@ -20,6 +20,7 @@
 
 using boost::bloom_filters::dynamic_bloom_filter;
 using boost::bloom_filters::boost_hash;
+using boost::bloom_filters::detail::incompatible_size_exception;
 
 BOOST_AUTO_TEST_CASE(defaultConstructor) {
   typedef boost::mpl::vector<
@@ -176,88 +177,98 @@ BOOST_AUTO_TEST_CASE(clear) {
   BOOST_CHECK_EQUAL(bloom.count(), 0ul);
 }
 
-BOOST_AUTO_TEST_CASE(memberSwap) {
-  size_t elems[5] = {1,2,3,4,5};
-  dynamic_bloom_filter<size_t> bloom1(4, elems, elems+2);
-  dynamic_bloom_filter<size_t> bloom2(6, elems+2, elems+5);
+struct SwapFixture {
+  SwapFixture() :
+    bloom1(10, elems, elems+2),
+    bloom2(20, elems+2, elems+5) {}
 
+  dynamic_bloom_filter<size_t> bloom1;
+  dynamic_bloom_filter<size_t> bloom2;  
+  size_t elems[5];
+};
+
+BOOST_FIXTURE_TEST_CASE(memberSwap, SwapFixture) {
   bloom1.swap(bloom2);
 
   BOOST_CHECK_EQUAL(bloom1.count(), 3ul);
-  BOOST_CHECK_EQUAL(bloom1.bit_capacity(), 6ul);
+  BOOST_CHECK_EQUAL(bloom1.bit_capacity(), 20ul);
   BOOST_CHECK_EQUAL(bloom2.count(), 2ul);
-  BOOST_CHECK_EQUAL(bloom2.bit_capacity(), 4ul);
+  BOOST_CHECK_EQUAL(bloom2.bit_capacity(), 10ul);
 }
 
-BOOST_AUTO_TEST_CASE(testUnion) {
-  dynamic_bloom_filter<size_t> bloom_1(300);
-  dynamic_bloom_filter<size_t> bloom_2(300);
-  dynamic_bloom_filter<size_t> bloom_union(300);
+BOOST_FIXTURE_TEST_CASE(globalSwap, SwapFixture) {
+  swap(bloom1, bloom2);
+
+  BOOST_CHECK_EQUAL(bloom1.count(), 3ul);
+  BOOST_CHECK_EQUAL(bloom2.count(), 2ul);
+}
+
+struct PairwiseOpsFixture {
+  PairwiseOpsFixture() :
+    bloom1(100), bloom2(100), bloom_result(100)
+  {
+  }
+
+  dynamic_bloom_filter<size_t> bloom1;
+  dynamic_bloom_filter<size_t> bloom2;
+  dynamic_bloom_filter<size_t> bloom_result;
+};
+
+BOOST_FIXTURE_TEST_CASE(testUnion, PairwiseOpsFixture) {
+  for (size_t i = 0; i < 50; ++i)
+    bloom1.insert(i);
+
+  for (size_t i = 50; i < 100; ++i)
+    bloom2.insert(i);
+
+  bloom_result = bloom1 | bloom2;
 
   for (size_t i = 0; i < 100; ++i)
-    bloom_1.insert(i);
+    BOOST_CHECK_EQUAL(bloom_result.probably_contains(i), true);
 
-  for (size_t i = 100; i < 200; ++i)
-    bloom_2.insert(i);
-
-  bloom_union = bloom_1 | bloom_2;
-
-  for (size_t i = 0; i < 200; ++i)
-    BOOST_CHECK_EQUAL(bloom_union.probably_contains(i), true);
-  BOOST_CHECK_GE(bloom_union.count(), bloom_1.count());
-  BOOST_CHECK_GE(bloom_union.count(), bloom_2.count());
+  BOOST_CHECK_GE(bloom_result.count(), bloom1.count());
+  BOOST_CHECK_GE(bloom_result.count(), bloom2.count());
 }
 
-BOOST_AUTO_TEST_CASE(testUnionAssign) {
-  dynamic_bloom_filter<size_t> bloom_1(300);
-  dynamic_bloom_filter<size_t> bloom_union(300);
-
+BOOST_FIXTURE_TEST_CASE(testUnionAssign, PairwiseOpsFixture) {
   for (size_t i = 0; i < 100; ++i) 
-    bloom_1.insert(i);
+    bloom1.insert(i);
 
-  bloom_union |= bloom_1;
+  bloom_result |= bloom1;
 
   for (size_t i = 0; i < 100; ++i)
-    BOOST_CHECK_EQUAL(bloom_union.probably_contains(i), true);
-  BOOST_CHECK_EQUAL(bloom_union.count(), bloom_1.count());
+    BOOST_CHECK_EQUAL(bloom_result.probably_contains(i), true);
+
+  BOOST_CHECK_EQUAL(bloom_result.count(), bloom1.count());
 }
 
-BOOST_AUTO_TEST_CASE(testIntersect) {
-  dynamic_bloom_filter<size_t> bloom_1(300);
-  dynamic_bloom_filter<size_t> bloom_2(300);
-  dynamic_bloom_filter<size_t> bloom_intersect(300);
-
-  // overlap at 100
-  for (size_t i = 0; i < 101; ++i) 
-    bloom_1.insert(i);
+BOOST_FIXTURE_TEST_CASE(testIntersect, PairwiseOpsFixture) {
+  // overlap at 50
+  for (size_t i = 0; i < 51; ++i) 
+    bloom1.insert(i);
   
-  for (size_t i = 100; i < 200; ++i) 
-    bloom_2.insert(i);
+  for (size_t i = 50; i < 100; ++i) 
+    bloom2.insert(i);
 
-  bloom_intersect = bloom_1 & bloom_2;
+  bloom_result = bloom1 & bloom2;
 
-  BOOST_CHECK_LE(bloom_intersect.count(), bloom_1.count());
-  BOOST_CHECK_LE(bloom_intersect.count(), bloom_2.count());
-  BOOST_CHECK_EQUAL(bloom_intersect.probably_contains(100), true);
+  BOOST_CHECK_LE(bloom_result.count(), bloom1.count());
+  BOOST_CHECK_LE(bloom_result.count(), bloom2.count());
+  BOOST_CHECK_LE(bloom_result.count(), 1ul);
+  BOOST_CHECK_EQUAL(bloom_result.probably_contains(50), true);
 }
 
-BOOST_AUTO_TEST_CASE(testIntersectAssign) {
-  dynamic_bloom_filter<size_t> bloom_1(300);
-  dynamic_bloom_filter<size_t> bloom_intersect(300);
-
+BOOST_FIXTURE_TEST_CASE(testIntersectAssign, PairwiseOpsFixture) {
   for (size_t i = 0; i < 100; ++i) 
-    bloom_1.insert(i);
+    bloom1.insert(i);
   
-  bloom_intersect &= bloom_1;
+  bloom_result &= bloom1;
 
   for (size_t i = 0; i < 100; ++i)
-    BOOST_CHECK_EQUAL(bloom_intersect.probably_contains(i), false);
+    BOOST_CHECK_EQUAL(bloom_result.probably_contains(i), false);
 }
 
-BOOST_AUTO_TEST_CASE(equalityOperator) {
-  dynamic_bloom_filter<int> bloom1(8);
-  dynamic_bloom_filter<int> bloom2(8);
-
+BOOST_FIXTURE_TEST_CASE(equalityOperator, PairwiseOpsFixture) {
   BOOST_CHECK_EQUAL(bloom1 == bloom2, true);
   bloom1.insert(1);
   BOOST_CHECK_EQUAL(bloom1 == bloom2, false);
@@ -265,10 +276,7 @@ BOOST_AUTO_TEST_CASE(equalityOperator) {
   BOOST_CHECK_EQUAL(bloom1 == bloom2, true);
 }
 
-BOOST_AUTO_TEST_CASE(inequalityOperator) {
-  dynamic_bloom_filter<int> bloom1(8);
-  dynamic_bloom_filter<int> bloom2(8);
-
+BOOST_FIXTURE_TEST_CASE(inequalityOperator, PairwiseOpsFixture) {
   BOOST_CHECK_EQUAL(bloom1 != bloom2, false);
   bloom1.insert(1);
   BOOST_CHECK_EQUAL(bloom1 != bloom2, true);
@@ -276,14 +284,47 @@ BOOST_AUTO_TEST_CASE(inequalityOperator) {
   BOOST_CHECK_EQUAL(bloom1 != bloom2, false);
 }
 
-BOOST_AUTO_TEST_CASE(globalSwap) {
-  size_t elems[5] = {1,2,3,4,5};
-  dynamic_bloom_filter<size_t> bloom1(8, elems, elems+2);
-  dynamic_bloom_filter<size_t> bloom2(8, elems+2, elems+5);
+struct IncompatibleSizeFixture {
+  IncompatibleSizeFixture() : 
+    bloom1(100), bloom2(101), exception_thrown(false)
+  {}
 
-  swap(bloom1, bloom2);
+  dynamic_bloom_filter<size_t> bloom1;
+  dynamic_bloom_filter<size_t> bloom2;
+  dynamic_bloom_filter<size_t> bloom3;  
+  bool exception_thrown;
+};
 
-  BOOST_CHECK_EQUAL(bloom1.count(), 3ul);
-  BOOST_CHECK_EQUAL(bloom2.count(), 2ul);
+BOOST_FIXTURE_TEST_CASE(_intersectException, IncompatibleSizeFixture) {
+  try {
+    bloom3 = bloom1 & bloom2;
+  }
+  catch (incompatible_size_exception e) {
+    exception_thrown = true;
+  }
+
+  BOOST_CHECK_EQUAL(exception_thrown, true);
 }
 
+BOOST_FIXTURE_TEST_CASE(_unionException, IncompatibleSizeFixture) {
+  try {
+    bloom3 = bloom1 | bloom2;
+  }
+  catch (incompatible_size_exception e) {
+    exception_thrown = true;
+  }
+
+  BOOST_CHECK_EQUAL(exception_thrown, true);
+}
+
+BOOST_FIXTURE_TEST_CASE(_equalityException, IncompatibleSizeFixture) {
+  try {
+    if (bloom1 == bloom2)
+      exception_thrown = false;
+  }
+  catch (incompatible_size_exception e) {
+    exception_thrown = true;
+  }
+
+  BOOST_CHECK_EQUAL(exception_thrown, true);
+}
