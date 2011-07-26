@@ -59,7 +59,7 @@ namespace boost {
       // can have internal fragmentation if the calculation for 
       // bins_per_slot has a remainder. The severity of the  internal
       // fragmentation is equal to the remainder * the number of slots.
-      // this check prevents internal fragmentation
+      // This check prevents internal fragmentation
       BOOST_STATIC_ASSERT( ((sizeof(Block) * 8) % BitsPerBin) == 0);
 
       // a slot is one element position in the array
@@ -72,16 +72,15 @@ namespace boost {
       static const size_t mask = 
 	static_cast<Block>(0 - 1) >> (slot_bits - BitsPerBin);
 
-    private:
-      typedef boost::array<Block, array_size> bucket_type;
-      typedef typename bucket_type::iterator bucket_iterator;
-      typedef typename bucket_type::const_iterator bucket_const_iterator;
-      
     public:
       typedef T value_type;
       typedef T key_type;
       typedef HashFunctions hash_function_type;
       typedef Block block_type;
+
+      typedef boost::array<Block, array_size> bucket_type;
+      typedef typename bucket_type::iterator bucket_iterator;
+      typedef typename bucket_type::const_iterator bucket_const_iterator;      
 
     public:
       counting_bloom_filter() 
@@ -130,13 +129,6 @@ namespace boost {
       size_t count() const {
 	size_t ret = 0;
 
-	/*
-	std::cout << "Num Bins: " << NumBins << "\n"
-		  << "Bins Per Slot: " << bins_per_slot << "\n"
-		  << "Bits Per Bin: " << BitsPerBin << "\n"
-		  << "Array Size: " << array_size << "\n";
-	*/
-
 	for (bucket_const_iterator i = this->bits.begin(), 
 	       end = this->bits.end(); 
 	     i != end; ++i) {
@@ -144,14 +136,6 @@ namespace boost {
 	    size_t offset_bits = bin * BitsPerBin;
 	    size_t target_bits = (*i >> offset_bits) & mask; 
 
-	    /*
-	    std::cout << "(count) targeting pos: " << std::distance(i, end) - 1
-		      << " with offset: " << offset_bits
-		      << " and bin: " << bin 
-		      << " with slot value: " << *i
-		      << " and bin value: " << target_bits << "\n";
-	    */
-	    
 	    if (target_bits > 0)
 	      ++ret;
 	  }
@@ -217,11 +201,27 @@ namespace boost {
 
       counting_bloom_filter& operator|=(const counting_bloom_filter& rhs)
       {
+	const bucket_iterator this_end = this->bits.end();
+	bucket_iterator this_start = this->bits.begin();
+	bucket_iterator rhs_start = rhs.bits.begin();
+
+	for (; this_start != this_end; ++this_start, ++rhs_start) {
+	  *this_start |= *rhs_start;
+	}
+
 	return *this;
       }
 
       counting_bloom_filter& operator&=(const counting_bloom_filter& rhs)
       {
+	const bucket_iterator this_end = this->bits.end();
+	bucket_iterator this_start = this->bits.begin();
+	bucket_iterator rhs_start = rhs.bits.begin();
+
+	for (; this_start != this_end; ++this_start, ++rhs_start) {
+	  *this_start &= *rhs_start;
+	}
+
 	return *this;
       }
 

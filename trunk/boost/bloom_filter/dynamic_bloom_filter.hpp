@@ -12,13 +12,8 @@
 
 #ifndef BOOST_BLOOM_FILTER_DYNAMIC_BLOOM_FILTER_HPP
 #define BOOST_BLOOM_FILTER_DYNAMIC_BLOOM_FILTER_HPP 1
-/**
- * \author Alejandro Cabrera
- * \brief A generic Bloom filter providing compile-time unrolling
- *        of hash function application. 
- */
+
 #include <cmath>
-#include <cassert>
 
 #include <boost/config.hpp>
 #include <boost/mpl/vector.hpp>
@@ -26,6 +21,7 @@
 #include <boost/dynamic_bitset.hpp>
 
 #include <boost/bloom_filter/detail/apply_hash.hpp>
+#include <boost/bloom_filter/detail/exceptions.hpp>
 #include <boost/bloom_filter/hash/default.hpp>
 
 namespace boost {
@@ -41,19 +37,22 @@ namespace boost {
       typedef HashFunctions hash_function_type;
       typedef Block block_type;
       typedef Allocator allocator_type;
+      typedef dynamic_bitset<block_type, allocator_type> bitset_type;
+      typedef dynamic_bloom_filter<T, HashFunctions,
+				   Block, Allocator> this_type;
 
     public:
       
       // constructors
       dynamic_bloom_filter() {}
       
-      explicit dynamic_bloom_filter(const size_t bit_capacity) : bits(bit_capacity) {}
+      explicit dynamic_bloom_filter(const size_t bit_capacity) : 
+	bits(bit_capacity) {}
       
       template <typename InputIterator>
-      dynamic_bloom_filter(const size_t bit_capacity,
-			   const InputIterator start, 
+      dynamic_bloom_filter(const InputIterator start, 
 			   const InputIterator end) 
-	: bits(bit_capacity)
+	: bits(std::distance(start, end) * 4)
       {
 	for (InputIterator i = start; i != end; ++i)
 	  this->insert(*i);
@@ -62,7 +61,7 @@ namespace boost {
       // query functions
       static BOOST_CONSTEXPR size_t num_hash_functions() {
         return mpl::size<HashFunctions>::value;
-      };
+      }
 
       double false_positive_rate() const {
         const double n = static_cast<double>(this->bits.count());
@@ -71,11 +70,11 @@ namespace boost {
         static const double e =
 	  2.718281828459045235360287471352662497757247093699959574966;
         return std::pow(1 - std::pow(e, -k * n / m), k);
-      };
+      }
 
       size_t count() const {
         return this->bits.count();
-      };
+      }
 
       size_t bit_capacity() const {
 	return this->bits.size();
@@ -88,8 +87,8 @@ namespace boost {
       // core operations
       void insert(const T& t) {
         static const unsigned N = mpl::size<HashFunctions>::value - 1;
-        detail::dynamic_apply_hash<N, T, HashFunctions, Block, Allocator>::
-	  insert(t, bits, bits.size());
+        detail::apply_hash<N, this_type>::
+	  insert(t, bits);
       }
 
       template <typename InputIterator>
@@ -102,8 +101,8 @@ namespace boost {
       bool probably_contains(const T& t) const {
         static const unsigned N = mpl::size<HashFunctions>::value - 1;
         return detail::
-	  dynamic_apply_hash<N, T, HashFunctions, Block, Allocator>::
-	  contains(t, bits, bits.size());
+	  apply_hash<N, this_type>::
+	  contains(t, bits);
       }
 
       // auxilliary operations
@@ -124,8 +123,10 @@ namespace boost {
 
       template <typename _T, typename _HashFunctions, 
 		typename _Block, typename _Allocator>
-      friend bool operator==(const dynamic_bloom_filter<_T, _HashFunctions, _Block, _Allocator>&, 
-			     const dynamic_bloom_filter<_T, _HashFunctions, _Block, _Allocator>&);
+      friend bool operator==(const dynamic_bloom_filter<_T, _HashFunctions, 
+							_Block, _Allocator>&, 
+			     const dynamic_bloom_filter<_T, _HashFunctions, 
+							_Block, _Allocator>&);
 
       template <typename _T, typename _HashFunctions, 
 		typename _Block, typename _Allocator>
@@ -139,19 +140,25 @@ namespace boost {
 							_Allocator>&);
 
       dynamic_bloom_filter& operator|=(const dynamic_bloom_filter& rhs) {
-	assert(this->bit_capacity() == rhs.bit_capacity());
+	if(this->bit_capacity() != rhs.bit_capacity()) {
+	  throw detail::incompatible_size_exception();
+	}
+
         this->bits |= rhs.bits;
         return *this;
       }
 
       dynamic_bloom_filter& operator&=(const dynamic_bloom_filter& rhs) {
-	assert(this->bit_capacity() == rhs.bit_capacity());
+	if(this->bit_capacity() != rhs.bit_capacity()) {
+	  throw detail::incompatible_size_exception();
+	}
+
         this->bits &= rhs.bits;
         return *this;
       }
 
     private:
-      dynamic_bitset<block_type, allocator_type> bits;
+      bitset_type bits;
     };
 
     template<class T, class HashFunctions,
@@ -164,7 +171,10 @@ namespace boost {
 					 HashFunctions, 
 					 Block, Allocator>& rhs)
     {
-      assert(lhs.bit_capacity() == rhs.bit_capacity());
+      if(lhs.bit_capacity() != rhs.bit_capacity()) {
+	throw detail::incompatible_size_exception();
+      }
+
       dynamic_bloom_filter<T, HashFunctions, Block, Allocator> ret(lhs);
       ret |= rhs;
       return ret;
@@ -180,7 +190,10 @@ namespace boost {
 					 HashFunctions, 
 					 Block, Allocator>& rhs)
     {
-      assert(lhs.bit_capacity() == rhs.bit_capacity());
+      if(lhs.bit_capacity() != rhs.bit_capacity()) {
+	throw detail::incompatible_size_exception();
+      }
+
       dynamic_bloom_filter<T, HashFunctions, Block, Allocator> ret(lhs);
       ret &= rhs;
       return ret;
@@ -197,6 +210,10 @@ namespace boost {
 					  HashFunctions, 
 					  Block, Allocator>& rhs)
     {
+      if(lhs.bit_capacity() != rhs.bit_capacity()) {
+	throw detail::incompatible_size_exception();
+      }
+
       return lhs.bits == rhs.bits;
     }
 

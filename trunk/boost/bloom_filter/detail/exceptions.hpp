@@ -19,18 +19,25 @@ namespace boost {
   namespace bloom_filters {
     namespace detail {
 
-      class underflow : public std::exception {
+      class bin_underflow_exception : public std::exception {
 	virtual const char *
 	what() const throw() {
-	  return "boost::bloom_filters::detail::underflow"; 
+	  return "boost::bloom_filters::detail::bin_underflow_exception"; 
 	}
       };
 
-      class overrflow : public std::exception {
+      class bin_overflow_exception : public std::exception {
 	virtual const char *
 	what() const throw() {
-	  return "boost::bloom_filters::detail::overflow"; 
+	  return "boost::bloom_filters::detail::bin_overflow_exception"; 
 	}
+      };
+
+      class incompatible_size_exception : public std::exception {
+	virtual const char *
+	what() const throw() {
+	  return "boost::bloom_filters::detail::incompatible_size_exception"; 
+	}	
       };
 
     } // namespace detail

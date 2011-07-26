@@ -18,6 +18,8 @@
 #include <boost/array.hpp>
 #include <boost/mpl/at.hpp>
 
+#include <boost/bloom_filter/detail/exceptions.hpp>
+
 namespace boost {
   namespace bloom_filters {
     namespace detail {
@@ -43,11 +45,15 @@ namespace boost {
 	  typedef typename boost::mpl::at_c<HashFunctions, N>::type Hash;
 	  static Hash hasher;
 	  
-	  size_t hash_val = Hash(t) % NumBins;
-	  size_t pos = hash_val / BinsPerSlot;
-	  size_t offset_bits = (hash_val % BinsPerSlot) * BitsPerBin;
+	  const size_t hash_val = Hash(t) % NumBins;
+	  const size_t pos = hash_val / BinsPerSlot;
+	  const size_t offset_bits = (hash_val % BinsPerSlot) * BitsPerBin;
 	  size_t target_bits = (_slots[pos] >> offset_bits) & MASK;
-	  ++target_bits;	  
+	  ++target_bits;
+
+	  if (target_bits == 0) 
+	    throw bin_overflow_exception();
+	  
 	  _slots[pos] |= (target_bits << offset_bits);
 
 	  counting_apply_hash<N-1, T, NumBins, 
@@ -60,11 +66,16 @@ namespace boost {
 	  typedef typename boost::mpl::at_c<HashFunctions, N>::type Hash;
 	  static Hash hasher;
 	  
-	  size_t hash_val = hasher(t) % NumBins;
-	  size_t pos = hash_val / BinsPerSlot;
-	  size_t offset_bits = (hash_val % BinsPerSlot) * BitsPerBin;
+	  const size_t hash_val = hasher(t) % NumBins;
+	  const size_t pos = hash_val / BinsPerSlot;
+	  const size_t offset_bits = (hash_val % BinsPerSlot) * BitsPerBin;
 	  size_t target_bits = (_slots[pos] >> offset_bits) & MASK;
+
+	  if (target_bits == 0) 
+	    throw bin_underflow_exception();
+	  
 	  --target_bits;	  
+
 	  _slots[pos] |= (target_bits << offset_bits);
 
 	  counting_apply_hash<N-1, T, NumBins, 
@@ -77,10 +88,10 @@ namespace boost {
 	  typedef typename boost::mpl::at_c<HashFunctions, N>::type Hash;
 	  static Hash hasher;
 	  
-	  size_t hash_val = hasher(t) % NumBins;
-	  size_t pos = hash_val / BinsPerSlot;
-	  size_t offset_bits = (hash_val % BinsPerSlot) * BitsPerBin;
-	  size_t target_bits = (_slots[pos] >> offset_bits) & MASK;
+	  const size_t hash_val = hasher(t) % NumBins;
+	  const size_t pos = hash_val / BinsPerSlot;
+	  const size_t offset_bits = (hash_val % BinsPerSlot) * BitsPerBin;
+	  const size_t target_bits = (_slots[pos] >> offset_bits) & MASK;
 
 	  return ((target_bits > 0) && 
 		  counting_apply_hash<N-1, T, NumBins, 
@@ -115,11 +126,16 @@ namespace boost {
 		    << " incoming value: " << t << "\n";
 	  */
 
-	  size_t hash_val = hasher(t) % NumBins;
-	  size_t pos = hash_val / BinsPerSlot;
-	  size_t offset_bits = (hash_val % BinsPerSlot) * BitsPerBin;
+	  const size_t hash_val = hasher(t) % NumBins;
+	  const size_t pos = hash_val / BinsPerSlot;
+	  const size_t offset_bits = (hash_val % BinsPerSlot) * BitsPerBin;
 	  size_t target_bits = (_slots[pos] >> offset_bits) & MASK;
+
 	  ++target_bits;	  
+
+	  if (target_bits == 0) 
+	    throw bin_overflow_exception();
+	  
 	  _slots[pos] &= ~(MASK << offset_bits);
 	  _slots[pos] |= (target_bits << offset_bits);
 
@@ -146,11 +162,17 @@ namespace boost {
 		    << " incoming value: " << t << "\n";
 	  */
 	  
-	  size_t hash_val = hasher(t) % NumBins;
-	  size_t pos = hash_val / BinsPerSlot;
-	  size_t offset_bits = (hash_val % BinsPerSlot) * BitsPerBin;
+	  const size_t hash_val = hasher(t) % NumBins;
+	  const size_t pos = hash_val / BinsPerSlot;
+	  const size_t offset_bits = (hash_val % BinsPerSlot) * BitsPerBin;
 	  size_t target_bits = (_slots[pos] >> offset_bits) & MASK;
+
+
+	  if (target_bits == 0) 
+	    throw bin_underflow_exception();
+
 	  --target_bits;
+
 	  _slots[pos] &= ~(MASK << offset_bits);
 	  _slots[pos] |= (target_bits << offset_bits);
 
@@ -177,10 +199,10 @@ namespace boost {
 		    << " incoming value: " << t << "\n";
 	  */
 	  
-	  size_t hash_val = hasher(t) % NumBins;
-	  size_t pos = hash_val / BinsPerSlot;
-	  size_t offset_bits = (hash_val % BinsPerSlot) * BitsPerBin;
-	  size_t target_bits = (_slots[pos] >> offset_bits) & MASK;
+	  const size_t hash_val = hasher(t) % NumBins;
+	  const size_t pos = hash_val / BinsPerSlot;
+	  const size_t offset_bits = (hash_val % BinsPerSlot) * BitsPerBin;
+	  const size_t target_bits = (_slots[pos] >> offset_bits) & MASK;
 
 	  /*
 	  std::cout << "(contains) checked bits at pos " << pos 

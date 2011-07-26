@@ -12,11 +12,7 @@
 
 #ifndef BOOST_BLOOM_FILTER_BLOOM_FILTER_HPP
 #define BOOST_BLOOM_FILTER_BLOOM_FILTER_HPP 1
-/**
- * \author Alejandro Cabrera
- * \brief A generic Bloom filter providing compile-time unrolling
- *        of hash function application.
- */
+
 #include <cmath>
 #include <bitset>
 
@@ -40,7 +36,10 @@ namespace boost {
     public:
       typedef T value_type;
       typedef T key_type;
+      typedef std::bitset<Size> bitset_type;
       typedef HashFunctions hash_function_type;
+      typedef basic_bloom_filter<T, Size,
+				 HashFunctions> this_type;
 
     public:
       basic_bloom_filter() {}
@@ -87,7 +86,8 @@ namespace boost {
 
       void insert(const T& t) {
         static const unsigned N = mpl::size<HashFunctions>::value - 1;
-        detail::apply_hash<N, T, Size, HashFunctions>::insert(t, bits);
+        detail::apply_hash<N, 
+			   this_type>::insert(t, bits);
       }
 
       template <typename InputIterator>
@@ -99,7 +99,9 @@ namespace boost {
 
       bool probably_contains(const T& t) const {
         static const unsigned N = mpl::size<HashFunctions>::value - 1;
-        return detail::apply_hash<N, T, Size, HashFunctions>::contains(t, bits);
+        return detail::
+	  apply_hash<N, 
+		     this_type>::contains(t, bits);
       }
 
       void clear() {
@@ -133,7 +135,7 @@ namespace boost {
 		 const basic_bloom_filter<_T, _Size, _HashFunctions>&);
       
     private:
-      std::bitset<Size> bits;
+      bitset_type bits;
     };
 
     template<class _T, size_t _Size, class _HashFunctions>
