@@ -34,14 +34,14 @@ BOOST_AUTO_TEST_CASE(defaultConstructor) {
 
 BOOST_AUTO_TEST_CASE(rangeConstructor) {
   int elems[5] = {1,2,3,4,5};
-  dynamic_bloom_filter<int> bloom(8, elems, elems+5);
+  dynamic_bloom_filter<int> bloom(elems, elems+5);
 
   BOOST_CHECK_EQUAL(bloom.count(), 5ul);
 }
 
 BOOST_AUTO_TEST_CASE(copyConstructor) {
   int elems[5] = {1,2,3,4,5};
-  dynamic_bloom_filter<int> bloom1(8, elems, elems+5);
+  dynamic_bloom_filter<int> bloom1(elems, elems+5);
   dynamic_bloom_filter<int> bloom2(bloom1);
 
   BOOST_CHECK_EQUAL(bloom1.count(), bloom2.count());
@@ -178,9 +178,15 @@ BOOST_AUTO_TEST_CASE(clear) {
 }
 
 struct SwapFixture {
-  SwapFixture() :
-    bloom1(10, elems, elems+2),
-    bloom2(20, elems+2, elems+5) {}
+  SwapFixture() 
+    : bloom1(10), bloom2(20)
+  {
+    for (size_t i = 0; i < 5; ++i)
+      elems[i] = i+1;
+    
+    bloom1.insert(elems, elems+2);
+    bloom2.insert(elems+2, elems+5);
+  }
 
   dynamic_bloom_filter<size_t> bloom1;
   dynamic_bloom_filter<size_t> bloom2;  
