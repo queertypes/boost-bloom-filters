@@ -12,18 +12,15 @@
 
 #ifndef BOOST_BLOOM_FILTER_COUNTING_BLOOM_FILTER_HPP
 #define BOOST_BLOOM_FILTER_COUNTING_BLOOM_FILTER_HPP 1
-/**
- * \author Alejandro Cabrera
- * \brief A generic counting Bloom filter providing compile-time unrolling
- *        of hash function application.
- */
-#include <cmath>
-#include <iostream>
 
-#include <boost/array.hpp>
+#include <cmath>
+
 #include <boost/config.hpp>
+#include <boost/array.hpp>
+
 #include <boost/mpl/vector.hpp>
 #include <boost/mpl/size.hpp>
+
 #include <boost/static_assert.hpp>
 #include <boost/type_traits/is_integral.hpp>
 #include <boost/type_traits/is_unsigned.hpp>
@@ -40,7 +37,7 @@ namespace boost {
     template <typename T,
 	      size_t NumBins,
 	      size_t BitsPerBin = 4,
-	      class HashFunctions = mpl::vector<boost_hash<T, 3> >,
+	      class HashFunctions = mpl::vector<boost_hash<T, 0> >,
 	      typename Block = size_t>
     class counting_bloom_filter {
 
