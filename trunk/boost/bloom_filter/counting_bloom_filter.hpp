@@ -59,7 +59,9 @@ namespace boost {
       // can have internal fragmentation if the calculation for 
       // bins_per_slot has a remainder. The severity of the  internal
       // fragmentation is equal to the remainder * the number of slots.
-      // This check prevents internal fragmentation
+      // This check prevents internal fragmentation.
+      // This also necessarily limits to bin sizes to one of:
+      // [1,2,4,8,16,32,64] bits
       BOOST_STATIC_ASSERT( ((sizeof(Block) * 8) % BitsPerBin) == 0);
 
       // a slot is one element position in the array
