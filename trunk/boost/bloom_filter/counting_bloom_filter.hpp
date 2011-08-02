@@ -92,7 +92,8 @@ namespace boost {
 
       template <typename InputIterator>
       counting_bloom_filter(const InputIterator start, 
-			    const InputIterator end) {
+			    const InputIterator end) 
+      {
 	this->clear();
 
 	for (InputIterator i = start; i != end; ++i)
@@ -100,7 +101,8 @@ namespace boost {
       }
 
 #ifndef BOOST_NO_0X_HDR_INITIALIZER_LIST
-      counting_bloom_filter(const std::initializer_list<T>& ilist) {
+      counting_bloom_filter(const std::initializer_list<T>& ilist) 
+      {
 	this->clear();
 
 	typedef typename std::initializer_list<T>::const_iterator citer;
@@ -110,15 +112,18 @@ namespace boost {
       }
 #endif
 
-      static BOOST_CONSTEXPR size_t bit_capacity() {
+      static BOOST_CONSTEXPR size_t bit_capacity() 
+      {
         return NumBins * BitsPerBin;
       }
 
-      static BOOST_CONSTEXPR size_t num_hash_functions() {
+      static BOOST_CONSTEXPR size_t num_hash_functions() 
+      {
         return mpl::size<HashFunctions>::value;
       };
 
-      double false_positive_rate() const {
+      double false_positive_rate() const 
+      {
         const double n = static_cast<double>(this->count());
         static const double k = static_cast<double>(num_hash_functions());
         static const double m = static_cast<double>(NumBins);
@@ -128,7 +133,8 @@ namespace boost {
       };
 
       // returns the number of bins that have at least 1 bit set
-      size_t count() const {
+      size_t count() const 
+      {
 	size_t ret = 0;
 
 	for (bucket_const_iterator i = this->bits.begin(), 
@@ -146,11 +152,13 @@ namespace boost {
         return ret;
       };
 
-      bool empty() const {
+      bool empty() const 
+      {
 	return this->count() == 0;
       }
 
-      void insert(const T& t) {
+      void insert(const T& t) 
+      {
 	static const unsigned N = mpl::size<HashFunctions>::value - 1;
 	detail::counting_apply_hash<N, T, NumBins, 
 				    BitsPerBin, HashFunctions,
@@ -159,13 +167,15 @@ namespace boost {
       }
 
       template <typename InputIterator>
-      void insert(const InputIterator start, const InputIterator end) {
+      void insert(const InputIterator start, const InputIterator end) 
+      {
 	for (InputIterator i = start; i != end; ++i) {
 	  this->insert(*i);
 	}
       }
 			   
-      void remove(const T& t) {
+      void remove(const T& t) 
+      {
 	static const unsigned N = mpl::size<HashFunctions>::value - 1;
 	detail::counting_apply_hash<N, T, NumBins, 
 				    BitsPerBin, HashFunctions,
@@ -174,13 +184,15 @@ namespace boost {
       }
       
       template <typename InputIterator>
-      void remove(const InputIterator start, const InputIterator end) {
+      void remove(const InputIterator start, const InputIterator end) 
+      {
 	for (InputIterator i = start; i != end; ++i) {
 	  this->remove(*i);
 	}
       }
 
-      bool probably_contains(const T& t) const {
+      bool probably_contains(const T& t) const 
+      {
 	static const unsigned N = mpl::size<HashFunctions>::value - 1;
 	return detail::counting_apply_hash<N, T, NumBins, 
 					   BitsPerBin, HashFunctions,
@@ -188,14 +200,16 @@ namespace boost {
 					   bins_per_slot>::contains(t, this->bits);
       }
 
-      void clear() {
+      void clear() 
+      {
 	for (bucket_iterator i = bits.begin(), end = bits.end();
 	     i != end; ++i) {
 	  *i = 0;
 	}
       }
 
-      void swap(counting_bloom_filter& other) {
+      void swap(counting_bloom_filter& other) 
+      {
 	counting_bloom_filter tmp = other;
 	other = *this;
 	*this = tmp;
