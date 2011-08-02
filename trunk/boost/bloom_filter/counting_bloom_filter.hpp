@@ -67,24 +67,23 @@ namespace boost {
       // a slot is one element position in the array
       // a bin is a segment of a slot
       static const size_t slot_bits = sizeof(Block) * 8;
-      static const size_t bins_per_slot = slot_bits / BitsPerBin;
       static const size_t bin_bits = NumBins * BitsPerBin;
       static const size_t array_size = bin_bits / slot_bits + 1;
-      static const size_t effective_num_bins = array_size * bins_per_slot;
-      static const size_t mask = 
-	static_cast<Block>(0 - 1) >> (slot_bits - BitsPerBin);
 
     public:
       typedef T value_type;
       typedef T key_type;
       typedef HashFunctions hash_function_type;
       typedef Block block_type;
+      typedef counting_bloom_filter<T, NumBins, BitsPerBin, 
+				    HashFunctions, Block> this_type;
 
       typedef boost::array<Block, array_size> bucket_type;
       typedef typename bucket_type::iterator bucket_iterator;
-      typedef typename bucket_type::const_iterator bucket_const_iterator;      
+      typedef typename bucket_type::const_iterator bucket_const_iterator;
 
     public:
+      //! constructors
       counting_bloom_filter() 
       {
 	this->clear();
@@ -112,6 +111,27 @@ namespace boost {
       }
 #endif
 
+      //! meta functions
+      static BOOST_CONSTEXPR size_t num_bins()
+      {
+	return NumBins;
+      }
+
+      static BOOST_CONSTEXPR size_t bits_per_bin()
+      {
+	return BitsPerBin;
+      }
+
+      static BOOST_CONSTEXPR size_t bins_per_slot()
+      {
+	return sizeof(block_type) * 8 / BitsPerBin;
+      }
+
+      static BOOST_CONSTEXPR size_t mask()
+      {
+	return static_cast<Block>(0 - 1) >> (slot_bits - BitsPerBin);
+      }
+
       static BOOST_CONSTEXPR size_t bit_capacity() 
       {
         return NumBins * BitsPerBin;
@@ -120,7 +140,7 @@ namespace boost {
       static BOOST_CONSTEXPR size_t num_hash_functions() 
       {
         return mpl::size<HashFunctions>::value;
-      };
+      }
 
       double false_positive_rate() const 
       {
@@ -130,9 +150,9 @@ namespace boost {
         static const double e =
 	  2.718281828459045235360287471352662497757247093699959574966;
         return std::pow(1 - std::pow(e, -k * n / m), k);
-      };
+      }
 
-      // returns the number of bins that have at least 1 bit set
+      //? returns the number of bins that have at least 1 bit set
       size_t count() const 
       {
 	size_t ret = 0;
@@ -140,9 +160,9 @@ namespace boost {
 	for (bucket_const_iterator i = this->bits.begin(), 
 	       end = this->bits.end(); 
 	     i != end; ++i) {
-	  for (size_t bin = 0; bin < bins_per_slot; ++bin) {
-	    size_t offset_bits = bin * BitsPerBin;
-	    size_t target_bits = (*i >> offset_bits) & mask; 
+	  for (size_t bin = 0; bin < this->bins_per_slot(); ++bin) {
+	    const size_t offset_bits = bin * BitsPerBin;
+	    const size_t target_bits = (*i >> offset_bits) & this->mask();
 
 	    if (target_bits > 0)
 	      ++ret;
@@ -150,20 +170,18 @@ namespace boost {
 	}
 
         return ret;
-      };
+      }
 
       bool empty() const 
       {
 	return this->count() == 0;
       }
 
+      //! core ops
       void insert(const T& t) 
       {
-	static const unsigned N = mpl::size<HashFunctions>::value - 1;
-	detail::counting_apply_hash<N, T, NumBins, 
-				    BitsPerBin, HashFunctions,
-				    Block, array_size, 
-				    bins_per_slot>::insert(t, this->bits);
+	static const unsigned N = boost::mpl::size<hash_function_type>::value - 1;
+	detail::counting_apply_hash<N, this_type>::insert(t, this->bits);
       }
 
       template <typename InputIterator>
@@ -176,11 +194,8 @@ namespace boost {
 			   
       void remove(const T& t) 
       {
-	static const unsigned N = mpl::size<HashFunctions>::value - 1;
-	detail::counting_apply_hash<N, T, NumBins, 
-				    BitsPerBin, HashFunctions,
-				    Block, array_size, 
-				    bins_per_slot>::remove(t, this->bits);
+	static const unsigned N = boost::mpl::size<hash_function_type>::value - 1;
+	detail::counting_apply_hash<N, this_type>::remove(t, this->bits);
       }
       
       template <typename InputIterator>
@@ -194,10 +209,8 @@ namespace boost {
       bool probably_contains(const T& t) const 
       {
 	static const unsigned N = mpl::size<HashFunctions>::value - 1;
-	return detail::counting_apply_hash<N, T, NumBins, 
-					   BitsPerBin, HashFunctions,
-					   Block, array_size, 
-					   bins_per_slot>::contains(t, this->bits);
+	return detail::counting_apply_hash<N, this_type>::contains(t, 
+								   this->bits);
       }
 
       void clear() 

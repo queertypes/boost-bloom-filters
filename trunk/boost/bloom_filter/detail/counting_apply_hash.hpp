@@ -13,9 +13,6 @@
 #ifndef BOOST_BLOOM_FILTER_COUNTING_APPLY_HASH_HPP
 #define BOOST_BLOOM_FILTER_COUNTING_APPLY_HASH_HPP
 
-#include <iostream>
-
-#include <boost/array.hpp>
 #include <boost/mpl/at.hpp>
 
 #include <boost/bloom_filter/detail/exceptions.hpp>
@@ -24,161 +21,116 @@ namespace boost {
   namespace bloom_filters {
     namespace detail {
 
-      template <typename T, 
-		typename Hash, 
-		typename Bitset,
-		size_t NumBins, size_t BinsPerSlot, 
-		size_t BitsPerBin, size_t Mask>
-      static size_t 
-      get_bits(const T& t, const Bitset slots)
-      {
-	static Hash hasher;
+      struct decrement {
+	size_t operator()(const size_t val, const size_t limit) {
+	  if (val == limit)
+	    throw bin_underflow_exception();
 
-	const size_t hash_val = hasher(t) % NumBins;
-	const size_t pos = hash_val / BinsPerSlot;
-	const size_t offset_bits = (hash_val % BinsPerSlot) * BitsPerBin;
+	  return val - 1;
+	}
+      };
+ 
+      struct increment {
+	size_t operator()(const size_t val, const size_t limit) {
+	  if ((val+1) == limit)
+	    throw bin_overflow_exception();
+
+	  return val+1;
+	}
+      };
+
+      template <size_t N, class CBF, class Op = void>
+      struct BloomOp {
+	typedef typename boost::mpl::at_c<typename CBF::hash_function_type, 
+					  N>::type Hash;
+
+	BloomOp(const typename CBF::value_type& t,
+		const typename CBF::bucket_type& slots)
+	  :
+	  hash_val(hasher(t) % CBF::num_bins()), 
+	  pos(hash_val / CBF::bins_per_slot()),
+	  offset_bits((hash_val % CBF::bins_per_slot()) * CBF::bits_per_bin()),
+	  target_bits((slots[pos] >> offset_bits) & CBF::mask())
+	{}
+
+	void update(const typename CBF::value_type& t,
+		    typename CBF::bucket_type& slots,
+		    const size_t limit) const {
+	  static Op op;
+
+	  const size_t final_bits = op(target_bits, limit);
+	  slots[pos] &= ~(CBF::mask() << offset_bits);
+	  slots[pos] |= (final_bits << offset_bits);
+	}
+
+	bool check() const {
+	  return (target_bits != 0);
+	}
 	
-	return ((slots[pos] >> offset_bits) & Mask);
-      }
+	Hash hasher;
+	const size_t hash_val;
+	const size_t pos;
+	const size_t offset_bits;
+	const size_t target_bits;
+      };
 
-      template <size_t N,
-	        typename T,
-	        size_t NumBins,
-		size_t BitsPerBin,
-	        class HashFunctions,
-		typename Block,
-		size_t ArraySize,
-		size_t BinsPerSlot>
+      // CBF : Counting Bloom Filter
+      template <size_t N, 
+		class CBF>
       struct counting_apply_hash
       {
-	static const size_t MASK = 
-	  static_cast<Block>(0 - 1) >> (sizeof(Block) * 8 - BitsPerBin);
-
-        static void insert(const T& t, boost::array<Block, ArraySize>& _slots) 
+	static void insert(const typename CBF::value_type& t, 
+			   typename CBF::bucket_type& slots)
 	{
-	  typedef typename boost::mpl::at_c<HashFunctions, N>::type Hash;
-	  static Hash hasher;
-	  
-	  const size_t hash_val = hasher(t) % NumBins;
-	  const size_t pos = hash_val / BinsPerSlot;
-	  const size_t offset_bits = (hash_val % BinsPerSlot) * BitsPerBin;
-	  size_t target_bits = (_slots[pos] >> offset_bits) & MASK;
-	  ++target_bits;
+	  BloomOp<N, CBF, increment> inserter(t, slots);
+	  inserter.update(t, slots, (1 << CBF::bits_per_bin()));
 
-	  if (target_bits == (1 << BitsPerBin))
-	    throw bin_overflow_exception();
-	  
-	  _slots[pos] |= (target_bits << offset_bits);
-
-	  counting_apply_hash<N-1, T, NumBins, 
-			      BitsPerBin, HashFunctions,
-			      Block, ArraySize, BinsPerSlot>::insert(t, _slots);
-        }
-
-        static void remove(const T& t, boost::array<Block, ArraySize>& _slots) 
-	{
-	  typedef typename boost::mpl::at_c<HashFunctions, N>::type Hash;
-	  static Hash hasher;
-	  
-	  const size_t hash_val = hasher(t) % NumBins;
-	  const size_t pos = hash_val / BinsPerSlot;
-	  const size_t offset_bits = (hash_val % BinsPerSlot) * BitsPerBin;
-	  size_t target_bits = (_slots[pos] >> offset_bits) & MASK;
-
-	  if (target_bits == 0)
-	    throw bin_underflow_exception();
-	  
-	  --target_bits;
-
-	  _slots[pos] |= (target_bits << offset_bits);
-
-	  counting_apply_hash<N-1, T, NumBins, 
-			      BitsPerBin, HashFunctions,
-			      Block, ArraySize, BinsPerSlot>::remove(t, _slots);
+	  counting_apply_hash<N-1, CBF>::insert(t, slots);
 	}
 
-        static bool contains(const T& t, const boost::array<Block, ArraySize>& _slots) 
+	static void remove(const typename CBF::value_type& t, 
+			   typename CBF::bucket_type& slots)
 	{
-	  typedef typename boost::mpl::at_c<HashFunctions, N>::type Hash;
-	  static Hash hasher;
-	  
-	  const size_t hash_val = hasher(t) % NumBins;
-	  const size_t pos = hash_val / BinsPerSlot;
-	  const size_t offset_bits = (hash_val % BinsPerSlot) * BitsPerBin;
-	  const size_t target_bits = (_slots[pos] >> offset_bits) & MASK;
+	  BloomOp<N, CBF, decrement> remover(t, slots);
+	  remover.update(t, slots, 0);
 
-	  return ((target_bits != 0) && 
-		  counting_apply_hash<N-1, T, NumBins, 
-				      BitsPerBin, HashFunctions,
-				      Block, ArraySize, BinsPerSlot>::contains(t, _slots));
-        }
+	  counting_apply_hash<N-1, CBF>::remove(t, slots);
+	}
+
+	static bool contains(const typename CBF::value_type& t, 
+			     const typename CBF::bucket_type& slots)
+	{
+	  BloomOp<N, CBF> checker(t, slots);
+	  return (checker.check() && 
+		  counting_apply_hash<N-1, CBF>::contains(t, slots));
+	}
       };
 
-      template <typename T,
-	        size_t NumBins,
-		size_t BitsPerBin,
-	        class HashFunctions,
-		typename Block,
-		size_t ArraySize,
-		size_t BinsPerSlot>
-      struct counting_apply_hash<0, T, NumBins, BitsPerBin, HashFunctions,
-				 Block, ArraySize, BinsPerSlot>
+      template <class CBF>
+      struct counting_apply_hash<0, CBF>
       {
-	static const size_t MASK = 
-	  static_cast<Block>(0 - 1) >> (sizeof(Block) * 8 - BitsPerBin);
-
-        static void insert(const T& t, 
-			   boost::array<Block, ArraySize>& _slots) 
+	static void insert(const typename CBF::value_type& t, 
+			   typename CBF::bucket_type& slots)
 	{
-	  typedef typename boost::mpl::at_c<HashFunctions, 0>::type Hash;
-	  static Hash hasher;
-
-	  const size_t hash_val = hasher(t) % NumBins;
-	  const size_t pos = hash_val / BinsPerSlot;
-	  const size_t offset_bits = (hash_val % BinsPerSlot) * BitsPerBin;
-	  size_t target_bits = (_slots[pos] >> offset_bits) & MASK;
-
-	  ++target_bits;
-
-	  if (target_bits == (1 << BitsPerBin)) 
-	    throw bin_overflow_exception();
-	  
-	  _slots[pos] &= ~(MASK << offset_bits);
-	  _slots[pos] |= (target_bits << offset_bits);
-        }
-
-        static void remove(const T& t, 
-			   boost::array<Block, ArraySize>& _slots) 
-	{
-	  typedef typename boost::mpl::at_c<HashFunctions, 0>::type Hash;
-	  static Hash hasher;
-
-	  const size_t hash_val = hasher(t) % NumBins;
-	  const size_t pos = hash_val / BinsPerSlot;
-	  const size_t offset_bits = (hash_val % BinsPerSlot) * BitsPerBin;
-	  size_t target_bits = (_slots[pos] >> offset_bits) & MASK;
-
-	  if (target_bits == 0)
-	    throw bin_underflow_exception();
-
-	  --target_bits;
-
-	  _slots[pos] &= ~(MASK << offset_bits);
-	  _slots[pos] |= (target_bits << offset_bits);
+	  BloomOp<0, CBF, increment> inserter(t, slots);
+	  inserter.update(t, slots, (1 << CBF::bits_per_bin()));
 	}
 
-        static bool contains(const T& t, 
-			     const boost::array<Block, ArraySize>& _slots) 
+	static void remove(const typename CBF::value_type& t, 
+			   typename CBF::bucket_type& slots)
 	{
-	  typedef typename boost::mpl::at_c<HashFunctions, 0>::type Hash;
+	  BloomOp<0, CBF, decrement> remover(t, slots);
+	  remover.update(t, slots, 0);
+	}
 
-	  size_t target_bits = 
-	    get_bits<T, Hash, boost::array<Block, ArraySize>,
-		     NumBins, BinsPerSlot, BitsPerBin, MASK>(t, _slots);
-
-	  return (target_bits != 0);
-        }
+	static bool contains(const typename CBF::value_type& t, 
+			     const typename CBF::bucket_type& slots)
+	{
+	  BloomOp<0, CBF> checker(t, slots);
+	  return (checker.check());
+	}
       };
+
     } // namespace detail
   } // namespace bloom_filter
 } // namespace boost
