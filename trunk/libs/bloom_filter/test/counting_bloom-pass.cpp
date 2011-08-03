@@ -12,7 +12,6 @@
 
 #define BOOST_TEST_DYN_LINK 1
 #define BOOST_TEST_MODULE "Boost Bloom Filter" 1
-#include <iostream>
 
 #include <boost/bloom_filter/counting_bloom_filter.hpp>
 #include <boost/test/unit_test.hpp>
@@ -20,10 +19,38 @@
 
 #include <boost/bloom_filter/detail/exceptions.hpp>
 
+#include <boost/cstdint.hpp>
+
 using boost::bloom_filters::counting_bloom_filter;
 using boost::bloom_filters::detail::bin_underflow_exception;
 using boost::bloom_filters::detail::bin_overflow_exception;
 using boost::bloom_filters::boost_hash;
+
+BOOST_AUTO_TEST_CASE(allBitsPerBinCompile)
+{
+  counting_bloom_filter<size_t, 2, 1> bloom1;
+  counting_bloom_filter<size_t, 2, 2> bloom2;
+  counting_bloom_filter<size_t, 2, 4> bloom4;
+  counting_bloom_filter<size_t, 2, 8> bloom8;
+  counting_bloom_filter<size_t, 2, 16> bloom16;
+  counting_bloom_filter<size_t, 2, 32> bloom32;
+}
+
+BOOST_AUTO_TEST_CASE(allReasonableBlockTypesCompile)
+{
+  typedef boost::mpl::vector<boost_hash<int, 0> > default_hash;
+
+  counting_bloom_filter<int, 2, 2, default_hash, unsigned char> a;
+  counting_bloom_filter<int, 2, 2, default_hash, unsigned short> b;
+  counting_bloom_filter<int, 2, 2, default_hash, unsigned int> c;
+  counting_bloom_filter<int, 2, 2, default_hash, unsigned long> d;
+  counting_bloom_filter<int, 2, 2, default_hash, size_t> e;
+
+  counting_bloom_filter<int, 2, 2, default_hash, uint8_t> aa;
+  counting_bloom_filter<int, 2, 2, default_hash, uint16_t> ab;
+  counting_bloom_filter<int, 2, 2, default_hash, uint32_t> ac;
+  counting_bloom_filter<int, 2, 2, default_hash, uintmax_t> ad;
+}
 
 BOOST_AUTO_TEST_CASE(defaultConstructor) {
   typedef boost::mpl::vector<
@@ -48,33 +75,76 @@ BOOST_AUTO_TEST_CASE(countSingle)
   BOOST_CHECK_EQUAL(bloom.count(), 0ul);
 }
 
+#include <iostream>
+
 BOOST_AUTO_TEST_CASE(countMulti)
 {
-  counting_bloom_filter<int, 100> bloom;
+  counting_bloom_filter<int, 100> bloom_default;
+  counting_bloom_filter<int, 100, 1> bloom1;
+  counting_bloom_filter<int, 100, 2> bloom2;
+  counting_bloom_filter<int, 100, 8> bloom8;
+  counting_bloom_filter<int, 100, 16> bloom16;
+  counting_bloom_filter<int, 100, 32> bloom32;
 
   for (size_t i = 0; i < 100; ++i) {
-    bloom.insert(i);
+    bloom_default.insert(i);
+    bloom1.insert(i);
+    bloom2.insert(i);
+    bloom8.insert(i);
+    bloom16.insert(i);
+    bloom32.insert(i);
   }
 
-  BOOST_CHECK_EQUAL(bloom.count(), 100ul);
+  BOOST_CHECK_EQUAL(bloom_default.count(), 100ul);
+  BOOST_CHECK_EQUAL(bloom1.count(), 100ul);
+  BOOST_CHECK_EQUAL(bloom2.count(), 100ul);
+  BOOST_CHECK_EQUAL(bloom8.count(), 100ul);
+  BOOST_CHECK_EQUAL(bloom16.count(), 100ul);
+  BOOST_CHECK_EQUAL(bloom32.count(), 100ul);
 
   for (size_t i = 0; i < 100; ++i) {
-    bloom.insert(i);
+    bloom_default.insert(i);
+    bloom2.insert(i);
+    bloom8.insert(i);
+    bloom16.insert(i);
+    bloom32.insert(i);
   }
 
-  BOOST_CHECK_EQUAL(bloom.count(), 100ul);
+  BOOST_CHECK_EQUAL(bloom_default.count(), 100ul);
+  BOOST_CHECK_EQUAL(bloom2.count(), 100ul);
+  BOOST_CHECK_EQUAL(bloom8.count(), 100ul);
+  BOOST_CHECK_EQUAL(bloom16.count(), 100ul);
+  BOOST_CHECK_EQUAL(bloom32.count(), 100ul);
 
   for (size_t i = 0; i < 100; ++i) {
-    bloom.remove(i);
+    bloom_default.remove(i);
+    bloom2.remove(i);
+    bloom8.remove(i);
+    bloom16.remove(i);
+    bloom32.remove(i);
   }
 
-  BOOST_CHECK_EQUAL(bloom.count(), 100ul);
+  BOOST_CHECK_EQUAL(bloom_default.count(), 100ul);
+  BOOST_CHECK_EQUAL(bloom2.count(), 100ul);
+  BOOST_CHECK_EQUAL(bloom8.count(), 100ul);
+  BOOST_CHECK_EQUAL(bloom16.count(), 100ul);
+  BOOST_CHECK_EQUAL(bloom32.count(), 100ul);
 
   for (size_t i = 0; i < 100; ++i) {
-    bloom.remove(i);
+    bloom_default.remove(i);
+    bloom1.remove(i);
+    bloom2.remove(i);
+    bloom8.remove(i);
+    bloom16.remove(i);
+    bloom32.remove(i);
   }
 
-  BOOST_CHECK_EQUAL(bloom.count(), 0ul);
+  BOOST_CHECK_EQUAL(bloom_default.count(), 0ul);
+  BOOST_CHECK_EQUAL(bloom1.count(), 0ul);
+  BOOST_CHECK_EQUAL(bloom2.count(), 0ul);
+  BOOST_CHECK_EQUAL(bloom8.count(), 0ul);
+  BOOST_CHECK_EQUAL(bloom16.count(), 0ul);
+  BOOST_CHECK_EQUAL(bloom32.count(), 0ul);
 }
 
 BOOST_AUTO_TEST_CASE(rangeConstructor) {
@@ -122,9 +192,12 @@ BOOST_AUTO_TEST_CASE(bit_capacity) {
   counting_bloom_filter<size_t, 256> bloom_256;
   counting_bloom_filter<size_t, 2048> bloom_2048;
   
-  BOOST_CHECK_EQUAL(bloom_8.bit_capacity(), 8ul * 4ul);
-  BOOST_CHECK_EQUAL(bloom_256.bit_capacity(), 256ul * 4ul);
-  BOOST_CHECK_EQUAL(bloom_2048.bit_capacity(), 2048ul * 4ul);
+  BOOST_CHECK_EQUAL(bloom_8.bit_capacity(), 
+		    8ul * bloom_8.bits_per_bin());
+  BOOST_CHECK_EQUAL(bloom_256.bit_capacity(), 
+		    256ul * bloom_256.bits_per_bin());
+  BOOST_CHECK_EQUAL(bloom_2048.bit_capacity(), 
+		    2048ul * bloom_2048.bits_per_bin());
 }
 
 BOOST_AUTO_TEST_CASE(empty) {
@@ -156,7 +229,6 @@ BOOST_AUTO_TEST_CASE(numHashFunctions) {
   BOOST_CHECK_EQUAL(bloom_7.num_hash_functions(), 7ul);
 }
 
-/*
 BOOST_AUTO_TEST_CASE(falsePositiveRate) {
   counting_bloom_filter<size_t, 64> bloom;
 
@@ -180,13 +252,12 @@ BOOST_AUTO_TEST_CASE(falsePositiveRate) {
   bloom.insert(6);
   BOOST_CHECK_CLOSE(bloom.false_positive_rate(), 0.089491, .01);
 
-  for (size_t i = 7; i < 5000; ++i)
+  for (size_t i = 7; i < 128; ++i)
     bloom.insert(i);
   
   BOOST_CHECK_GE(bloom.false_positive_rate(), 0.6);
   BOOST_CHECK_LE(bloom.false_positive_rate(), 1.0);
 }
-*/
 
 BOOST_AUTO_TEST_CASE(probably_contains) {
   counting_bloom_filter<size_t, 2> bloom;
@@ -230,7 +301,7 @@ BOOST_AUTO_TEST_CASE(insertOverflowExceptionThrown) {
   BOOST_CHECK_EQUAL(bloom.probably_contains(1), true);
 }
 
-BOOST_AUTO_TEST_CASE(insertUnderflowExceptionThrown) {
+BOOST_AUTO_TEST_CASE(removeUnderflowExceptionThrown) {
   counting_bloom_filter<size_t, 2, 1> bloom;
   bool exception_occurred = false;
 
@@ -244,6 +315,24 @@ BOOST_AUTO_TEST_CASE(insertUnderflowExceptionThrown) {
 
   BOOST_CHECK_EQUAL(exception_occurred, true);
   BOOST_CHECK_EQUAL(bloom.probably_contains(1), false);
+}
+
+BOOST_AUTO_TEST_CASE(insertOverflowException4bit)
+{
+  counting_bloom_filter<size_t, 2> bloom;
+  bool exception_occurred = false;
+
+  try {
+    for (size_t i = 0; i < (1ul << bloom.bits_per_bin()); ++i)
+      bloom.insert(1);
+  }
+
+  catch (bin_overflow_exception e) {
+    exception_occurred = true;
+  }
+
+  BOOST_CHECK_EQUAL(exception_occurred, true);
+  BOOST_CHECK_EQUAL(bloom.probably_contains(1), true);
 }
 
 BOOST_AUTO_TEST_CASE(rangeInsert) {
@@ -330,69 +419,106 @@ struct PairwiseOpsFixture {
   counting_bloom_filter<size_t, 300> bloom_result;
 };
 
-/*
 BOOST_AUTO_TEST_CASE(testUnion) {
+  counting_bloom_filter<size_t, 4, 2> bloom1;
+  counting_bloom_filter<size_t, 4, 2> bloom2;
+  counting_bloom_filter<size_t, 4, 2> bloom_union;
 
-  for (size_t i = 0; i < 100; ++i)
-    bloom_1.insert(i);
+  bloom1.insert(0);
+  bloom1.insert(1);
+  bloom1.insert(1);
+  bloom1.insert(3);
+  bloom1.insert(3);
 
-  for (size_t i = 100; i < 200; ++i)
-    bloom_2.insert(i);
+  bloom2.insert(0);
+  bloom2.insert(0);
+  bloom2.insert(1);
+  bloom2.insert(1);
+  bloom2.insert(1);
+  bloom2.insert(3);
+  bloom2.insert(3);
 
-  bloom_union = bloom_1 | bloom_2;
+  bloom_union = experimental_union(bloom1, bloom2);
 
-  for (size_t i = 0; i < 200; ++i)
-    BOOST_CHECK_EQUAL(bloom_union.probably_contains(i), true);
-  BOOST_CHECK_GE(bloom_union.count(), bloom_1.count());
-  BOOST_CHECK_GE(bloom_union.count(), bloom_2.count());
+  BOOST_CHECK_EQUAL(bloom_union.probably_contains(0), true);
+  BOOST_CHECK_EQUAL(bloom_union.probably_contains(1), true);
+  BOOST_CHECK_EQUAL(bloom_union.probably_contains(2), false);
+  BOOST_CHECK_EQUAL(bloom_union.probably_contains(3), true);
+  BOOST_CHECK_GE(bloom_union.count(), bloom1.count());
+  BOOST_CHECK_GE(bloom_union.count(), bloom2.count());
 }
 
 BOOST_AUTO_TEST_CASE(testUnionAssign) {
-  counting_bloom_filter<size_t, 300> bloom_1;
-  counting_bloom_filter<size_t, 300> bloom_union;
+  counting_bloom_filter<size_t, 4, 2> bloom1;
+  counting_bloom_filter<size_t, 4, 2> bloom_union;
 
-  for (size_t i = 0; i < 100; ++i) 
-    bloom_1.insert(i);
+  bloom1.insert(0);
+  bloom1.insert(1);
+  bloom1.insert(1);
 
-  bloom_union |= bloom_1;
+  bloom_union.insert(1);
+  bloom_union.insert(3);
+  bloom_union.insert(3);
 
-  for (size_t i = 0; i < 100; ++i)
-    BOOST_CHECK_EQUAL(bloom_union.probably_contains(i), true);
-  BOOST_CHECK_EQUAL(bloom_union.count(), bloom_1.count());
+  bloom_union.experimental_union_assign(bloom1);
+
+  BOOST_CHECK_EQUAL(bloom_union.probably_contains(0), true);
+  BOOST_CHECK_EQUAL(bloom_union.probably_contains(1), true);
+  BOOST_CHECK_EQUAL(bloom_union.probably_contains(2), false);
+  BOOST_CHECK_EQUAL(bloom_union.probably_contains(3), true);
+  BOOST_CHECK_EQUAL(bloom_union.count(), 3ul);
 }
 
 BOOST_AUTO_TEST_CASE(testIntersect) {
-  counting_bloom_filter<size_t, 300> bloom_1;
-  counting_bloom_filter<size_t, 300> bloom_2;
-  counting_bloom_filter<size_t, 300> bloom_intersect;
+  counting_bloom_filter<size_t, 4, 2> bloom1;
+  counting_bloom_filter<size_t, 4, 2> bloom2;
+  counting_bloom_filter<size_t, 4, 2> bloom_intersect;
 
-  // overlap at 100
-  for (size_t i = 0; i < 101; ++i) 
-    bloom_1.insert(i);
-  
-  for (size_t i = 100; i < 200; ++i) 
-    bloom_2.insert(i);
+  bloom1.insert(0);
+  bloom1.insert(1);
+  bloom1.insert(3);
+  bloom1.insert(3);
 
-  bloom_intersect = bloom_1 & bloom_2;
+  bloom2.insert(0);
+  bloom2.insert(0);
+  bloom2.insert(1);
+  bloom2.insert(1);
+  bloom2.insert(3);
+  bloom2.insert(3);
 
-  BOOST_CHECK_LE(bloom_intersect.count(), bloom_1.count());
-  BOOST_CHECK_LE(bloom_intersect.count(), bloom_2.count());
-  BOOST_CHECK_EQUAL(bloom_intersect.probably_contains(100), true);
+  bloom_intersect = experimental_intersect(bloom1, bloom2);
+
+  BOOST_CHECK_EQUAL(bloom_intersect.probably_contains(0), false);
+  BOOST_CHECK_EQUAL(bloom_intersect.probably_contains(1), false);
+  BOOST_CHECK_EQUAL(bloom_intersect.probably_contains(2), false);
+  BOOST_CHECK_EQUAL(bloom_intersect.probably_contains(3), true);
+  BOOST_CHECK_LE(bloom_intersect.count(), bloom1.count());
+  BOOST_CHECK_LE(bloom_intersect.count(), bloom2.count());
 }
 
 BOOST_AUTO_TEST_CASE(testIntersectAssign) {
-  counting_bloom_filter<size_t, 300> bloom_1;
-  counting_bloom_filter<size_t, 300> bloom_intersect;
+  counting_bloom_filter<size_t, 4, 2> bloom1;
+  counting_bloom_filter<size_t, 4, 2> bloom_intersect;
 
-  for (size_t i = 0; i < 100; ++i) 
-    bloom_1.insert(i);
-  
-  bloom_intersect &= bloom_1;
+  bloom1.insert(0);
+  bloom1.insert(1);
+  bloom1.insert(3);
 
-  for (size_t i = 0; i < 100; ++i)
-    BOOST_CHECK_EQUAL(bloom_intersect.probably_contains(i), false);
+  bloom1.insert(0);
+  bloom1.insert(0);
+  bloom_intersect.insert(1);
+  bloom_intersect.insert(3);
+  bloom_intersect.insert(3);
+  bloom_intersect.insert(3);
+
+  bloom_intersect.experimental_intersect_assign(bloom1);
+
+  BOOST_CHECK_EQUAL(bloom_intersect.probably_contains(0), false);
+  BOOST_CHECK_EQUAL(bloom_intersect.probably_contains(1), true);
+  BOOST_CHECK_EQUAL(bloom_intersect.probably_contains(2), false);
+  BOOST_CHECK_EQUAL(bloom_intersect.probably_contains(3), true);
+  BOOST_CHECK_EQUAL(bloom_intersect.count(), 2ul);
 }
-*/
 
 BOOST_FIXTURE_TEST_CASE(equalityOperator, PairwiseOpsFixture) {
   BOOST_CHECK_EQUAL(bloom1 == bloom2, true);
