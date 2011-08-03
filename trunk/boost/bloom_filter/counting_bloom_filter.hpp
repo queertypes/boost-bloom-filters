@@ -172,62 +172,40 @@ namespace boost {
         return ret;
       }
 
-<<<<<<< HEAD
       bool empty() const
-=======
-      bool empty() const 
->>>>>>> wip
       {
 	return this->count() == 0;
       }
 
       //! core ops
-<<<<<<< HEAD
       void insert(const T& t)
-=======
-      void insert(const T& t) 
->>>>>>> wip
       {
 	static const unsigned N = boost::mpl::size<hash_function_type>::value - 1;
 	detail::counting_apply_hash<N, this_type>::insert(t, this->bits);
       }
 
       template <typename InputIterator>
-<<<<<<< HEAD
       void insert(const InputIterator start, const InputIterator end)
-=======
-      void insert(const InputIterator start, const InputIterator end) 
->>>>>>> wip
       {
 	for (InputIterator i = start; i != end; ++i) {
 	  this->insert(*i);
 	}
       }
-<<<<<<< HEAD
 
       void remove(const T& t)
-=======
-			   
-      void remove(const T& t) 
->>>>>>> wip
       {
 	static const unsigned N = boost::mpl::size<hash_function_type>::value - 1;
 	detail::counting_apply_hash<N, this_type>::remove(t, this->bits);
       }
 
       template <typename InputIterator>
-<<<<<<< HEAD
       void remove(const InputIterator start, const InputIterator end)
-=======
-      void remove(const InputIterator start, const InputIterator end) 
->>>>>>> wip
       {
 	for (InputIterator i = start; i != end; ++i) {
 	  this->remove(*i);
 	}
       }
 
-<<<<<<< HEAD
       bool probably_contains(const T& t) const
       {
 	static const unsigned N = mpl::size<HashFunctions>::value - 1;
@@ -237,17 +215,6 @@ namespace boost {
 
       //! auxiliary ops
       void clear()
-=======
-      bool probably_contains(const T& t) const 
-      {
-	static const unsigned N = mpl::size<HashFunctions>::value - 1;
-	return detail::counting_apply_hash<N, this_type>::contains(t, 
-								   this->bits);
-      }
-      
-      //! auxiliary ops
-      void clear() 
->>>>>>> wip
       {
 	for (bucket_iterator i = bits.begin(), end = bits.end();
 	     i != end; ++i) {
@@ -255,11 +222,7 @@ namespace boost {
 	}
       }
 
-<<<<<<< HEAD
       void swap(counting_bloom_filter& other)
-=======
-      void swap(counting_bloom_filter& other) 
->>>>>>> wip
       {
 	counting_bloom_filter tmp = other;
 	other = *this;
@@ -267,11 +230,7 @@ namespace boost {
       }
 
       //! pairwise ops
-<<<<<<< HEAD
       counting_bloom_filter&
-=======
-      counting_bloom_filter& 
->>>>>>> wip
       experimental_union_assign(const counting_bloom_filter& rhs)
       {
 	bucket_iterator this_end = this->bits.end();
@@ -285,11 +244,7 @@ namespace boost {
 	return *this;
       }
 
-<<<<<<< HEAD
       counting_bloom_filter&
-=======
-      counting_bloom_filter& 
->>>>>>> wip
       experimental_intersect_assign(const counting_bloom_filter& rhs)
       {
 	bucket_iterator this_end = this->bits.end();
