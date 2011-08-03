@@ -32,14 +32,14 @@ int main()
   boost::progress_display progress(REPEAT);
   double total_time = 0.0;
 
+  benchmark<int, OPS, 
+	    generator<int>,
+	    dynamic_bloom_filter<int> > bench(BITS);
+
   for (size_t i = 0; i < REPEAT; ++i, ++progress) {
-    benchmark<int, OPS, 
-	      generator<int>,
-	      dynamic_bloom_filter<int> > bench(BITS);
-
     bench.run();
-
     total_time += bench.time();
+    bench.reset();
   }
 
   cout << REPEAT << " trials of " << OPS << " insertions took " 

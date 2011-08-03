@@ -2,3 +2,5 @@ bloom_insert
 stdhash_insert
 stdset_insert
 dynamic_bloom_insert
+meta_compare
+makefile

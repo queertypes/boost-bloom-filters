@@ -37,6 +37,10 @@ namespace boost {
 	test_time = timer.elapsed();
       }
 
+      void reset() {
+        test_time = 0.0;
+      }
+
     private:
       Container container;
       Generator gen;
