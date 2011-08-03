@@ -47,10 +47,13 @@ namespace boost {
       // Block needs to be an unsigned type
       BOOST_STATIC_ASSERT( boost::is_unsigned<Block>::value == true);
 
+      // BitsPerBin needs to be greater than 0
+      BOOST_STATIC_ASSERT( BitsPerBin > 0);
+
       // it doesn't make sense to ever support using a BitsPerBin value larger
       // than the number of bits per Block. In that case, the user shouldn't
       // be using a Bloom filter to represent their data.
-      BOOST_STATIC_ASSERT( (BitsPerBin <= (sizeof(Block) * 8) ) );
+      BOOST_STATIC_ASSERT( (BitsPerBin < (sizeof(Block) * 8) ) );
 
       // because of the nature of this implementation, the Bloom filter
       // can have internal fragmentation if the calculation for 
@@ -58,7 +61,7 @@ namespace boost {
       // fragmentation is equal to the remainder * the number of slots.
       // This check prevents internal fragmentation.
       // This also necessarily limits to bin sizes to one of:
-      // [1,2,4,8,16,32,64] bits
+      // [1,2,4,8,16,32(64-bit system only)] bits
       BOOST_STATIC_ASSERT( ((sizeof(Block) * 8) % BitsPerBin) == 0);
 
       // a slot is one element position in the array
@@ -169,48 +172,82 @@ namespace boost {
         return ret;
       }
 
+<<<<<<< HEAD
+      bool empty() const
+=======
       bool empty() const 
+>>>>>>> wip
       {
 	return this->count() == 0;
       }
 
       //! core ops
+<<<<<<< HEAD
+      void insert(const T& t)
+=======
       void insert(const T& t) 
+>>>>>>> wip
       {
 	static const unsigned N = boost::mpl::size<hash_function_type>::value - 1;
 	detail::counting_apply_hash<N, this_type>::insert(t, this->bits);
       }
 
       template <typename InputIterator>
+<<<<<<< HEAD
+      void insert(const InputIterator start, const InputIterator end)
+=======
       void insert(const InputIterator start, const InputIterator end) 
+>>>>>>> wip
       {
 	for (InputIterator i = start; i != end; ++i) {
 	  this->insert(*i);
 	}
       }
+<<<<<<< HEAD
+
+      void remove(const T& t)
+=======
 			   
       void remove(const T& t) 
+>>>>>>> wip
       {
 	static const unsigned N = boost::mpl::size<hash_function_type>::value - 1;
 	detail::counting_apply_hash<N, this_type>::remove(t, this->bits);
       }
-      
+
       template <typename InputIterator>
+<<<<<<< HEAD
+      void remove(const InputIterator start, const InputIterator end)
+=======
       void remove(const InputIterator start, const InputIterator end) 
+>>>>>>> wip
       {
 	for (InputIterator i = start; i != end; ++i) {
 	  this->remove(*i);
 	}
       }
 
+<<<<<<< HEAD
+      bool probably_contains(const T& t) const
+      {
+	static const unsigned N = mpl::size<HashFunctions>::value - 1;
+	return detail::counting_apply_hash<N, this_type>::contains(t,
+								   this->bits);
+      }
+
+      //! auxiliary ops
+      void clear()
+=======
       bool probably_contains(const T& t) const 
       {
 	static const unsigned N = mpl::size<HashFunctions>::value - 1;
 	return detail::counting_apply_hash<N, this_type>::contains(t, 
 								   this->bits);
       }
-
+      
+      //! auxiliary ops
       void clear() 
+>>>>>>> wip
       {
 	for (bucket_iterator i = bits.begin(), end = bits.end();
 	     i != end; ++i) {
@@ -218,18 +255,28 @@ namespace boost {
 	}
       }
 
+<<<<<<< HEAD
+      void swap(counting_bloom_filter& other)
+=======
       void swap(counting_bloom_filter& other) 
+>>>>>>> wip
       {
 	counting_bloom_filter tmp = other;
 	other = *this;
 	*this = tmp;
       }
 
-      counting_bloom_filter& operator|=(const counting_bloom_filter& rhs)
+      //! pairwise ops
+<<<<<<< HEAD
+      counting_bloom_filter&
+=======
+      counting_bloom_filter& 
+>>>>>>> wip
+      experimental_union_assign(const counting_bloom_filter& rhs)
       {
-	const bucket_iterator this_end = this->bits.end();
+	bucket_iterator this_end = this->bits.end();
 	bucket_iterator this_start = this->bits.begin();
-	bucket_iterator rhs_start = rhs.bits.begin();
+	bucket_const_iterator rhs_start = rhs.bits.begin();
 
 	for (; this_start != this_end; ++this_start, ++rhs_start) {
 	  *this_start |= *rhs_start;
@@ -238,11 +285,16 @@ namespace boost {
 	return *this;
       }
 
-      counting_bloom_filter& operator&=(const counting_bloom_filter& rhs)
+<<<<<<< HEAD
+      counting_bloom_filter&
+=======
+      counting_bloom_filter& 
+>>>>>>> wip
+      experimental_intersect_assign(const counting_bloom_filter& rhs)
       {
-	const bucket_iterator this_end = this->bits.end();
+	bucket_iterator this_end = this->bits.end();
 	bucket_iterator this_start = this->bits.begin();
-	bucket_iterator rhs_start = rhs.bits.begin();
+	bucket_const_iterator rhs_start = rhs.bits.begin();
 
 	for (; this_start != this_end; ++this_start, ++rhs_start) {
 	  *this_start &= *rhs_start;
@@ -252,22 +304,22 @@ namespace boost {
       }
 
       // equality comparison operators
-      template <typename _T, size_t _Bins, size_t _BitsPerBin, 
+      template <typename _T, size_t _Bins, size_t _BitsPerBin,
 		typename _HashFns, typename _Block>
-      friend bool 
+      friend bool
       operator==(const counting_bloom_filter<_T, _Bins, _BitsPerBin,
 					     _HashFns, _Block>& lhs,
 		 const counting_bloom_filter<_T, _Bins, _BitsPerBin,
 					     _HashFns, _Block>& rhs);
-			     
-      template <typename _T, size_t _Bins, size_t _BitsPerBin, 
+
+      template <typename _T, size_t _Bins, size_t _BitsPerBin,
 		typename _HashFns, typename _Block>
-      friend bool 
+      friend bool
       operator!=(const counting_bloom_filter<_T, _Bins, _BitsPerBin,
 					     _HashFns, _Block>& lhs,
 		 const counting_bloom_filter<_T, _Bins, _BitsPerBin,
 					     _HashFns, _Block>& rhs);
-			     
+
 
     private:
       bucket_type bits;
@@ -277,14 +329,14 @@ namespace boost {
     template<class T, size_t NumBins, size_t BitsPerBin, class HashFunctions,
 	     typename Block>
     counting_bloom_filter<T, NumBins, BitsPerBin, HashFunctions, Block>
-    operator|(const counting_bloom_filter<T, NumBins, BitsPerBin, 
-					  HashFunctions, Block>& lhs,
-	      const counting_bloom_filter<T, NumBins, BitsPerBin,
-					  HashFunctions, Block>& rhs)
+    experimental_union(const counting_bloom_filter<T, NumBins, BitsPerBin, 
+						   HashFunctions, Block>& lhs,
+		       const counting_bloom_filter<T, NumBins, BitsPerBin,
+						   HashFunctions, Block>& rhs)
     {
       counting_bloom_filter<T, NumBins, BitsPerBin, 
 			    HashFunctions, Block> ret(lhs);
-      ret |= rhs;
+      ret.experimental_union_assign(rhs);
       return ret;
     }
 
@@ -292,14 +344,14 @@ namespace boost {
     template<class T, size_t NumBins, size_t BitsPerBin, class HashFunctions,
 	     typename Block>
     counting_bloom_filter<T, NumBins, BitsPerBin, HashFunctions, Block>
-    operator&(const counting_bloom_filter<T, NumBins, BitsPerBin, 
-					  HashFunctions, Block>& lhs,
-	      const counting_bloom_filter<T, NumBins, BitsPerBin,
-					  HashFunctions, Block>& rhs)
+    experimental_intersect(const counting_bloom_filter<T, NumBins, BitsPerBin, 
+						       HashFunctions, Block>& lhs,
+			   const counting_bloom_filter<T, NumBins, BitsPerBin,
+						       HashFunctions, Block>& rhs)
     {
       counting_bloom_filter<T, NumBins, BitsPerBin, 
 			    HashFunctions, Block> ret(lhs);
-      ret &= rhs;
+      ret.experimental_intersect_assign(rhs);
       return ret;
     }
 
@@ -310,7 +362,7 @@ namespace boost {
 			       HashFunctions, Block>& lhs,
 	 counting_bloom_filter<T, NumBins, BitsPerBin,
 			       HashFunctions, Block>& rhs)
-	 
+
     {
       lhs.swap(rhs);
     }

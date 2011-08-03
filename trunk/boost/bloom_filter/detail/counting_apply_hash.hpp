@@ -32,12 +32,13 @@ namespace boost {
  
       struct increment {
 	size_t operator()(const size_t val, const size_t limit) {
-	  if ((val+1) == limit)
+	  if (val == limit)
 	    throw bin_overflow_exception();
 
 	  return val+1;
 	}
       };
+<<<<<<< HEAD
 
       template <size_t N, class CBF, class Op = void>
       struct BloomOp {
@@ -47,7 +48,37 @@ namespace boost {
 	BloomOp(const typename CBF::value_type& t,
 		const typename CBF::bucket_type& slots)
 	  :
-	  hash_val(hasher(t) % CBF::num_bins()), 
+	  hash_val(hasher(t) % CBF::num_bins()),
+	  pos(hash_val / CBF::bins_per_slot()),
+	  offset_bits((hash_val % CBF::bins_per_slot()) * CBF::bits_per_bin()),
+	  target_bits((slots[pos] >> offset_bits) & CBF::mask())
+	{}
+
+	void update(const typename CBF::value_type& t,
+		    typename CBF::bucket_type& slots,
+		    const size_t limit) const {
+	  static Op op;
+
+	  const size_t final_bits = op(target_bits, limit);
+	  slots[pos] &= ~(CBF::mask() << offset_bits);
+	  slots[pos] |= (final_bits << offset_bits);
+	}
+
+	bool check() const {
+	  return (target_bits != 0);
+	}
+
+=======
+
+      template <size_t N, class CBF, class Op = void>
+      struct BloomOp {
+	typedef typename boost::mpl::at_c<typename CBF::hash_function_type, 
+					  N>::type Hash;
+
+	BloomOp(const typename CBF::value_type& t,
+		const typename CBF::bucket_type& slots)
+	  :
+	  hash_val(hasher(t) % CBF::num_bins()),
 	  pos(hash_val / CBF::bins_per_slot()),
 	  offset_bits((hash_val % CBF::bins_per_slot()) * CBF::bits_per_bin()),
 	  target_bits((slots[pos] >> offset_bits) & CBF::mask())
@@ -67,6 +98,7 @@ namespace boost {
 	  return (target_bits != 0);
 	}
 	
+>>>>>>> wip
 	Hash hasher;
 	const size_t hash_val;
 	const size_t pos;
@@ -83,7 +115,7 @@ namespace boost {
 			   typename CBF::bucket_type& slots)
 	{
 	  BloomOp<N, CBF, increment> inserter(t, slots);
-	  inserter.update(t, slots, (1 << CBF::bits_per_bin()));
+	  inserter.update(t, slots, (1ull << CBF::bits_per_bin()) - 1ull);
 
 	  counting_apply_hash<N-1, CBF>::insert(t, slots);
 	}
@@ -113,7 +145,7 @@ namespace boost {
 			   typename CBF::bucket_type& slots)
 	{
 	  BloomOp<0, CBF, increment> inserter(t, slots);
-	  inserter.update(t, slots, (1 << CBF::bits_per_bin()));
+	  inserter.update(t, slots, (1ull << CBF::bits_per_bin()) - 1ull);
 	}
 
 	static void remove(const typename CBF::value_type& t, 
