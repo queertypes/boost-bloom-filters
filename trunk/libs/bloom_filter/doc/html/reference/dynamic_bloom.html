@@ -52,6 +52,8 @@
         <code class="c_keyword">typedef</code> <code class="c_type">HashFunctions hash_function_type</code>;
         <code class="c_keyword">typedef</code> <code class="c_type">Block block_type</code>;
         <code class="c_keyword">typedef</code> <code class="c_type">Allocator allocator_type</code>;
+        <code class="c_keyword">typedef</code> <code class="c_type">dynamic_bitset</code>&lt;<code class="c_type">Block</code>, <code class="c_type">Allocator</code>&gt; <code class="c_type">bitset_type</code>;
+        <code class="c_keyword">typedef</code> <code class="c_type">dynamic_bloom_filter</code>&lt<code class="c_type">T</code>, <code class="c_type">HashFunctions</code>, <code class="c_type">Block</code>, <code class="c_type">Allocator</code>&gt; <code class="c_type">this_type</code>;
 
         <code class="c_comment">// constructors</code>
         <code class="c_func">dynamic_bloom_filter</code>();
@@ -180,8 +182,8 @@
 
     <br/>
 
+    <a name="default_constructor"></a>
     <div class="func_ref">
-      <a name="default_constructor"></a>
       <div class="ref_listing"><code class="c_func">dynamic_bloom_filter</code>();</div>
       <dl>
 	<dt>Description</dt>
@@ -195,8 +197,8 @@
       </dl>
     </div>
 
+    <a name="capacity_constructor"></a>
     <div class="func_ref">
-      <a name="capacity_constructor"></a>
       <div class="ref_listing"><code class="c_func">dynamic_bloom_filter</code>(<code class="c_keyword">const</code> <code class="c_type">size_t</code> <code class="c_id">capacity</code>);</div>
       <dl>
 	<dt>Description</dt>
@@ -208,8 +210,8 @@
       </dl>
     </div>
 
+    <a name="range_constructor"></a>
     <div class="func_ref">
-      <a name="range_constructor"></a>
       <div class="ref_listing"><code class="c_func">dynamic_bloom_filter</code>(<code class="c_keyword">const</code> <code class="c_type">InputIterator</code> <code class="c_id">start</code>, <code class="c_keyword">const</code> <code class="c_type">InputIterator</code> <code class="c_id">end</code>);</div>
       <dl>
 	<dt>Description</dt>
@@ -221,8 +223,8 @@
       </dl>
     </div>
 
+    <a name="bit_capacity"></a>
     <div class="func_ref">
-      <a name="bit_capacity"></a>
       <div class="ref_listing"><code class="c_type">size_t</code> <code class="c_func">bit_capacity</code>() <code class="c_keyword">const</code>;</div>
       <dl>
 	<dt>Description</dt>
@@ -235,8 +237,8 @@
     </div>
 
 
+    <a name="num_hash_functions"></a>
     <div class="func_ref">
-      <a name="num_hash_functions"></a>
       <div class="ref_listing"><code class="c_type">size_t</code><code class="c_func"> num_hash_functions</code>()<code class="c_keyword"> const</code>;</div>
       <dl>
 	<dt>Description</dt>
@@ -248,8 +250,8 @@
       </dl>
     </div>
 
+    <a name="false_positive_rate"></a>
     <div class="func_ref">
-      <a name="false_positive_rate"></a>
       <div class="ref_listing"><code class="c_type">double </code><code class="c_func">false_positive_rate</code>() <code class="c_keyword">const</code>;</div>
       <dl>
 	<dt>Description</dt>
@@ -261,8 +263,8 @@
       </dl>
     </div>
 
+    <a name="empty"></a>
     <div class="func_ref">
-      <a name="empty"></a>
       <div class="ref_listing"><code class="c_type">bool</code> <code class="c_func">empty</code>() <code class="c_keyword">const</code>;</div>
       <dl>
 	<dt>Description</dt>
@@ -276,8 +278,8 @@
       </dl>
     </div>
 
+    <a name="count"></a>
     <div class="func_ref">
-      <a name="count"></a>
       <div class="ref_listing"><code class="c_type">size_t</code> <code class="c_func">count</code>() <code class="c_keyword">const</code>;</div>
       <dl>
 	<dt>Description</dt>
@@ -291,8 +293,8 @@
       </dl>
     </div>
 
+    <a name="insert"></a>
     <div class="func_ref">
-      <a name="insert"></a>
       <div class="ref_listing"><code class="c_type">void</code> <code class="c_func">insert</code>(<code class="c_keyword">const</code> <code class="c_type">T&amp;</code>);</div>
       <dl>
 	<dt>Description</dt>
@@ -304,8 +306,8 @@
       </dl>
     </div>
 
+    <a name="range_insert"></a>
     <div class="func_ref">
-      <a name="range_insert"></a>
       <div class="ref_listing"><code class="c_type">void</code> <code class="c_func">insert</code>(<code class="c_keyword">const</code> <code class="c_type">InputIterator</code> <code class="c_id">start</code>, <code class="c_keyword">const</code> <code class="c_type">InputIterator</code> <code class="c_id">end</code>);</div>
       <dl>
 	<dt>Description</dt>
@@ -317,8 +319,8 @@
       </dl>
     </div>
 
+    <a name="probably_contains"></a>
     <div class="func_ref">
-      <a name="probably_contains"></a>
       <div class="ref_listing"><code class="c_type">bool</code> <code class="c_func">probably_contains</code>(<code class="c_keyword">const</code> <code class="c_type">T&amp;</code>) <code class="c_keyword">const</code>;</div>
       <dl>
 	<dt>Description</dt>
@@ -332,8 +334,8 @@
       </dl>
     </div>
 
+    <a name="clear"></a>
     <div class="func_ref">
-      <a name="clear"></a>
       <div class="ref_listing"><code class="c_type">void</code> <code class="c_func">clear</code>();</div>
       <dl>
 	<dt>Description</dt>
@@ -347,8 +349,8 @@
       </dl>
     </div>
 
+    <a name="swap"></a>
     <div class="func_ref">
-      <a name="swap"></a>
       <div class="ref_listing"><code class="c_type">void</code> <code class="c_func">swap</code>(<code class="c_type">bloom_filter</code>&amp;);</div>
       <dl>
 	<dt>Description</dt>
@@ -358,8 +360,8 @@
       </dl>
     </div>
 
+    <a name="resize"></a>
     <div class="func_ref">
-      <a name="resize"></a>
       <div class="ref_listing"><code class="c_type">void</code> <code class="c_func">resize</code>(<code class="c_type">size_t</code> <code class="c_id">new_capacity</code>);</div>
       <dl>
 	<dt>Description</dt>
@@ -373,8 +375,8 @@
       </dl>
     </div>
 
+    <a name="union_assign"></a>
     <div class="func_ref">
-      <a name="union_assign"></a>
       <div class="ref_listing"><code class="c_type">bloom_filter&amp;</code> <code class="c_func">operator|=</code>(<code class="c_keyword">const</code> <code class="c_type">bloom_filter&amp;</code>);</div>
       <dl>
 	<dt>Description</dt>
@@ -385,6 +387,9 @@
 	<dd>Returns a reference to <code class="c_keyword">this</code>.</dd>
 	<dt>Post-condition</dt>
 	<dd>The number of bits set in <code class="c_keyword">this</code> will be greater than or equal to the number of bits set before the operation.</dd>
+	<dt>Throws</dt>
+	<dd>incompatible_size exception if the argument Bloom filters 
+	have a different bit_capacity.</dd>
 	<dt>Complexity</dt>
 	<dd>Depends on the implementation of
 	<a href="http://www.boost.org/doc/libs/1_47_0/libs/dynamic_bitset/dynamic_bitset.html#member-functions">
@@ -392,8 +397,8 @@
       </dl>
     </div>
 
+    <a name="intersect_assign"></a>
     <div class="func_ref">
-      <a name="intersect_assign"></a>
       <div class="ref_listing"><code class="c_type">bloom_filter&amp;</code> <code class="c_func">operator&amp;=</code>(<code class="c_keyword">const</code> <code class="c_type">bloom_filter&amp;</code>);</div>
       <dl>
 	<dt>Description</dt>
@@ -404,6 +409,9 @@
 	<dd>Returns a reference to <code class="c_keyword">this</code>.</dd>
 	<dt>Post-condition</dt>
 	<dd>The number of bits set in <code class="c_keyword">this</code> will be less than or equal to the number of bits set before the operation.</dd>
+	<dt>Throws</dt>
+	<dd>incompatible_size exception if the argument Bloom filters 
+	have a different bit_capacity.</dd>
 	<dt>Complexity</dt>
 	<dd>Depends on the implementation of
 	<a href="http://www.boost.org/doc/libs/1_47_0/libs/dynamic_bitset/dynamic_bitset.html#member-functions">
@@ -411,8 +419,8 @@
       </dl>
     </div>
 
+    <a name="union"></a>
     <div class="func_ref">
-      <a name="union"></a>
       <div class="ref_listing"><code class="c_type">bloom_filter&amp;</code> <code class="c_func">operator|</code>(<code class="c_keyword">const</code> <code class="c_type">bloom_filter&amp;</code> <code class="c_id">lhs</code>, <code class="c_keyword">const</code> <code class="c_type">bloom_filter&amp;</code> <code class="c_id">rhs</code>);</div>
       <dl>
 	<dt>Description</dt>
@@ -423,6 +431,9 @@
 	<dd>Returns a new, stack-allocated Bloom filter that is the result of performing a union between the lhs and the rhs.</dd>
 	<dt>Post-condition</dt>
 	<dd>The number of bits set in the new filter will be greater than or equal to the number of bits set in max(lhs.count(), rhs.count()).</dd>
+	<dt>Throws</dt>
+	<dd>incompatible_size exception if the argument Bloom filters 
+	have a different bit_capacity.</dd>
 	<dt>Complexity</dt>
 	<dd>Depends on the implementation of
 	<a href="http://www.boost.org/doc/libs/1_47_0/libs/dynamic_bitset/dynamic_bitset.html#member-functions">
@@ -430,8 +441,8 @@
       </dl>
     </div>
 
+    <a name="intersect"></a>
     <div class="func_ref">
-      <a name="intersect"></a>
       <div class="ref_listing"><code class="c_type">bloom_filter&amp;</code> <code class="c_func">operator&amp;</code>(<code class="c_keyword">const</code> <code class="c_type">bloom_filter&amp;</code> <code class="c_id">lhs</code>, <code class="c_keyword">const</code> <code class="c_type">bloom_filter&amp;</code> <code class="c_id">rhs</code>);</div>
       <dl>
 	<dt>Description</dt>
@@ -442,6 +453,9 @@
 	<dd>Returns a new, stack-allocated Bloom filter that is the result of performing an intersect between the lhs and the rhs.</dd>
 	<dt>Post-condition</dt>
 	<dd>The number of bits set in the new filter will be less than or equal to the number of bits set in min(lhs.count(), rhs.count()).</dd>
+	<dt>Throws</dt>
+	<dd>incompatible_size exception if the argument Bloom filters 
+	have a different bit_capacity.</dd>
 	<dt>Complexity</dt>
 	<dd>Depends on the implementation of
 	<a href="http://www.boost.org/doc/libs/1_47_0/libs/dynamic_bitset/dynamic_bitset.html#member-functions">
@@ -449,8 +463,8 @@
       </dl>
     </div>
 
+    <a name="global_swap"></a>
     <div class="func_ref">
-      <a name="global_swap"></a>
       <div class="ref_listing"><code class="c_type">void</code> <code class="c_func">swap</code>(<code class="c_type">bloom_filter</code>&amp;, <code class="c_type">bloom_filter</code>&amp;);</div>
       <dl>
 	<dt>Description</dt>
@@ -460,14 +474,17 @@
       </dl>
     </div>
 
+    <a name="operator_equality"></a>
     <div class="func_ref">
-      <a name="operator_equality"></a>
       <div class="ref_listing"><code class="c_type">bool</code> <code class="c_func">operator==</code>(<code class="c_keyword">const</code> <code class="c_type">bloom_filter&amp;</code> <code class="c_id">lhs</code>, <code class="c_keyword">const</code> <code class="c_type">bloom_filter&amp;</code> <code class="c_id">rhs</code>);</div>
       <dl>
 	<dt>Description</dt>
 	<dd>Compares the bits of the argument Bloom filters for equality.</dd>
 	<dt>Returns</dt>
 	<dd>True if the bits match, false otherwise.</dd>
+	<dt>Throws</dt>
+	<dd>incompatible_size exception if the argument Bloom filters 
+	have a different bit_capacity.</dd>
 	<dt>Complexity</dt>
 	<dd>Depends on the implementation of
 	<a href="http://www.boost.org/doc/libs/1_47_0/libs/dynamic_bitset/dynamic_bitset.html#member-functions">
@@ -475,14 +492,17 @@
       </dl>
     </div>
 
+    <a name="operator_inequality"></a>
     <div class="func_ref">
-      <a name="operator_inequality"></a>
       <div class="ref_listing"><code class="c_type">bool</code> <code class="c_func">operator!=</code>(<code class="c_keyword">const</code> <code class="c_type">bloom_filter&amp;</code> <code class="c_id">lhs</code>, <code class="c_keyword">const</code> <code class="c_type">bloom_filter&amp;</code> <code class="c_id">rhs</code>);</div>
       <dl>
 	<dt>Description</dt>
 	<dd>Compares the bits of the argument Bloom filters for equality.</dd>
 	<dt>Returns</dt>
 	<dd>True if the bits don't match, false otherwise.</dd>
+	<dt>Throws</dt>
+	<dd>incompatible_size exception if the argument Bloom filters 
+	have a different bit_capacity.</dd>
 	<dt>Complexity</dt>
 	<dd>Depends on the implementation of
 	<a href="http://www.boost.org/doc/libs/1_47_0/libs/dynamic_bitset/dynamic_bitset.html#member-functions">

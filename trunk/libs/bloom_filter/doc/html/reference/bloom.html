@@ -48,7 +48,9 @@
         <code class="c_comment">// exported typedefs</code>
         <code class="c_keyword">typedef</code> <code class="c_type">T value_type</code>;
         <code class="c_keyword">typedef</code> <code class="c_type">T key_type</code>;
+        <code class="c_keyword">typedef</code> <code class="c_namespace">std::</code><code class="c_type">bitset</code>&lt;Size&gt; <code class="c_type">bitset_type</code>;
         <code class="c_keyword">typedef</code> <code class="c_type">HashFunctions hash_function_type</code>;
+        <code class="c_keyword">typedef</code> <code class="c_type">basic_bloom_filter</code>&lt;<code class="c_type">T</code>, Size, <code class="c_type">HashFunctions</code>&gt; <code class="c_type">this_type</code>;
 
         <code class="c_comment">// constructors</code>
         <code class="c_func">basic_bloom_filter</code>();
@@ -162,8 +164,8 @@
 
     <br/>
 
+    <a name="default_constructor"></a>
     <div class="func_ref">
-      <a name="default_constructor"></a>
       <div class="ref_listing"><code class="c_func">basic_bloom_filter</code>();</div>
       <dl>
 	<dt>Description</dt>
@@ -173,8 +175,8 @@
       </dl>
     </div>
 
+    <a name="range_constructor"></a>
     <div class="func_ref">
-      <a name="range_constructor"></a>
       <div class="ref_listing"><code class="c_func">basic_bloom_filter</code>(<code class="c_keyword">const</code> <code class="c_type">InputIterator</code> <code class="c_id">start</code>, <code class="c_keyword">const</code> <code class="c_type">InputIterator</code> <code class="c_id">end</code>);</div>
       <dl>
 	<dt>Description</dt>
@@ -184,8 +186,8 @@
       </dl>
     </div>
 
+    <a name="ilist_constructor"></a>
     <div class="func_ref">
-      <a name="ilist_constructor"></a>
       <div class="ref_listing"><code class="c_func">basic_bloom_filter</code>(<code class="c_keyword">const</code> <code class="c_namespace">std::initializer</code>&lt;<code class="c_type">T</code>&gt;&amp;);</div>
       <dl>
 	<dt>Description</dt>
@@ -197,8 +199,8 @@
       </dl>
     </div>
 
+    <a name="bit_capacity"></a>
     <div class="func_ref">
-      <a name="bit_capacity"></a>
       <div class="ref_listing"><code class="c_type">size_t</code> <code class="c_func">bit_capacity</code>() <code class="c_keyword">const</code>;</div>
       <dl>
 	<dt>Description</dt>
@@ -211,8 +213,8 @@
     </div>
 
 
+    <a name="num_hash_functions"></a>
     <div class="func_ref">
-      <a name="num_hash_functions"></a>
       <div class="ref_listing"><code class="c_type">size_t</code><code class="c_func"> num_hash_functions</code>()<code class="c_keyword"> const</code>;</div>
       <dl>
 	<dt>Description</dt>
@@ -224,8 +226,8 @@
       </dl>
     </div>
 
+    <a name="false_positive_rate"></a>
     <div class="func_ref">
-      <a name="false_positive_rate"></a>
       <div class="ref_listing"><code class="c_type">double </code><code class="c_func">false_positive_rate</code>() <code class="c_keyword">const</code>;</div>
       <dl>
 	<dt>Description</dt>
@@ -237,8 +239,8 @@
       </dl>
     </div>
 
+    <a name="empty"></a>
     <div class="func_ref">
-      <a name="empty"></a>
       <div class="ref_listing"><code class="c_type">bool</code> <code class="c_func">empty</code>() <code class="c_keyword">const</code>;</div>
       <dl>
 	<dt>Description</dt>
@@ -250,8 +252,8 @@
       </dl>
     </div>
 
+    <a name="count"></a>
     <div class="func_ref">
-      <a name="count"></a>
       <div class="ref_listing"><code class="c_type">size_t</code> <code class="c_func">count</code>() <code class="c_keyword">const</code>;</div>
       <dl>
 	<dt>Description</dt>
@@ -263,8 +265,8 @@
       </dl>
     </div>
 
+    <a name="insert"></a>
     <div class="func_ref">
-      <a name="insert"></a>
       <div class="ref_listing"><code class="c_type">void</code> <code class="c_func">insert</code>(<code class="c_keyword">const</code> <code class="c_type">T&amp;</code>);</div>
       <dl>
 	<dt>Description</dt>
@@ -276,8 +278,8 @@
       </dl>
     </div>
 
+    <a name="range_insert"></a>
     <div class="func_ref">
-      <a name="range_insert"></a>
       <div class="ref_listing"><code class="c_type">void</code> <code class="c_func">insert</code>(<code class="c_keyword">const</code> <code class="c_type">InputIterator</code> <code class="c_id">start</code>, <code class="c_keyword">const</code> <code class="c_type">InputIterator</code> <code class="c_id">end</code>);</div>
       <dl>
 	<dt>Description</dt>
@@ -289,8 +291,8 @@
       </dl>
     </div>
 
+    <a name="probably_contains"></a>
     <div class="func_ref">
-      <a name="probably_contains"></a>
       <div class="ref_listing"><code class="c_type">bool</code> <code class="c_func">probably_contains</code>(<code class="c_keyword">const</code> <code class="c_type">T&amp;</code>) <code class="c_keyword">const</code>;</div>
       <dl>
 	<dt>Description</dt>
@@ -304,8 +306,8 @@
       </dl>
     </div>
 
+    <a name="clear"></a>
     <div class="func_ref">
-      <a name="clear"></a>
       <div class="ref_listing"><code class="c_type">void</code> <code class="c_func">clear</code>();</div>
       <dl>
 	<dt>Description</dt>
@@ -317,8 +319,8 @@
       </dl>
     </div>
 
+    <a name="swap"></a>
     <div class="func_ref">
-      <a name="swap"></a>
       <div class="ref_listing"><code class="c_type">void</code> <code class="c_func">swap</code>(<code class="c_type">basic_bloom_filter</code>&amp;);</div>
       <dl>
 	<dt>Description</dt>
@@ -328,8 +330,8 @@
       </dl>
     </div>
 
+    <a name="union_assign"></a>
     <div class="func_ref">
-      <a name="union_assign"></a>
       <div class="ref_listing"><code class="c_type">basic_bloom_filter&amp;</code> <code class="c_func">operator|=</code>(<code class="c_keyword">const</code> <code class="c_type">basic_bloom_filter&amp;</code>);</div>
       <dl>
 	<dt>Description</dt>
@@ -343,8 +345,8 @@
       </dl>
     </div>
 
+    <a name="intersect_assign"></a>
     <div class="func_ref">
-      <a name="intersect_assign"></a>
       <div class="ref_listing"><code class="c_type">basic_bloom_filter&amp;</code> <code class="c_func">operator&amp;=</code>(<code class="c_keyword">const</code> <code class="c_type">basic_bloom_filter&amp;</code>);</div>
       <dl>
 	<dt>Description</dt>
@@ -358,8 +360,8 @@
       </dl>
     </div>
 
+    <a name="union"></a>
     <div class="func_ref">
-      <a name="union"></a>
       <div class="ref_listing"><code class="c_type">basic_bloom_filter&amp;</code> <code class="c_func">operator|</code>(<code class="c_keyword">const</code> <code class="c_type">basic_bloom_filter&amp;</code> <code class="c_id">lhs</code>, <code class="c_keyword">const</code> <code class="c_type">basic_bloom_filter&amp;</code> <code class="c_id">rhs</code>);</div>
       <dl>
 	<dt>Description</dt>
@@ -373,8 +375,8 @@
       </dl>
     </div>
 
+    <a name="intersect"></a>
     <div class="func_ref">
-      <a name="intersect"></a>
       <div class="ref_listing"><code class="c_type">basic_bloom_filter&amp;</code> <code class="c_func">operator&amp;</code>(<code class="c_keyword">const</code> <code class="c_type">basic_bloom_filter&amp;</code> <code class="c_id">lhs</code>, <code class="c_keyword">const</code> <code class="c_type">basic_bloom_filter&amp;</code> <code class="c_id">rhs</code>);</div>
       <dl>
 	<dt>Description</dt>
@@ -388,8 +390,8 @@
       </dl>
     </div>
 
+    <a name="global_swap"></a>
     <div class="func_ref">
-      <a name="global_swap"></a>
       <div class="ref_listing"><code class="c_type">void</code> <code class="c_func">swap</code>(<code class="c_type">basic_bloom_filter</code>&amp;, <code class="c_type">basic_bloom_filter</code>&amp;);</div>
       <dl>
 	<dt>Description</dt>
@@ -399,8 +401,8 @@
       </dl>
     </div>
 
+    <a name="operator_equality"></a>
     <div class="func_ref">
-      <a name="operator_equality"></a>
       <div class="ref_listing"><code class="c_type">bool</code> <code class="c_func">operator==</code>(<code class="c_keyword">const</code> <code class="c_type">basic_bloom_filter&amp;</code> <code class="c_id">lhs</code>, <code class="c_keyword">const</code> <code class="c_type">basic_bloom_filter&amp;</code> <code class="c_id">rhs</code>);</div>
       <dl>
 	<dt>Description</dt>
@@ -412,8 +414,8 @@
       </dl>
     </div>
 
+    <a name="operator_inequality"></a>
     <div class="func_ref">
-      <a name="operator_inequality"></a>
       <div class="ref_listing"><code class="c_type">bool</code> <code class="c_func">operator!=</code>(<code class="c_keyword">const</code> <code class="c_type">basic_bloom_filter&amp;</code> <code class="c_id">lhs</code>, <code class="c_keyword">const</code> <code class="c_type">basic_bloom_filter&amp;</code> <code class="c_id">rhs</code>);</div>
       <dl>
 	<dt>Description</dt>

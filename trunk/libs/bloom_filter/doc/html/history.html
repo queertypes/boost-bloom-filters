@@ -36,6 +36,81 @@
     </div>
 
     <h1 class="title">Version history</h1>
+    <h3>v0.6.5 (August 3rd)</h3>
+    <ul>
+      <li><strong>Documentation Update</strong>
+	<ul>
+	  <li>Updated reference - basic_bloom_filter, dynamic_bloom_filter, 
+	  counting_bloom_filter</li>
+	  <li>Updated tutorial - added information regarding new
+	  exception support for counting_bloom_filter</li>
+	  <li>Updated history</li>
+	</ul>
+      </li>
+    </ul>
+
+    <h3>v0.6.0 (August 2nd)</h3>
+    <ul>
+      <li><strong>Implementation Update</strong>
+	<ul>
+	  <li>Refactored counting_apply_hash - LOC cut in half,
+	  also usable for future dynamic_counting_bloom_filter.</li>
+	</ul>
+      </li>
+      <li><strong>API Changes</strong>
+	<ul>
+	  <li>counting_bloom_filter - added various typedefs and a few 
+	  metadata functions. More specifically:
+	  <ul>
+	    <li>Added bits_per_bin()</li>
+	    <li>Added bins_per_slot()</li>
+	    <li>Added mask()</li>
+	    <li>Added num_bins()</li>
+	    <li>Changed operator|=() -&gt; experimental_union_assign</li>
+	    <li>Changed operator|() -&gt; experimental_union</li>
+	    <li>Changed operator&amp;=() -&gt; experimental_intersect_assign</li>
+	    <li>Changed operator&amp;() -&gt; experimental_intersect</li>
+	    <li>Added restraint on BitsPerBin - must be greater than 0</li>
+	    <li>Added restraint on BitsPerBin - must be &lt;= sizeof(block_type)</li>
+	  </ul>
+	  </li>
+	</ul>
+	<ul>
+	  <li><strong>Testing Update</strong>
+	  <ul>
+	    <li>Greatly expanded counting_bloom_filter tests. New coverage:
+	    <ul>
+	      <li>Ensured all valid BitsPerBin sizes compile</li>
+	      <li>Ensured that many valid block_types compile</li>
+	      <li>Added tests for falsePositiveRate()</li>
+	      <li>Added tests for union/intersection</li>
+	      <li>Added more tests for exception triggering</li>
+	      <li>Made countMulti test more comprehensive - tested on
+	      all valid bitsPerBin values</li>
+	    </ul>
+	    </li>
+	  </ul>
+	  </li>
+	</ul>
+      </li>
+    </ul>
+
+    <h3>v0.5.0 (July 26nd)</h3>
+    <ul>
+      <li><strong>Implementation Update</strong>
+	<ul>
+	  <li>Refactored apply_hash - both basic_bloom_filter and 
+	  dynamic_bloom_filter use same apply_hash meta-function.</li>
+	</ul>
+      </li>
+      <li><strong>API Changes</strong>
+	<ul>
+	  <li>basic_bloom_filter - added [this_type, bitset_type] typedef</li>
+	  <li>dynamic_bloom_filter - added [this_type, bitset_type] typedef</li>
+	</ul>
+      </li>
+    </ul>    
+
     <h3>v0.4.4 (July 24nd)</h3>
     <ul>
       <li><strong>New!</strong>
