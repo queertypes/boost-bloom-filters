@@ -181,7 +181,9 @@ namespace boost {
       void insert(const T& t)
       {
 	static const unsigned N = boost::mpl::size<hash_function_type>::value - 1;
-	detail::counting_apply_hash<N, this_type>::insert(t, this->bits);
+	detail::counting_apply_hash<N, this_type>::insert(t, 
+							  this->bits,
+							  this->num_bins());
       }
 
       template <typename InputIterator>
@@ -195,7 +197,9 @@ namespace boost {
       void remove(const T& t)
       {
 	static const unsigned N = boost::mpl::size<hash_function_type>::value - 1;
-	detail::counting_apply_hash<N, this_type>::remove(t, this->bits);
+	detail::counting_apply_hash<N, this_type>::remove(t, 
+							  this->bits,
+							  this->num_bins());
       }
 
       template <typename InputIterator>
@@ -209,8 +213,10 @@ namespace boost {
       bool probably_contains(const T& t) const
       {
 	static const unsigned N = mpl::size<HashFunctions>::value - 1;
-	return detail::counting_apply_hash<N, this_type>::contains(t,
-								   this->bits);
+	return detail::counting_apply_hash<N, 
+					   this_type>::contains(t,
+								this->bits,
+								this->num_bins());
       }
 
       //! auxiliary ops

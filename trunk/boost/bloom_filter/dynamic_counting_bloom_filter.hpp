@@ -74,36 +74,35 @@ namespace boost {
       typedef typename bucket_type::iterator bucket_iterator;
       typedef typename bucket_type::const_iterator bucket_const_iterator;
 
-      static const slot_bits = sizeof(block_type) * 8;
-      static const size_t default_num_bins = 10000;
+      static const size_t slot_bits = sizeof(block_type) * 8;
+      static const size_t default_num_bins = 32;
 
     private:
-      size_t bucket_size(const size_t num_bins) const {
-	const size_t bin_bits = num_bins * this->bits_per_bin();
+      size_t bucket_size(const size_t requested_bins) const {
+	const size_t bin_bits = requested_bins * BitsPerBin;
 	return bin_bits / slot_bits + 1;
       }
 
     public:
       //! constructors
       dynamic_counting_bloom_filter() 
-	: bits(bucket_size(default_num_bins))
+	: bits(bucket_size(default_num_bins)),
+	  _num_bins(default_num_bins)
       {
-	this->clear();
       }
 
-      explicit dynamic_counting_bloom_filter(const size_t num_bins)
-	: bits(bucket_size(num_bins))
+      explicit dynamic_counting_bloom_filter(const size_t requested_bins)
+	: bits(bucket_size(requested_bins)),
+	  _num_bins(requested_bins)
       {
-	this->clear();
       }
 
       template <typename InputIterator>
       dynamic_counting_bloom_filter(const InputIterator start, 
 				    const InputIterator end) 
-	: bits(bucket_size(std::distance(start, end) * 4))
+	: bits(bucket_size(std::distance(start, end) * 4)),
+	  _num_bins(std::distance(start, end) * 4)
       {
-	this->clear();
-
 	for (InputIterator i = start; i != end; ++i)
 	  this->insert(*i);
       }
@@ -111,7 +110,7 @@ namespace boost {
       //! meta functions
       size_t num_bins() const
       {
-	return NumBins;
+	return this->_num_bins;
       }
 
       static BOOST_CONSTEXPR size_t bits_per_bin()
@@ -143,7 +142,7 @@ namespace boost {
       {
         const double n = static_cast<double>(this->count());
         static const double k = static_cast<double>(num_hash_functions());
-        static const double m = static_cast<double>(NumBins);
+        static const double m = static_cast<double>(this->num_bins());
         static const double e =
 	  2.718281828459045235360287471352662497757247093699959574966;
         return std::pow(1 - std::pow(e, -k * n / m), k);
@@ -178,7 +177,10 @@ namespace boost {
       void insert(const T& t)
       {
 	static const unsigned N = boost::mpl::size<hash_function_type>::value - 1;
-	detail::counting_apply_hash<N, this_type>::insert(t, this->bits);
+	detail::counting_apply_hash<N, 
+				    this_type>::insert(t, 
+						       this->bits,
+						       this->num_bins());
       }
 
       template <typename InputIterator>
@@ -192,7 +194,10 @@ namespace boost {
       void remove(const T& t)
       {
 	static const unsigned N = boost::mpl::size<hash_function_type>::value - 1;
-	detail::counting_apply_hash<N, this_type>::remove(t, this->bits);
+	detail::counting_apply_hash<N, 
+				    this_type>::remove(t, 
+						       this->bits,
+						       this->num_bins());
       }
 
       template <typename InputIterator>
@@ -206,26 +211,30 @@ namespace boost {
       bool probably_contains(const T& t) const
       {
 	static const unsigned N = mpl::size<HashFunctions>::value - 1;
-	return detail::counting_apply_hash<N, this_type>::contains(t,
-								   this->bits);
+	return detail::counting_apply_hash<N, 
+					   this_type>::contains(t,
+								this->bits,
+								this->num_bins());
       }
 
       //! auxiliary ops
       void clear()
       {
-	this->bits.clear();
+	for (bucket_iterator i = bits.begin(), end = bits.end();
+	     i != end; ++i)
+	  *i = 0;
       }
 
-      void swap(counting_bloom_filter& other)
+      void swap(dynamic_counting_bloom_filter& other)
       {
-	counting_bloom_filter tmp = other;
+	dynamic_counting_bloom_filter tmp = other;
 	other = *this;
 	*this = tmp;
       }
 
       //! pairwise ops
-      counting_bloom_filter&
-      experimental_union_assign(const counting_bloom_filter& rhs)
+      dynamic_counting_bloom_filter&
+      experimental_union_assign(const dynamic_counting_bloom_filter& rhs)
       {
 	if (this->bit_capacity() != rhs.bit_capacity())
 	  throw detail::incompatible_size_exception();
@@ -241,8 +250,8 @@ namespace boost {
 	return *this;
       }
 
-      counting_bloom_filter&
-      experimental_intersect_assign(const counting_bloom_filter& rhs)
+      dynamic_counting_bloom_filter&
+      experimental_intersect_assign(const dynamic_counting_bloom_filter& rhs)
       {
 	if (this->bit_capacity() != rhs.bit_capacity())
 	  throw detail::incompatible_size_exception();
@@ -282,6 +291,7 @@ namespace boost {
 
     private:
       bucket_type bits;
+      size_t _num_bins;
     };
 
     // union

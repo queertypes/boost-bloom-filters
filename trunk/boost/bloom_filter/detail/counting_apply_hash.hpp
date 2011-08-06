@@ -44,17 +44,18 @@ namespace boost {
 	typedef typename boost::mpl::at_c<typename CBF::hash_function_type, 
 					  N>::type Hash;
 
+      public:
 	BloomOp(const typename CBF::value_type& t,
-		const typename CBF::bucket_type& slots)
+		const typename CBF::bucket_type& slots,
+		const size_t num_bins)
 	  :
-	  hash_val(hasher(t) % CBF::num_bins()),
+	  hash_val(hasher(t) % num_bins),
 	  pos(hash_val / CBF::bins_per_slot()),
 	  offset_bits((hash_val % CBF::bins_per_slot()) * CBF::bits_per_bin()),
 	  target_bits((slots[pos] >> offset_bits) & CBF::mask())
 	{}
 
-	void update(const typename CBF::value_type& t,
-		    typename CBF::bucket_type& slots,
+	void update(typename CBF::bucket_type& slots,
 		    const size_t limit) const {
 	  static Op op;
 
@@ -80,27 +81,30 @@ namespace boost {
       struct counting_apply_hash
       {
 	static void insert(const typename CBF::value_type& t, 
-			   typename CBF::bucket_type& slots)
+			   typename CBF::bucket_type& slots,
+			   const size_t num_bins)
 	{
-	  BloomOp<N, CBF, increment> inserter(t, slots);
-	  inserter.update(t, slots, (1ull << CBF::bits_per_bin()) - 1ull);
+	  BloomOp<N, CBF, increment> inserter(t, slots, num_bins);
+	  inserter.update(slots, (1ull << CBF::bits_per_bin()) - 1ull);
 
 	  counting_apply_hash<N-1, CBF>::insert(t, slots);
 	}
 
 	static void remove(const typename CBF::value_type& t, 
-			   typename CBF::bucket_type& slots)
+			   typename CBF::bucket_type& slots,
+			   const size_t num_bins)
 	{
-	  BloomOp<N, CBF, decrement> remover(t, slots);
-	  remover.update(t, slots, 0);
+	  BloomOp<N, CBF, decrement> remover(t, slots, num_bins);
+	  remover.update(slots, 0);
 
 	  counting_apply_hash<N-1, CBF>::remove(t, slots);
 	}
 
 	static bool contains(const typename CBF::value_type& t, 
-			     const typename CBF::bucket_type& slots)
+			     const typename CBF::bucket_type& slots,
+			   const size_t num_bins)
 	{
-	  BloomOp<N, CBF> checker(t, slots);
+	  BloomOp<N, CBF> checker(t, slots, num_bins);
 	  return (checker.check() && 
 		  counting_apply_hash<N-1, CBF>::contains(t, slots));
 	}
@@ -110,23 +114,26 @@ namespace boost {
       struct counting_apply_hash<0, CBF>
       {
 	static void insert(const typename CBF::value_type& t, 
-			   typename CBF::bucket_type& slots)
+			   typename CBF::bucket_type& slots,
+			   const size_t num_bins)
 	{
-	  BloomOp<0, CBF, increment> inserter(t, slots);
-	  inserter.update(t, slots, (1ull << CBF::bits_per_bin()) - 1ull);
+	  BloomOp<0, CBF, increment> inserter(t, slots, num_bins);
+	  inserter.update(slots, (1ull << CBF::bits_per_bin()) - 1ull);
 	}
 
 	static void remove(const typename CBF::value_type& t, 
-			   typename CBF::bucket_type& slots)
+			   typename CBF::bucket_type& slots,
+			   const size_t num_bins)
 	{
-	  BloomOp<0, CBF, decrement> remover(t, slots);
-	  remover.update(t, slots, 0);
+	  BloomOp<0, CBF, decrement> remover(t, slots, num_bins);
+	  remover.update(slots, 0);
 	}
 
 	static bool contains(const typename CBF::value_type& t, 
-			     const typename CBF::bucket_type& slots)
+			     const typename CBF::bucket_type& slots,
+			   const size_t num_bins)
 	{
-	  BloomOp<0, CBF> checker(t, slots);
+	  BloomOp<0, CBF> checker(t, slots, num_bins);
 	  return (checker.check());
 	}
       };
