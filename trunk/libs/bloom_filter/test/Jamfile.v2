@@ -25,5 +25,6 @@ project
 	[ run bloom-pass.cpp ]
 	[ run dynamic_bloom-pass.cpp ]
 	[ run counting_bloom-pass.cpp ]
+	[ run dynamic_counting_bloom-pass.cpp ]
         ;
 
