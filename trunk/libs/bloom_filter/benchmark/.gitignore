@@ -4,3 +4,4 @@ stdset_insert
 dynamic_bloom_insert
 meta_compare
 makefile
+perf_log
