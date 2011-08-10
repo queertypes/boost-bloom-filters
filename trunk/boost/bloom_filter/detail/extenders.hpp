@@ -26,7 +26,7 @@ namespace boost {
       template <>
       struct Power<0> {
 	static size_t power(const size_t val) {
-	  return 1;
+	  return 0 * val + 1;
 	}
       };
 
