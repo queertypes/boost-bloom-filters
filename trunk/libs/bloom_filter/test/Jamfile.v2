@@ -27,5 +27,6 @@ project
 	[ run counting_bloom-pass.cpp ]
 	[ run dynamic_counting_bloom-pass.cpp ]
 	[ run twohash_basic_bloom_filter-pass.cpp ]
+	[ run twohash_dynamic_basic_bloom_filter-pass.cpp ]
         ;
 
