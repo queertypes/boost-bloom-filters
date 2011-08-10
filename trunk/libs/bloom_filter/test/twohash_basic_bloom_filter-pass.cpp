@@ -38,6 +38,28 @@ BOOST_AUTO_TEST_CASE(defaultConstructor) {
 			     boost_hash<int, 0>, cube> cube_extender_bloom;
 }
 
+BOOST_AUTO_TEST_CASE(checkExtenders)
+{
+  using boost::bloom_filters::detail::zero;
+  using boost::bloom_filters::detail::square;
+  using boost::bloom_filters::detail::fourth;
+
+  twohash_basic_bloom_filter<int, 8, 2, 0, 
+			     boost_hash<int, 0>, 
+			     murmurhash3<int>, 
+			     zero> zero_extend_bloom;
+
+  twohash_basic_bloom_filter<int, 8, 2, 0, 
+			     boost_hash<int, 0>, 
+			     murmurhash3<int>, 
+			     square> square_extend_bloom;
+
+  twohash_basic_bloom_filter<int, 8, 2, 0, 
+			     boost_hash<int, 0>, 
+			     murmurhash3<int>, 
+			     fourth> fourth_extend_bloom;
+}
+
 BOOST_AUTO_TEST_CASE(rangeConstructor) {
   int elems[5] = {1,2,3,4,5};
   twohash_basic_bloom_filter<int, 8> bloom(elems, elems+5);
