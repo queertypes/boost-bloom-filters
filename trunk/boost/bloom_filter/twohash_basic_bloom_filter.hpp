@@ -17,8 +17,6 @@
 #include <bitset>
 
 #include <boost/config.hpp>
-#include <boost/mpl/vector.hpp>
-#include <boost/mpl/size.hpp>
 
 #include <boost/bloom_filter/hash/default.hpp>
 #include <boost/bloom_filter/hash/murmurhash3.hpp>
@@ -168,27 +166,6 @@ namespace boost {
 	       class _ExtensionFunction>
       friend bool
       operator==(const twohash_basic_bloom_filter<_T, 
-						  _Size,
-		                                  _HashValues, 
-						  _ExpectedInsertionCount,
-						  _HashFunction1,
-						  _HashFunction2,
-						  _ExtensionFunction>&,
-		 const twohash_basic_bloom_filter<_T, 
-						  _Size,
-		                                  _HashValues,
-						  _ExpectedInsertionCount,
-						  _HashFunction1,
-						  _HashFunction2,
-						  _ExtensionFunction>&);
-
-      template<class _T, size_t _Size, size_t _HashValues,
-	       size_t _ExpectedInsertionCount,
-	       class _HashFunction1,
-	       class _HashFunction2,
-	       class _ExtensionFunction>
-      friend bool
-      operator!=(const twohash_basic_bloom_filter<_T, 
 						  _Size,
 		                                  _HashValues, 
 						  _ExpectedInsertionCount,
