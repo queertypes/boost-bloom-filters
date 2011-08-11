@@ -91,7 +91,7 @@ namespace boost {
       typedef typename bucket_type::const_iterator bucket_const_iterator;
 
     private:
-      typedef detail::twohash_counting_apply_hash<HashValues - 1,
+      typedef detail::twohash_counting_apply_hash<HashValues,
 						  this_type> apply_hash_type;
 
     public:
@@ -157,7 +157,7 @@ namespace boost {
       double false_positive_rate() const 
       {
         const double n = static_cast<double>(this->count());
-        static const double k = static_cast<double>(num_hash_functions());
+        static const double k = static_cast<double>(HashValues);
         static const double m = static_cast<double>(NumBins);
         static const double e =
 	  2.718281828459045235360287471352662497757247093699959574966;

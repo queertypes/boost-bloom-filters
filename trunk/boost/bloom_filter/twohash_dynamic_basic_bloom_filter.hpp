@@ -55,6 +55,10 @@ namespace boost {
 
       static const size_t default_size = 32;
 
+    private:
+      typedef detail::twohash_apply_hash<HashValues,
+					 this_type> apply_hash_type;
+
     public:
       //* constructors
       twohash_dynamic_basic_bloom_filter()
@@ -121,8 +125,7 @@ namespace boost {
       //* core ops
       void insert(const T& t)
       {
-	detail::twohash_apply_hash<HashValues - 1, 
-				   this_type>::insert(t, bits);
+	apply_hash_type::insert(t, bits);
       }
 
       template <typename InputIterator>
@@ -135,8 +138,7 @@ namespace boost {
 
       bool probably_contains(const T& t) const
       {
-	return detail::twohash_apply_hash<HashValues - 1, 
-					  this_type>::contains(t, bits);
+	return apply_hash_type::contains(t, bits);
       }
 
       void clear()
