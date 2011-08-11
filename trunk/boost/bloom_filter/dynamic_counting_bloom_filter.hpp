@@ -173,6 +173,12 @@ namespace boost {
 	return this->count() == 0;
       }
 
+      const bucket_type&
+      data() const 
+      {
+	return this->bits;
+      }
+
       //! core ops
       void insert(const T& t)
       {

@@ -84,6 +84,12 @@ namespace boost {
 	return this->count() == 0;
       }
 
+      const bitset_type&
+      data() const
+      {
+	return this->bits;
+      }
+
       void insert(const T& t) {
         static const unsigned N = mpl::size<HashFunctions>::value - 1;
         detail::apply_hash<N, 
