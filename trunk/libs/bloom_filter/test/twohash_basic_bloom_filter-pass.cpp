@@ -62,14 +62,14 @@ BOOST_AUTO_TEST_CASE(checkExtenders)
 
 BOOST_AUTO_TEST_CASE(rangeConstructor) {
   int elems[5] = {1,2,3,4,5};
-  twohash_basic_bloom_filter<int, 8> bloom(elems, elems+5);
+  twohash_basic_bloom_filter<int, 8, 1> bloom(elems, elems+5);
 
   BOOST_CHECK_EQUAL(bloom.count(), 5ul);
 }
 
 #ifndef BOOST_NO_0X_HDR_INITIALIZER_LIST
 BOOST_AUTO_TEST_CASE(initListConstructor) {
-  twohash_basic_bloom_filter<int, 8> bloom = {1,2,3,4,5};
+  twohash_basic_bloom_filter<int, 8, 1> bloom = {1,2,3,4,5};
 
   BOOST_CHECK_EQUAL(bloom.count(), 5ul);
 }
@@ -148,22 +148,21 @@ BOOST_AUTO_TEST_CASE(falsePositiveRate) {
   BOOST_CHECK_EQUAL(bloom.false_positive_rate(), 0.0);
 
   bloom.insert(1);
-  BOOST_CHECK_CLOSE(bloom.false_positive_rate(), 0.00094659, .01);
-
-  bloom.insert(2);
   BOOST_CHECK_CLOSE(bloom.false_positive_rate(), 0.0036708, .01);
 
+  bloom.insert(2);
+  BOOST_CHECK_CLOSE(bloom.false_positive_rate(), 0.013807, .01); 
   bloom.insert(3);
-  BOOST_CHECK_CLOSE(bloom.false_positive_rate(), 0.0080084, .01);
+  BOOST_CHECK_CLOSE(bloom.false_positive_rate(), 0.029231, .01);
 
   bloom.insert(4);
-  BOOST_CHECK_CLOSE(bloom.false_positive_rate(), 0.013807, .01);
+  BOOST_CHECK_CLOSE(bloom.false_positive_rate(), 0.048929, .01);
 
   bloom.insert(5);
-  BOOST_CHECK_CLOSE(bloom.false_positive_rate(), 0.020925, .01);
+  BOOST_CHECK_CLOSE(bloom.false_positive_rate(), 0.072030, .01);
 
   bloom.insert(6);
-  BOOST_CHECK_CLOSE(bloom.false_positive_rate(), 0.029231, .01);
+  BOOST_CHECK_CLOSE(bloom.false_positive_rate(), 0.084619, .01);
 
   for (size_t i = 7; i < 5000; ++i)
     bloom.insert(i);
@@ -198,7 +197,7 @@ BOOST_AUTO_TEST_CASE(insertNoFalseNegatives) {
 
 BOOST_AUTO_TEST_CASE(rangeInsert) {
   int elems[5] = {1,2,3,4,5};
-  twohash_basic_bloom_filter<size_t, 8> bloom;
+  twohash_basic_bloom_filter<size_t, 8, 1> bloom;
 
   bloom.insert(elems, elems+5);
   BOOST_CHECK_EQUAL(bloom.count(), 5ul);
@@ -217,8 +216,8 @@ BOOST_AUTO_TEST_CASE(clear) {
 
 BOOST_AUTO_TEST_CASE(memberSwap) {
   size_t elems[5] = {1,2,3,4,5};
-  twohash_basic_bloom_filter<size_t, 8> bloom1(elems, elems+2);
-  twohash_basic_bloom_filter<size_t, 8> bloom2(elems+2, elems+5);
+  twohash_basic_bloom_filter<size_t, 8, 1> bloom1(elems, elems+2);
+  twohash_basic_bloom_filter<size_t, 8, 1> bloom2(elems+2, elems+5);
 
   bloom1.swap(bloom2);
 
@@ -293,8 +292,8 @@ BOOST_AUTO_TEST_CASE(testIntersectAssign) {
 
 BOOST_AUTO_TEST_CASE(globalSwap) {
   size_t elems[5] = {1,2,3,4,5};
-  twohash_basic_bloom_filter<size_t, 8> bloom1(elems, elems+2);
-  twohash_basic_bloom_filter<size_t, 8> bloom2(elems+2, elems+5);
+  twohash_basic_bloom_filter<size_t, 8, 1> bloom1(elems, elems+2);
+  twohash_basic_bloom_filter<size_t, 8, 1> bloom2(elems+2, elems+5);
 
   swap(bloom1, bloom2);
 

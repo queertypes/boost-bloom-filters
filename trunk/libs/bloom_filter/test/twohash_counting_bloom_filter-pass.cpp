@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE(defaultConstructor) {
 
 BOOST_AUTO_TEST_CASE(countSingle)
 {
-  twohash_counting_bloom_filter<int, 2> bloom;
+  twohash_counting_bloom_filter<int, 2, 4, 1> bloom;
   
   bloom.insert(1);
   BOOST_CHECK_EQUAL(bloom.count(), 1ul);
@@ -102,13 +102,13 @@ BOOST_AUTO_TEST_CASE(countSingle)
 
 BOOST_AUTO_TEST_CASE(countMulti)
 {
-  twohash_counting_bloom_filter<int, 100> bloom_default;
-  twohash_counting_bloom_filter<int, 100, 1> bloom1;
-  twohash_counting_bloom_filter<int, 100, 2> bloom2;
-  twohash_counting_bloom_filter<int, 100, 4> bloom4;
-  twohash_counting_bloom_filter<int, 100, 8> bloom8;
-  twohash_counting_bloom_filter<int, 100, 16> bloom16;
-  twohash_counting_bloom_filter<int, 100, 32> bloom32;
+  twohash_counting_bloom_filter<int, 400, 4, 1> bloom_default;
+  twohash_counting_bloom_filter<int, 400, 1, 1> bloom1;
+  twohash_counting_bloom_filter<int, 400, 2, 1> bloom2;
+  twohash_counting_bloom_filter<int, 400, 4, 1> bloom4;
+  twohash_counting_bloom_filter<int, 400, 8, 1> bloom8;
+  twohash_counting_bloom_filter<int, 400, 16, 1> bloom16;
+  twohash_counting_bloom_filter<int, 400, 32, 1> bloom32;
 
   for (size_t i = 0; i < 100; ++i) {
     bloom_default.insert(i);
@@ -181,7 +181,7 @@ BOOST_AUTO_TEST_CASE(countMulti)
 
 BOOST_AUTO_TEST_CASE(rangeConstructor) {
   int elems[5] = {1,2,3,4,5};
-  twohash_counting_bloom_filter<int, 5> bloom(elems, elems+5);
+  twohash_counting_bloom_filter<int, 5, 4, 1> bloom(elems, elems+5);
 
   BOOST_CHECK_EQUAL(bloom.count(), 5ul);
 }
@@ -252,32 +252,8 @@ BOOST_AUTO_TEST_CASE(numHashFunctions) {
   BOOST_CHECK_EQUAL(bloom_7h.num_hash_functions(), 7ul);
 }
 
-BOOST_AUTO_TEST_CASE(falsePositiveRate) {
-  twohash_counting_bloom_filter<size_t, 64> bloom;
-
-  BOOST_CHECK_EQUAL(bloom.false_positive_rate(), 0.0);
-
-  bloom.insert(1);
-  BOOST_CHECK_CLOSE(bloom.false_positive_rate(), 0.00094659, .01);
-
-  bloom.insert(2);
-  BOOST_CHECK_CLOSE(bloom.false_positive_rate(), 0.0036708, .01);
-
-  bloom.insert(3);
-  BOOST_CHECK_CLOSE(bloom.false_positive_rate(), 0.0080084, .01);
-
-  bloom.insert(4);
-  BOOST_CHECK_CLOSE(bloom.false_positive_rate(), 0.013807, .01);
-
-  bloom.insert(5);
-  BOOST_CHECK_CLOSE(bloom.false_positive_rate(), 0.020925, .01);
-
-  bloom.insert(6);
-  BOOST_CHECK_CLOSE(bloom.false_positive_rate(), 0.029231, .01);
-}
-
 BOOST_AUTO_TEST_CASE(probably_contains) {
-  twohash_counting_bloom_filter<size_t, 2> bloom;
+  twohash_counting_bloom_filter<size_t, 2, 4, 1> bloom;
 
   bloom.insert(1);
   BOOST_CHECK_EQUAL(bloom.probably_contains(1), true);
@@ -409,8 +385,8 @@ struct SwapFixture {
   }
 
   size_t elems[5];
-  twohash_counting_bloom_filter<size_t, 5> bloom1;
-  twohash_counting_bloom_filter<size_t, 5> bloom2;
+  twohash_counting_bloom_filter<size_t, 5, 4, 1> bloom1;
+  twohash_counting_bloom_filter<size_t, 5, 4, 1> bloom2;
 };
 
 BOOST_FIXTURE_TEST_CASE(memberSwap, SwapFixture) {
