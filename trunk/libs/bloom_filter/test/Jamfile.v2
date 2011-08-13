@@ -22,12 +22,16 @@ project
 
     test-suite "regression"
         :
-	[ run bloom-pass.cpp ]
-	[ run dynamic_bloom-pass.cpp ]
-	[ run counting_bloom-pass.cpp ]
-	[ run dynamic_counting_bloom-pass.cpp ]
+	[ run basic_bloom_filter-pass.cpp ]
+	[ run dynamic_bloom_filter-pass.cpp ]
+	[ run counting_bloom_filter-pass.cpp ]
+	[ run dynamic_counting_bloom_filter-pass.cpp ]
+        ;
+
+    test-suite "twohash_regression"
+        :
 	[ run twohash_basic_bloom_filter-pass.cpp ]
 	[ run twohash_dynamic_basic_bloom_filter-pass.cpp ]
 	[ run twohash_counting_bloom_filter-pass.cpp ]
+	[ run twohash_dynamic_counting_bloom_filter-pass.cpp ]
         ;
-
