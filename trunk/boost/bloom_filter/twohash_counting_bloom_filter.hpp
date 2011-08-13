@@ -38,7 +38,7 @@ namespace boost {
 	      size_t BitsPerBin = 4,
 	      size_t HashValues = 2,
 	      size_t ExpectedInsertionCount = 0,
-	      class HashFunction1 = boost_hash<T, 0>,
+	      class HashFunction1 = boost_hash<T>,
 	      class HashFunction2 = murmurhash3<T>,
 	      class ExtensionFunction = detail::square,
 	      typename Block = size_t>
@@ -132,6 +132,11 @@ namespace boost {
       static BOOST_CONSTEXPR size_t bits_per_bin()
       {
 	return BitsPerBin;
+      }
+
+      static BOOST_CONSTEXPR size_t expected_insertion_count()
+      {
+	return ExpectedInsertionCount;
       }
 
       static BOOST_CONSTEXPR size_t bins_per_slot()

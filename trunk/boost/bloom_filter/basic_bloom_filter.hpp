@@ -31,7 +31,7 @@ namespace boost {
   namespace bloom_filters {
     template <typename T,
 	      size_t Size,
-	      class HashFunctions = mpl::vector<boost_hash<T, 3> > >
+	      class HashFunctions = mpl::vector<boost_hash<T> > >
     class basic_bloom_filter {
     public:
       typedef T value_type;
@@ -40,6 +40,10 @@ namespace boost {
       typedef HashFunctions hash_function_type;
       typedef basic_bloom_filter<T, Size,
 				 HashFunctions> this_type;
+
+    private:
+      typedef detail::apply_hash<mpl::size<HashFunctions>::value - 1,
+				 this_type> apply_hash_type;
 
     public:
       basic_bloom_filter() {}
@@ -91,9 +95,7 @@ namespace boost {
       }
 
       void insert(const T& t) {
-        static const unsigned N = mpl::size<HashFunctions>::value - 1;
-        detail::apply_hash<N, 
-			   this_type>::insert(t, bits);
+        apply_hash_type::insert(t, bits);
       }
 
       template <typename InputIterator>
@@ -104,10 +106,7 @@ namespace boost {
       }
 
       bool probably_contains(const T& t) const {
-        static const unsigned N = mpl::size<HashFunctions>::value - 1;
-        return detail::
-	  apply_hash<N, 
-		     this_type>::contains(t, bits);
+        return apply_hash_type::contains(t, bits);
       }
 
       void clear() {

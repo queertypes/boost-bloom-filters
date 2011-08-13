@@ -20,7 +20,7 @@
 
 namespace boost {
   namespace bloom_filters {
-  template <typename T, size_t Seed>
+  template <typename T, size_t Seed = 0>
     struct boost_hash {
       size_t operator()(const T& t) {
         return boost::hash_value(t) + Seed;

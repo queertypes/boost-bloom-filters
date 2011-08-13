@@ -37,7 +37,7 @@ namespace boost {
     template <typename T,
 	      size_t NumBins,
 	      size_t BitsPerBin = 4,
-	      class HashFunctions = mpl::vector<boost_hash<T, 0> >,
+	      class HashFunctions = mpl::vector<boost_hash<T> >,
 	      typename Block = size_t>
     class counting_bloom_filter {
 
@@ -82,8 +82,12 @@ namespace boost {
       typedef typename bucket_type::iterator bucket_iterator;
       typedef typename bucket_type::const_iterator bucket_const_iterator;
 
+    private:
+      typedef detail::counting_apply_hash<mpl::size<HashFunctions>::value - 1,
+					  this_type> apply_hash_type;
+
     public:
-      //! constructors
+      //* constructors
       counting_bloom_filter() 
       {
 	this->clear();
@@ -111,7 +115,7 @@ namespace boost {
       }
 #endif
 
-      //! meta functions
+      //* meta functions
       static BOOST_CONSTEXPR size_t num_bins()
       {
 	return NumBins;
@@ -183,13 +187,12 @@ namespace boost {
 	return this->bits;
       }
 
-      //! core ops
+      //* core ops
       void insert(const T& t)
       {
-	static const unsigned N = boost::mpl::size<hash_function_type>::value - 1;
-	detail::counting_apply_hash<N, this_type>::insert(t, 
-							  this->bits,
-							  this->num_bins());
+	apply_hash_type::insert(t, 
+				this->bits,
+				this->num_bins());
       }
 
       template <typename InputIterator>
@@ -202,10 +205,9 @@ namespace boost {
 
       void remove(const T& t)
       {
-	static const unsigned N = boost::mpl::size<hash_function_type>::value - 1;
-	detail::counting_apply_hash<N, this_type>::remove(t, 
-							  this->bits,
-							  this->num_bins());
+	apply_hash_type::remove(t, 
+				this->bits,
+				this->num_bins());
       }
 
       template <typename InputIterator>
@@ -218,14 +220,12 @@ namespace boost {
 
       bool probably_contains(const T& t) const
       {
-	static const unsigned N = mpl::size<HashFunctions>::value - 1;
-	return detail::counting_apply_hash<N, 
-					   this_type>::contains(t,
-								this->bits,
-								this->num_bins());
+	return apply_hash_type::contains(t,
+					 this->bits,
+					 this->num_bins());
       }
 
-      //! auxiliary ops
+      //* auxiliary ops
       void clear()
       {
 	for (bucket_iterator i = bits.begin(), end = bits.end();
@@ -241,36 +241,7 @@ namespace boost {
 	*this = tmp;
       }
 
-      //! pairwise ops
-      counting_bloom_filter&
-      experimental_union_assign(const counting_bloom_filter& rhs)
-      {
-	bucket_iterator this_end = this->bits.end();
-	bucket_iterator this_start = this->bits.begin();
-	bucket_const_iterator rhs_start = rhs.bits.begin();
-
-	for (; this_start != this_end; ++this_start, ++rhs_start) {
-	  *this_start |= *rhs_start;
-	}
-
-	return *this;
-      }
-
-      counting_bloom_filter&
-      experimental_intersect_assign(const counting_bloom_filter& rhs)
-      {
-	bucket_iterator this_end = this->bits.end();
-	bucket_iterator this_start = this->bits.begin();
-	bucket_const_iterator rhs_start = rhs.bits.begin();
-
-	for (; this_start != this_end; ++this_start, ++rhs_start) {
-	  *this_start &= *rhs_start;
-	}
-
-	return *this;
-      }
-
-      // equality comparison operators
+      //* equality comparison operators
       template <typename _T, size_t _Bins, size_t _BitsPerBin,
 		typename _HashFns, typename _Block>
       friend bool
@@ -291,36 +262,6 @@ namespace boost {
     private:
       bucket_type bits;
     };
-
-    // union
-    template<class T, size_t NumBins, size_t BitsPerBin, class HashFunctions,
-	     typename Block>
-    counting_bloom_filter<T, NumBins, BitsPerBin, HashFunctions, Block>
-    experimental_union(const counting_bloom_filter<T, NumBins, BitsPerBin, 
-						   HashFunctions, Block>& lhs,
-		       const counting_bloom_filter<T, NumBins, BitsPerBin,
-						   HashFunctions, Block>& rhs)
-    {
-      counting_bloom_filter<T, NumBins, BitsPerBin, 
-			    HashFunctions, Block> ret(lhs);
-      ret.experimental_union_assign(rhs);
-      return ret;
-    }
-
-    // intersection
-    template<class T, size_t NumBins, size_t BitsPerBin, class HashFunctions,
-	     typename Block>
-    counting_bloom_filter<T, NumBins, BitsPerBin, HashFunctions, Block>
-    experimental_intersect(const counting_bloom_filter<T, NumBins, BitsPerBin, 
-						       HashFunctions, Block>& lhs,
-			   const counting_bloom_filter<T, NumBins, BitsPerBin,
-						       HashFunctions, Block>& rhs)
-    {
-      counting_bloom_filter<T, NumBins, BitsPerBin, 
-			    HashFunctions, Block> ret(lhs);
-      ret.experimental_intersect_assign(rhs);
-      return ret;
-    }
 
     template<class T, size_t NumBins, size_t BitsPerBin, class HashFunctions,
 	     typename Block>

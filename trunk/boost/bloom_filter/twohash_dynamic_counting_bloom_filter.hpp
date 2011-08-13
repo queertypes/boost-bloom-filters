@@ -18,24 +18,27 @@
 
 #include <boost/config.hpp>
 
-#include <boost/mpl/vector.hpp>
-#include <boost/mpl/size.hpp>
-
 #include <boost/static_assert.hpp>
 #include <boost/type_traits/is_integral.hpp>
 #include <boost/type_traits/is_unsigned.hpp>
 
-#include <boost/bloom_filter/detail/counting_apply_hash.hpp>
+#include <boost/bloom_filter/detail/twohash_counting_apply_hash.hpp>
+#include <boost/bloom_filter/detail/extenders.hpp>
 #include <boost/bloom_filter/hash/default.hpp>
+#include <boost/bloom_filter/hash/murmurhash3.hpp>
 
 namespace boost {
   namespace bloom_filters {
     template <typename T,
 	      size_t BitsPerBin = 4,
-	      class HashFunctions = mpl::vector<boost_hash<T> >,
+	      size_t HashValues = 2,
+	      size_t ExpectedInsertionCount = 0,
+	      class HashFunction1 = boost_hash<T>,
+	      class HashFunction2 = murmurhash3<T>,
+	      class ExtensionFunction = detail::square,
 	      typename Block = size_t,
 	      typename Allocator = std::allocator<Block> >
-    class dynamic_counting_bloom_filter {
+    class twohash_dynamic_counting_bloom_filter {
 
       // Block needs to be an integral type
       BOOST_STATIC_ASSERT( boost::is_integral<Block>::value == true);
@@ -63,46 +66,53 @@ namespace boost {
     public:
       typedef T value_type;
       typedef T key_type;
-      typedef HashFunctions hash_function_type;
+      typedef HashFunction1 hash_function1_type;
+      typedef HashFunction2 hash_function2_type;
+      typedef ExtensionFunction extension_function_type;
       typedef Block block_type;
       typedef Allocator allocator_type;
-      typedef dynamic_counting_bloom_filter<T, BitsPerBin, 
-					    HashFunctions, 
-					    Block, Allocator> this_type;
+      typedef twohash_dynamic_counting_bloom_filter<T, BitsPerBin,
+						    HashValues,
+						    ExpectedInsertionCount,
+						    HashFunction1,
+						    HashFunction2,
+						    ExtensionFunction,
+						    Block, Allocator> this_type;
 
       typedef std::vector<Block, Allocator> bucket_type;
       typedef typename bucket_type::iterator bucket_iterator;
       typedef typename bucket_type::const_iterator bucket_const_iterator;
 
-      static const size_t slot_bits = sizeof(block_type) * 8;
       static const size_t default_num_bins = 32;
 
     private:
+      static const size_t slot_bits = sizeof(block_type) * 8;
+
       size_t bucket_size(const size_t requested_bins) const {
 	const size_t bin_bits = requested_bins * BitsPerBin;
 	return bin_bits / slot_bits + 1;
       }
 
-      typedef detail::counting_apply_hash<mpl::size<HashFunctions>::value - 1,
-					  this_type> apply_hash_type;
+      typedef detail::twohash_counting_apply_hash<HashValues,
+						  this_type> apply_hash_type;
 
     public:
-      //* constructors
-      dynamic_counting_bloom_filter() 
+      //! constructors
+      twohash_dynamic_counting_bloom_filter() 
 	: bits(bucket_size(default_num_bins)),
 	  _num_bins(default_num_bins)
       {
       }
 
-      explicit dynamic_counting_bloom_filter(const size_t requested_bins)
+      explicit twohash_dynamic_counting_bloom_filter(const size_t requested_bins)
 	: bits(bucket_size(requested_bins)),
 	  _num_bins(requested_bins)
       {
       }
 
       template <typename InputIterator>
-      dynamic_counting_bloom_filter(const InputIterator start, 
-				    const InputIterator end) 
+      twohash_dynamic_counting_bloom_filter(const InputIterator start, 
+					    const InputIterator end) 
 	: bits(bucket_size(std::distance(start, end) * 4)),
 	  _num_bins(std::distance(start, end) * 4)
       {
@@ -110,10 +120,15 @@ namespace boost {
 	  this->insert(*i);
       }
 
-      //* meta functions
+      //! meta functions
       size_t num_bins() const
       {
 	return this->_num_bins;
+      }
+
+      static BOOST_CONSTEXPR size_t expected_insertion_count()
+      {
+	return ExpectedInsertionCount;
       }
 
       static BOOST_CONSTEXPR size_t bits_per_bin()
@@ -138,7 +153,7 @@ namespace boost {
 
       static BOOST_CONSTEXPR size_t num_hash_functions() 
       {
-        return mpl::size<HashFunctions>::value;
+        return HashValues;
       }
 
       double false_positive_rate() const 
@@ -182,7 +197,7 @@ namespace boost {
 	return this->bits;
       }
 
-      //* core ops
+      //! core ops
       void insert(const T& t)
       {
 	apply_hash_type::insert(t, 
@@ -220,7 +235,7 @@ namespace boost {
 					 this->num_bins());
       }
 
-      //* auxiliary ops
+      //! auxiliary ops
       void clear()
       {
 	for (bucket_iterator i = bits.begin(), end = bits.end();
@@ -228,65 +243,112 @@ namespace boost {
 	  *i = 0;
       }
 
-      void swap(dynamic_counting_bloom_filter& other)
+      void swap(twohash_dynamic_counting_bloom_filter& other)
       {
-	dynamic_counting_bloom_filter tmp = other;
+	twohash_dynamic_counting_bloom_filter tmp = other;
 	other = *this;
 	*this = tmp;
       }
 
-      //* equality comparison operators
+      // equality comparison operators
       template <typename _T, size_t _BitsPerBin,
-		typename _HashFns, typename _Block, typename _Allocator>
+		size_t _HashValues, size_t _ExpectedInsertionCount,
+		class _HashFn1, class _HashFn2, class _Extender,
+		typename _Block, class _Allocator>
       friend bool
-      operator==(const dynamic_counting_bloom_filter<_T, _BitsPerBin,
-						     _HashFns, _Block,
-						     _Allocator>& lhs,
-		 const dynamic_counting_bloom_filter<_T, _BitsPerBin,
-						     _HashFns, _Block,
-						     _Allocator>& rhs);
+      operator==(const twohash_dynamic_counting_bloom_filter<_T, _BitsPerBin,
+							     _HashValues,
+							     _ExpectedInsertionCount,
+							     _HashFn1,
+							     _HashFn2,
+							     _Extender,
+							     _Block,
+							     _Allocator>& lhs,
+		 const twohash_dynamic_counting_bloom_filter<_T, _BitsPerBin,
+							     _HashValues,
+							     _ExpectedInsertionCount,
+							     _HashFn1,
+							     _HashFn2,
+							     _Extender,
+							     _Block,
+							     _Allocator>& rhs);
 
       template <typename _T, size_t _BitsPerBin,
-		typename _HashFns, typename _Block, typename _Allocator>
+		size_t _HashValues, size_t _ExpectedInsertionCount,
+		class _HashFn1, class _HashFn2, class _Extender,
+		typename _Block, class _Allocator>
       friend bool
-      operator!=(const dynamic_counting_bloom_filter<_T, _BitsPerBin,
-						     _HashFns, _Block,
-						     _Allocator>& lhs,
-		 const dynamic_counting_bloom_filter<_T, _BitsPerBin,
-						     _HashFns, _Block,
-						     _Allocator>& rhs);
-
+      operator!=(const twohash_dynamic_counting_bloom_filter<_T, _BitsPerBin,
+							     _HashValues,
+							     _ExpectedInsertionCount,
+							     _HashFn1,
+							     _HashFn2,
+							     _Extender,
+							     _Block,
+							     _Allocator>& lhs,
+		 const twohash_dynamic_counting_bloom_filter<_T, _BitsPerBin,
+							     _HashValues,
+							     _ExpectedInsertionCount,
+							     _HashFn1,
+							     _HashFn2,
+							     _Extender,
+							     _Block,
+							     _Allocator>& rhs);
 
     private:
       bucket_type bits;
       size_t _num_bins;
     };
 
-    template<class T, size_t BitsPerBin, class HashFunctions,
-	     typename Block, typename Allocator>
+    template<class T, size_t BitsPerBin, size_t HashValues,
+	     size_t ExpectedInsertionCount,
+	     class HashFunction1, class HashFunction2,
+	     class ExtensionFunction, typename Block,
+	     class Allocator>
     void
-    swap(dynamic_counting_bloom_filter<T, BitsPerBin, 
-				       HashFunctions, Block,
-				       Allocator>& lhs,
-	 dynamic_counting_bloom_filter<T, BitsPerBin,
-				       HashFunctions, Block,
-				       Allocator>& rhs)
+    swap(twohash_dynamic_counting_bloom_filter<T, BitsPerBin,
+					       HashValues,
+					       ExpectedInsertionCount,
+					       HashFunction1,
+					       HashFunction2,
+					       ExtensionFunction,
+					       Block,
+					       Allocator>& lhs,
+	 twohash_dynamic_counting_bloom_filter<T, BitsPerBin,
+					       HashValues,
+					       ExpectedInsertionCount,
+					       HashFunction1,
+					       HashFunction2,
+					       ExtensionFunction,
+					       Block,
+					       Allocator>& rhs)
 
     {
       lhs.swap(rhs);
     }
 
-    template<class T, size_t BitsPerBin, class HashFunctions,
-	     typename Block, typename Allocator>
+    template<class T, size_t BitsPerBin, size_t HashValues,
+	     size_t ExpectedInsertionCount,
+	     class HashFunction1, class HashFunction2,
+	     class ExtensionFunction, typename Block,
+	     class Allocator>
     bool
-    operator==(const dynamic_counting_bloom_filter<T, BitsPerBin, 
-						   HashFunctions, 
-						   Block,
-						   Allocator>& lhs,
-	       const dynamic_counting_bloom_filter<T, BitsPerBin,
-						   HashFunctions, 
-						   Block,
-						   Allocator>& rhs)
+    operator==(const twohash_dynamic_counting_bloom_filter<T, BitsPerBin,
+							   HashValues,
+							   ExpectedInsertionCount,
+							   HashFunction1,
+							   HashFunction2,
+							   ExtensionFunction,
+							   Block,
+							   Allocator>& lhs,
+	       const twohash_dynamic_counting_bloom_filter<T, BitsPerBin,
+							   HashValues,
+							   ExpectedInsertionCount,
+							   HashFunction1,
+							   HashFunction2,
+							   ExtensionFunction,
+							   Block,
+							   Allocator>& rhs)
     {
       if (lhs.bit_capacity() != rhs.bit_capacity())
 	throw detail::incompatible_size_exception();
@@ -294,17 +356,28 @@ namespace boost {
       return (lhs.bits == rhs.bits);
     }
 
-    template<class T, size_t BitsPerBin, class HashFunctions,
-	     typename Block, typename Allocator>
+    template<class T, size_t BitsPerBin, size_t HashValues,
+	     size_t ExpectedInsertionCount,
+	     class HashFunction1, class HashFunction2,
+	     class ExtensionFunction, typename Block,
+	     class Allocator>
     bool
-    operator!=(const dynamic_counting_bloom_filter<T, BitsPerBin, 
-						   HashFunctions, 
-						   Block,
-						   Allocator>& lhs,
-	       const dynamic_counting_bloom_filter<T, BitsPerBin,
-						   HashFunctions, 
-						   Block,
-						   Allocator>& rhs)
+    operator!=(const twohash_dynamic_counting_bloom_filter<T, BitsPerBin,
+							   HashValues,
+							   ExpectedInsertionCount,
+							   HashFunction1,
+							   HashFunction2,
+							   ExtensionFunction,
+							   Block,
+							   Allocator>& lhs,
+	       const twohash_dynamic_counting_bloom_filter<T, BitsPerBin,
+							   HashValues,
+							   ExpectedInsertionCount,
+							   HashFunction1,
+							   HashFunction2,
+							   ExtensionFunction,
+							   Block,
+							   Allocator>& rhs)
     {
       if (lhs.bit_capacity() != rhs.bit_capacity())
 	throw detail::incompatible_size_exception();

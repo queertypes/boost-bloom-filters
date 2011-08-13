@@ -27,7 +27,7 @@
 namespace boost {
   namespace bloom_filters {
     template <typename T,
-	      class HashFunctions = mpl::vector<boost_hash<T, 3> >,
+	      class HashFunctions = mpl::vector<boost_hash<T> >,
 	      class Block = size_t,
 	      class Allocator = std::allocator<Block> >
     class dynamic_bloom_filter {
@@ -41,9 +41,13 @@ namespace boost {
       typedef dynamic_bloom_filter<T, HashFunctions,
 				   Block, Allocator> this_type;
 
+    private:
+      typedef detail::apply_hash<mpl::size<HashFunctions>::value - 1,
+				 this_type> apply_hash_type;
+
     public:
       
-      // constructors
+      //* constructors
       dynamic_bloom_filter() {}
       
       explicit dynamic_bloom_filter(const size_t bit_capacity) : 
@@ -58,7 +62,7 @@ namespace boost {
 	  this->insert(*i);
       }
 
-      // query functions
+      //* query functions
       static BOOST_CONSTEXPR size_t num_hash_functions() {
         return mpl::size<HashFunctions>::value;
       }
@@ -90,11 +94,9 @@ namespace boost {
 	return this->bits;
       }
 
-      // core operations
+      //* core operations
       void insert(const T& t) {
-        static const unsigned N = mpl::size<HashFunctions>::value - 1;
-        detail::apply_hash<N, this_type>::
-	  insert(t, bits);
+	apply_hash_type::insert(t, bits);
       }
 
       template <typename InputIterator>
@@ -105,13 +107,10 @@ namespace boost {
       }
 
       bool probably_contains(const T& t) const {
-        static const unsigned N = mpl::size<HashFunctions>::value - 1;
-        return detail::
-	  apply_hash<N, this_type>::
-	  contains(t, bits);
+	return apply_hash_type::contains(t, bits);
       }
 
-      // auxilliary operations
+      //* auxilliary operations
       void clear() {
         this->bits.reset();
       }

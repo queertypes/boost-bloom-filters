@@ -33,7 +33,7 @@ namespace boost {
 	      size_t Size,
 	      size_t HashValues = 2,
 	      size_t ExpectedInsertionCount = 0,
-	      class HashFunction1 = boost_hash<T, 0>,
+	      class HashFunction1 = boost_hash<T>,
 	      class HashFunction2 = murmurhash3<T>, 
 	      typename ExtensionFunction = detail::square>// = ???
     class twohash_basic_bloom_filter {
