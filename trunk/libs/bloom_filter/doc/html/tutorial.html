@@ -48,6 +48,7 @@
 	<li><a href="tut/querying.html">Querying Elements</a></li>
 	<li><a href="tut/removing.html">Removing Elements</a></li>
 	<li><a href="tut/joining.html">Intersections and Unions</a></li>
+	<li><a href="tut/two_hash.html">Double-Hashing Schemes and Two-Hash Bloom Filters</a></li>
 	<li><a href="tut/tips.html">Tips &amp; Best Practices</a></li>
       </ul>
     </div>
@@ -67,13 +68,20 @@
       Bloom filters also support the intersect and union operations. 
       The intersection of two Bloom filters represents the elements
       that are in both bloom filters. The union of two Bloom filters
-      represents the elements that are in either Bloom filter. 
+      represents the elements that are in either Bloom filter. Counting
+      bloom filters do not support union and intersection operations.
     </p>
 
     <h3>Types of Bloom Filters Provided</h3>
     <ul>
-      <li>Basic Bloom filter (<a href="reference/bloom.html">basic_bloom_filter</a>, <a href="reference/dynamic_bloom.html">dynamic_bloom_filter</a>)</li>
-      <li>Counting Bloom filter (<a href="reference/counting_bloom.html">counting_bloom_filter</a>)</li>
+      <li>Basic Bloom filter (<a href="reference/basic_bloom_filter.html">basic_bloom_filter</a>, 
+                              <a href="reference/dynamic_basic_bloom_filter.html">dynamic_bloom_filter</a>)</li>
+      <li>Counting Bloom filter (<a href="reference/counting_bloom_filter.html">counting_bloom_filter</a>, 
+                                 <a href="reference/dynamic_counting_bloom_filter.html">dynamic_counting_bloom_filter</a>)</li>
+      <li>Twohash basic Bloom filter (<a href="reference/twohash_basic_bloom_filter.html">twohash_basic_bloom_filter</a>, 
+                              <a href="reference/twohash_dynamic_basic_bloom_filter.html">twohash_dynamic_bloom_filter</a>)</li>
+      <li>Twohash counting Bloom filter (<a href="reference/twohash_counting_bloom_filter.html">twohash_counting_bloom_filter</a>, 
+                                 <a href="reference/twohash_dynamic_counting_bloom_filter.html">twohash_dynamic_counting_bloom_filter</a>)</li> 
     </ul>
 
     <hr/>
