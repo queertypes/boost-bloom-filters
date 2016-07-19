@@ -49,11 +49,11 @@ namespace boost {
 
     // forward declarations
     namespace detail {
-      void murmurhash3_x86_32 ( const void *const key, const size_t len,
+      static void murmurhash3_x86_32 ( const void *const key, const size_t len,
 				const size_t seed, const void * out );
-      void murmurhash3_x86_128 ( const void *const key, const size_t len,
+      static void murmurhash3_x86_128 ( const void *const key, const size_t len,
 				 const size_t seed, const void * out );
-      void murmurhash3_x64_128 ( const void *const key, const size_t len,
+      static void murmurhash3_x64_128 ( const void *const key, const size_t len,
 				 const size_t seed, const void * out );
       template <bool, bool> 
       struct murmurhash3_dispatch;
@@ -125,12 +125,12 @@ namespace boost {
       // Block read - if your platform needs to do endian-swapping or can only
       // handle aligned reads, do the conversion here
       
-      uint32_t getblock(const uint32_t *const p, const size_t i)
+      static uint32_t getblock(const uint32_t *const p, const size_t i)
       {
 	return p[i];
       }
       
-      uint64_t getblock(const uint64_t *const p, const size_t i)
+      static uint64_t getblock(const uint64_t *const p, const size_t i)
       {
 	return p[i];
       }
@@ -138,7 +138,7 @@ namespace boost {
       //-----------------------------------------------------------------------------
       // Finalization mix - force all bits of a hash block to avalanche
       
-      uint32_t fmix(const uint32_t val)
+      static uint32_t fmix(const uint32_t val)
       {
 	uint32_t h = val;
 
@@ -153,7 +153,7 @@ namespace boost {
 
       //----------
       
-      uint64_t fmix(const uint64_t val)
+      static uint64_t fmix(const uint64_t val)
       {
 	uint64_t k = val;
 
@@ -168,7 +168,7 @@ namespace boost {
 
       //-----------------------------------------------------------------------------
 
-      void murmurhash3_x86_32 ( const void *const key, const size_t len,
+      static void murmurhash3_x86_32 ( const void *const key, const size_t len,
 				const size_t seed, const void * out )
       {
 	const uint8_t *const data = static_cast<const uint8_t*>(key);
@@ -224,7 +224,7 @@ namespace boost {
 
       //-----------------------------------------------------------------------------
 
-      void murmurhash3_x86_128(const void *const key, const size_t len,
+      static void murmurhash3_x86_128(const void *const key, const size_t len,
 				 const size_t seed, const void *out )
       {
 	const uint8_t *const data = static_cast<const uint8_t*>(key);
@@ -329,7 +329,7 @@ namespace boost {
 
       //-----------------------------------------------------------------------------
 
-      void murmurhash3_x64_128(const void *const __restrict__ key, const size_t len,
+      static void murmurhash3_x64_128(const void *const __restrict__ key, const size_t len,
 			       const size_t seed, const void *__restrict__ out )
       {
 	const uint8_t *const __restrict__ data = static_cast<const uint8_t*>(key);
